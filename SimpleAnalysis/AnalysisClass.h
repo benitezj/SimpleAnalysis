@@ -199,6 +199,9 @@ class AnalysisClass
   static float sumObjectsPt(const AnalysisObjects& cands,
 			    unsigned int maxNum=10000,float ptCut=0);
 
+  static float sumObjectsM(const AnalysisObjects& cands,
+			    unsigned int maxNum=10000,float mCut=0);
+
   static void sortObjectsByPt(AnalysisObjects& cands);
   static float minDphi(const AnalysisObject &met, const AnalysisObjects& cands, unsigned int maxNum=10000, float ptCut=0);
   static float minDR(const AnalysisObjects& cands, unsigned int maxNum=10000, float ptCut=0);

@@ -68,12 +68,12 @@ void AnalysisClass::ntupVar(const std::string &label,AnalysisObjects &objects,bo
   if (saveMass) _output->ntupVar(label+"_m",mass);
   if (saveType) _output->ntupVar(label+"_type",type);
   _output->ntupVar(label+"_id",id);
-  
+
 }
 
 AnalysisObjects AnalysisClass::overlapRemoval(const AnalysisObjects &cands,
 					      const AnalysisObjects &others,
-					      std::function<float(const AnalysisObject&,const AnalysisObject&)> radiusFunc, 
+					      std::function<float(const AnalysisObject&,const AnalysisObject&)> radiusFunc,
 					      int passId) {
   AnalysisObjects reducedList;
 
@@ -92,7 +92,7 @@ AnalysisObjects AnalysisClass::overlapRemoval(const AnalysisObjects &cands,
 
 AnalysisObjects AnalysisClass::overlapRemoval(const AnalysisObjects &cands,
 					      const AnalysisObjects &others,
-					      float deltaR, 
+					      float deltaR,
 					      int passId) {
   return overlapRemoval(cands,others,
 			[deltaR] (const AnalysisObject& , const AnalysisObject&) {return deltaR;},
@@ -133,6 +133,13 @@ float AnalysisClass::sumObjectsPt(const AnalysisObjects& cands, unsigned int max
   return sum;
 }
 
+float AnalysisClass::sumObjectsM(const AnalysisObjects& cands, unsigned int maxNum, float mCut) {
+  float sum=0;
+  for(int ii=0; ii<std::min((int)maxNum, (int)cands.size());ii++)
+    if (cands[ii].M()>mCut) sum += cands[ii].M();
+  return sum;
+}
+
 struct pt_sort
 {
   bool operator() (const TLorentzVector& v1, const TLorentzVector& v2) const
@@ -159,7 +166,7 @@ float AnalysisClass::calcMT(const AnalysisObject& lepton, const AnalysisObject& 
 
 float AnalysisClass::calcMTmin(const AnalysisObjects& cands, const AnalysisObject& met, int maxNum) {
   float mtmin=1e9;
-  
+
   for(int ii=0; ii<std::min((int)maxNum, (int)cands.size());ii++)
     mtmin=std::min(mtmin,calcMT(cands[ii],met));
   return mtmin;
@@ -173,7 +180,7 @@ float AnalysisClass::calcMT2(const AnalysisObject &o1, const AnalysisObject &o2,
   mt2_bisect::mt2 mt2calculator;
   mt2calculator.set_momenta(patr, pbtr, pmisstr);
   mt2calculator.set_mn(0);
-  return mt2calculator.get_mt2();   
+  return mt2calculator.get_mt2();
 }
 
 float AnalysisClass::calcAMT2(const AnalysisObject &o1, const AnalysisObject &o2, const AnalysisObject &met, float m1, float m2) {
@@ -224,7 +231,7 @@ AnalysisObjects AnalysisClass::reclusterJets(const AnalysisObjects &jets, float 
   for(const auto& fat_jet : fat_jets) {
     if (ptfrac>=0) {
       fastjet::PseudoJet trimmed_jet=trimmer(fat_jet);
-      if (trimmed_jet.pt()>ptmin) 
+      if (trimmed_jet.pt()>ptmin)
 	fatJets.push_back(AnalysisObject(trimmed_jet.px(), trimmed_jet.py(), trimmed_jet.pz(), trimmed_jet.E(), 0, 0, COMBINED, 0));
     } else {
       fatJets.push_back(AnalysisObject(fat_jet.px(), fat_jet.py(), fat_jet.pz(), fat_jet.E(), 0, 0, COMBINED, 0));
