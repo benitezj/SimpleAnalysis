@@ -67,7 +67,7 @@ Bool_t SlimReaderSelector::Process(Long64_t entry)
     event->addFatJet(tlv,obj_id[5]->at(idx),idx);
   }
 
-  double weight=1;
+  double weight=EventWeight;
   _runner->processEvent(event,weight,EventNumber);
 
   delete event;

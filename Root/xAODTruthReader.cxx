@@ -242,7 +242,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     }
   }
 
-  double weight=1.;
+  double weight=eventInfo->mcEventWeight();
   _analysisRunner->processEvent(event,weight,eventNumber);
 
   delete event;

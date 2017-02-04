@@ -22,6 +22,7 @@ public :
 
    // Declaration of leaf types
    Int_t           EventNumber;
+   Float_t         EventWeight;
    Float_t         met_pt;
    Float_t         met_phi;
 
@@ -35,6 +36,7 @@ public :
 
    // List of branches
    TBranch        *b_EventNumber;   //!
+   TBranch        *b_EventWeight;   //!
    TBranch        *b_met_pt;   //!
    TBranch        *b_met_phi;   //!
    TBranch        *b_obj_pt[NUMTYPES];   //!
@@ -88,15 +90,17 @@ void SlimReaderSelector::Init(TTree *tree)
    obj_id[ii] = 0;
   }
   jet_m = 0;
+  fatjet_m = 0;
   // Set branch addresses and branch pointers
   if (!tree) return;
   fChain = tree;
   fChain->SetMakeClass(1);
   fChain->SetBranchAddress("Event", &EventNumber, &b_EventNumber);
+  fChain->SetBranchAddress("eventWeight", &EventWeight, &b_EventWeight);
   fChain->SetBranchAddress("met_pt", &met_pt, &b_met_pt);
   fChain->SetBranchAddress("met_phi", &met_phi, &b_met_phi);
   int idx=0;
-  std::vector<std::string> bNames({"el","mu","tau","photon","jet","fatjet"});
+  std::vector<std::string> bNames({"el","mu","tau","ph","jet","fatjet"});
   for(const auto& bName : bNames) {
     fChain->SetBranchAddress((bName+"_pt").c_str(),     &obj_pt[idx], &b_obj_pt[idx]);
     fChain->SetBranchAddress((bName+"_eta").c_str(),    &obj_eta[idx], &b_obj_eta[idx]);
