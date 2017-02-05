@@ -11,6 +11,7 @@ void NtupleMaker::ProcessEvent(AnalysisEvent *event)
   auto jets       = event->getJets(_minJetPt,5.2,0);
   auto fatjets    = event->getFatJets(_minFatJetPt,5.2,0);
   auto met        = event->getMET();
+  float sumet     = event->getSumET();
 
   ntupVar("el",electrons);
   ntupVar("mu",muons);
@@ -19,5 +20,6 @@ void NtupleMaker::ProcessEvent(AnalysisEvent *event)
   ntupVar("jet",jets,true);
   ntupVar("fatjet",fatjets,true);
   ntupVar("met",met);
+  ntupVar("sumet",sumet);
   return;
 }

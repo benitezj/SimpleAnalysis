@@ -7,14 +7,16 @@ input formats:
 *  slimmed ntuples (Reduced ntuples produced from above input :construction_worker:)
 
 It provides the analysis acceptance per control and signal region as well as 
-optionally histograms or ntuples with event level objects. It is foreseen that
-smearing of the truth-level objects will be possible :construction_worker:.
+optionally histograms or ntuples with event level objects. Smearing of the truth-level objects 
+can optionally be done using the latest upgrade performance smearing functions.
 
 ## Compiling:
 It should compile out-of-the-box on top of any recent AnalysisBase release 
 (tested in AnalysisBase,2.4.23):
 ```
  rcSetup Base,2.4.23
+ #The following line is optional and is only needed if one wants to enable smearing 
+ rc checkout_pkg $SVNOFF/PhysicsAnalysis/UpgradePhys/SmearingFunctions/UpgradePerformanceFunctions/tags
  rc find_packages
  rc compile
 ```
@@ -27,8 +29,10 @@ This will run the analyses specified with "-a" option (or all if not given)
 over all of the input files and provide acceptances in a text file for each 
 analysis ("analysisName.txt") and histograms in a root file ("analysisName.root").
 Ntuples can be activated by adding "-n", while the different outputs can be 
-merged in single text and root files by specifying "-o <name>". Finally
-the available analysis can be seen with the "-l" option.
+merged in single text and root files by specifying "-o <name>". 
+Smearing of the truth-level objects is enabled with the option "-s mu=200".
+It is foreseen that later different smearing functions will be supported.
+Finally the available analysis can be seen with the "-l" option.
 
 ### Submission on the grid:
 Submission to the grid is straightforward:

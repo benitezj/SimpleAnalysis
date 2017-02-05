@@ -23,6 +23,7 @@ public :
    // Declaration of leaf types
    Int_t           EventNumber;
    Float_t         EventWeight;
+   Float_t         sumet;
    Float_t         met_pt;
    Float_t         met_phi;
 
@@ -37,6 +38,7 @@ public :
    // List of branches
    TBranch        *b_EventNumber;   //!
    TBranch        *b_EventWeight;   //!
+   TBranch        *b_sumet;   //!
    TBranch        *b_met_pt;   //!
    TBranch        *b_met_phi;   //!
    TBranch        *b_obj_pt[NUMTYPES];   //!
@@ -97,6 +99,7 @@ void SlimReaderSelector::Init(TTree *tree)
   fChain->SetMakeClass(1);
   fChain->SetBranchAddress("Event", &EventNumber, &b_EventNumber);
   fChain->SetBranchAddress("eventWeight", &EventWeight, &b_EventWeight);
+  fChain->SetBranchAddress("sumet", &sumet, &b_sumet);
   fChain->SetBranchAddress("met_pt", &met_pt, &b_met_pt);
   fChain->SetBranchAddress("met_phi", &met_phi, &b_met_phi);
   int idx=0;

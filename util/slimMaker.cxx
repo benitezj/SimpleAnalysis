@@ -17,6 +17,7 @@ namespace po = boost::program_options;
 #include "SimpleAnalysis/OutputHandler.h"
 #include "SimpleAnalysis/AnalysisRunner.h"
 #include "SimpleAnalysis/NtupleMaker.h"
+#include "SimpleAnalysis/TruthSmear.h"
 
 static void splitCommaString(const std::string& names,std::vector<std::string>& result) {
   std::stringstream ss(names);
@@ -50,6 +51,7 @@ int main(int argc, char **argv) {
     ("minJetPt",  po::value<double>(&minJetPt), "Minimum jet pt [default: 15 GeV]")
     ("minFatJetPt",  po::value<double>(&minFatJetPt), "Minimum fat jet pt [default: 100 GeV]")
     ("input-files", po::value< vector<std::string> >(), "Comma-separated list of input files")
+    ("smear,s", po::value<std::string>(), "Comma-separated list smearing options (use help to see full list of options)")
     ;
   po::positional_options_description p;
   p.add("input-files", -1);
@@ -71,6 +73,13 @@ int main(int argc, char **argv) {
   std::cout<<"Files to slim: ";
   for(const auto& fileName: inputFileNames) std::cout<<fileName<<" ";
   std::cout<<std::endl;
+
+  TruthSmear *smearer=0;
+  if (vm.count("smear")) {
+    std::vector<std::string> smearingOptions;
+    splitCommaString(vm["smear"].as<std::string>(),smearingOptions);
+    smearer=new TruthSmear(smearingOptions);
+  }
 
   TFile *oRoot = new TFile((outputName).c_str(),"RECREATE");
 
@@ -99,8 +108,10 @@ int main(int argc, char **argv) {
     std::cerr<<"Unknown input format in: "<<inputFileNames[0]<<std::endl;
     return 2;
   }
+  reader->SetSmearing(smearer);
   reader->processFiles(inputFileNames);
   delete reader;
+  delete smearer;
 
   std::stringstream oFile;
   writer->getOutput()->saveRegions(oFile,true);

@@ -44,6 +44,8 @@ enum AnalysisMuonID {  MuLoose=1<<0,
 };
 
 enum AnalysisTauID { TauLoose=1<<0,
+		     TauOneProng=1<<10,
+		     TauThreeProng=1<<11,
 		     TauGood=TauLoose,
 		     TauIsoGood=TauGood};
 
@@ -107,6 +109,7 @@ public:
   virtual AnalysisObjects getJets(float ptCut,float etaCut,int btag=0)=0;
   virtual AnalysisObjects getFatJets(float ptCut,float etaCut,int btag=0)=0;
   virtual AnalysisObject  getMET()=0;
+  virtual float           getSumET()=0;
   virtual ~AnalysisEvent() {};
 };
 

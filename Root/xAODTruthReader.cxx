@@ -112,7 +112,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   }
   const xAOD::MissingET* met = (*metCont)["NonInt"];
   
-  TruthEvent* event=new TruthEvent(met->mpx()/1000.,met->mpy()/1000.); //TODO: we need "met->sumet()" for smearing functions
+  TruthEvent* event=new TruthEvent(met->sumet()/1000.,met->mpx()/1000.,met->mpy()/1000.);
   TLorentzVector tlv(0.,0.,0.,0.);
 
   int idx=0;
@@ -164,8 +164,10 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     if (tau->auxdata<char>("IsHadronicTau")) {
       int iso = getTruthType(tau)==MCTruthPartClassifier::IsoTau;
       tlv.SetPtEtaPhiM(tau->pt()/1000.,tau->eta(),tau->phi(),tau->m()/1000.);
-      event->addTau(tlv,tau->charge(),iso?TauIsoGood:0,idx++);
-      //TODO: do we need charge multiplicity from: tau->auxdata<unsigned long>("numCharged")
+      int tauId=iso?TauIsoGood:0;
+      if (tau->auxdata<unsigned long>("numCharged")==3) tauId|=TauThreeProng;
+      else tauId|=TauOneProng;
+      event->addTau(tlv,tau->charge(),tauId,idx++);
     }
   }
   

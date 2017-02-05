@@ -16,6 +16,7 @@ namespace po = boost::program_options;
 #include "SimpleAnalysis/AnalysisClass.h"
 #include "SimpleAnalysis/OutputHandler.h"
 #include "SimpleAnalysis/AnalysisRunner.h"
+#include "SimpleAnalysis/TruthSmear.h"
 
 static void splitCommaString(const std::string& names,std::vector<std::string>& result) {
   std::stringstream ss(names);
@@ -40,6 +41,7 @@ int main(int argc, char **argv) {
     ("listanalyses,l", "List available analyses and exit")
     ("input-files", po::value< vector<std::string> >(), "Comma-separated list of input files")
     ("ntuple,n", "Fill ntuple")
+    ("smear,s", po::value<std::string>(), "Comma-separated list smearing options (use help to see full list of options)")
     ;
   po::positional_options_description p;
   p.add("input-files", -1);
@@ -62,6 +64,13 @@ int main(int argc, char **argv) {
   }
   bool doNtuple = vm.count("ntuple");
   bool mergedOutput = vm.count("output");
+
+  TruthSmear *smearer=0;
+  if (vm.count("smear")) {
+    std::vector<std::string> smearingOptions;
+    splitCommaString(vm["smear"].as<std::string>(),smearingOptions);
+    smearer=new TruthSmear(smearingOptions);
+  }
 
   std::vector<std::string> inputFileNames;
   std::vector<std::string> analysisNames;
@@ -128,8 +137,10 @@ int main(int argc, char **argv) {
     std::cerr<<"Unknown input format in: "<<inputFileNames[0]<<std::endl;
     return 2;
   }
+  reader->SetSmearing(smearer);
   reader->processFiles(inputFileNames);
   delete reader;
+  delete smearer;
 
   std::ofstream oFile;
   if (mergedOutput) oFile.open(outputName+".txt");
@@ -142,6 +153,6 @@ int main(int argc, char **argv) {
     analysis->getOutput()->saveRegions(oFile,first);
     if (mergedOutput) first=false;
   }
-  
+
   return 0;
 }

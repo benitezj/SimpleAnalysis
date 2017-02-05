@@ -33,7 +33,7 @@ Bool_t OldSlimReaderSelector::Process(Long64_t entry)
     }
   }
   
-  TruthEvent* event=new TruthEvent(MET_Truth_NonInt_etx/1000.,MET_Truth_NonInt_ety/1000.);
+  TruthEvent* event=new TruthEvent(0,MET_Truth_NonInt_etx/1000.,MET_Truth_NonInt_ety/1000.); //FIXME: need sumet as well
   
   TLorentzVector tlv(0.,0.,0.,0.);
   for(int idx=0; idx<el_n; idx++) {

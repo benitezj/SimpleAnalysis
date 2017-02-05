@@ -7,7 +7,7 @@
 class TruthEvent : public AnalysisEvent
 {
  public:
- TruthEvent(double Ex, double Ey) :  _met(Ex,Ey,0,sqrt(Ex*Ex+Ey*Ey),0,0,MET,0) {};
+ TruthEvent(float sumet, double Ex, double Ey) : _sumet(sumet), _met(Ex,Ey,0,sqrt(Ex*Ex+Ey*Ey),0,0,MET,0) {};
   virtual AnalysisObjects getElectrons(float ptCut,float etaCut,int isolation) { return AnalysisClass::filterObjects( _baseElectrons, ptCut, etaCut, isolation); };
   virtual AnalysisObjects getMuons(float ptCut,float etaCut,int isolation)  { return AnalysisClass::filterObjects( _baseMuons, ptCut, etaCut, isolation); };
   virtual AnalysisObjects getTaus(float ptCut,float etaCut,int isolation) { return AnalysisClass::filterObjects( _baseTaus, ptCut, etaCut, isolation); };
@@ -15,6 +15,7 @@ class TruthEvent : public AnalysisEvent
   virtual AnalysisObjects getJets(float ptCut,float etaCut,int btag) { return AnalysisClass::filterObjects( _baseJets, ptCut, etaCut, btag); };
   virtual AnalysisObjects getFatJets(float ptCut,float etaCut,int btag) { return AnalysisClass::filterObjects( _baseFatJets, ptCut, etaCut, btag); };
   virtual AnalysisObject  getMET() { return _met; };
+  virtual float  getSumET() { return _sumet; };
   void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) { 
     _baseElectrons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,ELECTRON,idx));
   };
@@ -58,7 +59,8 @@ class TruthEvent : public AnalysisEvent
   AnalysisObjects _basePhotons;
   AnalysisObjects _baseJets;
   AnalysisObjects _baseFatJets;
-  AnalysisObject _met;
+  float           _sumet;
+  AnalysisObject  _met;
 
  public:
   void sortObjects() {
