@@ -3,8 +3,8 @@
 Holds a collections of SUSY analyses. These can be run over samples in different
 input formats:  
 *  DAOD_TRUTH      (TRUTH1 and TRUTH3 tested)  
-*  xAOD            (both truth and reco :construction_worker:)  
-*  slimmed ntuples (Reduced ntuples produced from above input :construction_worker:)
+*  xAOD            (either truth-level and or reco-level - the latter with some constraints)  
+*  slimmed ntuples (Reduced ntuples produced from above input)
 
 It provides the analysis acceptance per control and signal region as well as 
 optionally histograms or ntuples with event level objects. Smearing of the truth-level objects 
@@ -12,9 +12,9 @@ can optionally be done using the latest upgrade performance smearing functions.
 
 ## Compiling:
 It should compile out-of-the-box on top of any recent AnalysisBase release 
-(tested in AnalysisBase,2.4.23):
+(tested in AnalysisBase,2.4.28):
 ```
- rcSetup Base,2.4.23
+ rcSetup Base,2.4.28
  #The following line is optional and is only needed if one wants to enable smearing 
  rc checkout_pkg $SVNOFF/PhysicsAnalysis/UpgradePhys/SmearingFunctions/UpgradePerformanceFunctions/tags
  rc find_packages
@@ -32,6 +32,9 @@ Ntuples can be activated by adding "-n", while the different outputs can be
 merged in single text and root files by specifying "-o <name>". 
 Smearing of the truth-level objects is enabled with the option "-s mu=200".
 It is foreseen that later different smearing functions will be supported.
+If "-r" is specified, it will try to use reco-level objects instead of truth-level.
+This allows to compare directly to the standard analysis results, though no
+trigger efficiencies etc. are applied and overall this is still experimental.
 Finally the available analysis can be seen with the "-l" option.
 
 ### Submission on the grid:

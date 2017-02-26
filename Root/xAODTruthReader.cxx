@@ -170,7 +170,8 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
       event->addTau(tlv,tau->charge(),tauId,idx++);
     }
   }
-  
+
+  idx=0;
   const xAOD::TruthParticleContainer* truthphotons = 0;
   std::string photonName="TruthPhotons";
   if ( !xaodEvent->contains<xAOD::TruthParticleContainer>(photonName)) photonName="Truth3Photons";
@@ -203,7 +204,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     int flavor=0;
     if (jet->isAvailable<int>("PartonTruthLabelID"))
       flavor=abs(jet->auxdata<int>("PartonTruthLabelID"));
-    else {
+    else if (jet->isAvailable<int>("GhostBHadronsFinalCount")) {
       if (jet->auxdata<int>("GhostBHadronsFinalCount")) {
 	flavor=5;
       } else if (jet->auxdata<int>("GhostCHadronsFinalCount")) {

@@ -13,6 +13,7 @@ namespace po = boost::program_options;
 #include "SimpleAnalysis/SlimReader.h"
 #include "SimpleAnalysis/OldSlimReader.h"
 #include "SimpleAnalysis/xAODTruthReader.h"
+#include "SimpleAnalysis/xAODRecoReader.h"
 #include "SimpleAnalysis/AnalysisClass.h"
 #include "SimpleAnalysis/OutputHandler.h"
 #include "SimpleAnalysis/AnalysisRunner.h"
@@ -51,6 +52,7 @@ int main(int argc, char **argv) {
     ("minJetPt",  po::value<double>(&minJetPt), "Minimum jet pt [default: 15 GeV]")
     ("minFatJetPt",  po::value<double>(&minFatJetPt), "Minimum fat jet pt [default: 100 GeV]")
     ("input-files", po::value< vector<std::string> >(), "Comma-separated list of input files")
+    ("readReco,r", "Use reconstructed quantities instead of truth")
     ("smear,s", po::value<std::string>(), "Comma-separated list smearing options (use help to see full list of options)")
     ;
   po::positional_options_description p;
@@ -103,7 +105,11 @@ int main(int argc, char **argv) {
     reader=new SlimReader(analysisList);
   } else if (fh->FindKey("CollectionTree")) {
     std::cout<<"Reading xAOD input"<<std::endl;
-    reader=new xAODTruthReader(analysisList);
+    if (vm.count("readReco")) {
+      std::cout<<" using reconstructed quantities"<<std::endl;
+      reader=new xAODRecoReader(analysisList);
+    } else 
+      reader=new xAODTruthReader(analysisList);
   } else {
     std::cerr<<"Unknown input format in: "<<inputFileNames[0]<<std::endl;
     return 2;

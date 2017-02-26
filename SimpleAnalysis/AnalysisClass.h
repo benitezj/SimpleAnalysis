@@ -17,41 +17,55 @@ enum AnalysisElectronID { EVeryLooseLH=1<<0,
 			  ELooseLH=1<<1,
 			  EMediumLH=1<<2,
 			  ETightLH=1<<3,
+			  ELooseBLLH=1<<4,
 			  EIsoGradientLoose=1<<8,
 			  EIsoBoosted=1<<9, // from 3-bjet paper
 			  EIsoFixedCutTight=1<<10,
 			  EIsoLooseTrack=1<<11,
+			  EIsoLoose=1<<12,
+			  EIsoGradient=1<<13,
+			  EIsoFixedCutLoose=1<<14,
+			  EIsoFixedCutTightTrackOnly=1<<15,
 			  ED0Sigma5=1<<16,
 			  EZ05mm=1<<17,
-			  EGood=EVeryLooseLH|ELooseLH|EMediumLH|ETightLH|ED0Sigma5|EZ05mm,
-			  EIsoGood=EGood|EIsoGradientLoose|EIsoBoosted|EIsoFixedCutTight|EIsoLooseTrack
+			  EGood=EVeryLooseLH|ELooseLH|EMediumLH|ETightLH|ELooseBLLH|ED0Sigma5|EZ05mm,
+			  EIsoGood=EGood|EIsoGradientLoose|EIsoBoosted|EIsoFixedCutTight|EIsoLooseTrack|EIsoLoose|EIsoGradient|EIsoFixedCutLoose|EIsoFixedCutTightTrackOnly
 };
 
 enum AnalysisMuonID {  MuLoose=1<<0,
 		       MuMedium=1<<1,
 		       MuTight=1<<2,
+		       MuVeryLoose=1<<3,
 		       MuIsoGradientLoose=1<<8,
 		       MuIsoBoosted=1<<9, // from 3-bjet paper
 		       MuIsoFixedCutTightTrackOnly=1<<10,
 		       MuIsoLooseTrack=1<<11,
+		       MuIsoLoose=1<<12,
+		       MuIsoGradient=1<<13,
+		       MuIsoFixedCutLoose=1<<14,
 		       MuD0Sigma3=1<<16,
 		       MuZ05mm=1<<17,
 		       MuNotCosmic=1<<18,
 		       MuQoPSignificance=1<<19,
 		       MuCaloTaggedOnly=1<<20,
-		       MuGood=MuLoose|MuMedium|MuTight|MuD0Sigma3|MuZ05mm|MuNotCosmic|MuQoPSignificance,
+		       MuGood=MuLoose|MuMedium|MuTight|MuVeryLoose|MuD0Sigma3|MuZ05mm|MuNotCosmic|MuQoPSignificance,
 		       MuIsoGood=MuGood|MuIsoGradientLoose|MuIsoBoosted|MuIsoFixedCutTightTrackOnly|MuIsoLooseTrack
 };
 
 enum AnalysisTauID { TauLoose=1<<0,
+		     TauMedium=1<<1,
+		     TauTight=1<<2,
 		     TauOneProng=1<<10,
 		     TauThreeProng=1<<11,
-		     TauGood=TauLoose,
+		     TauGood=TauLoose|TauMedium|TauTight,
 		     TauIsoGood=TauGood};
 
 enum AnalysisPhotonID { PhotonLoose=1<<0,
-		     PhotonGood=PhotonLoose,
-		     PhotonIsoGood=PhotonGood};
+			PhotonTight=1<<1,
+			PhotonIsoFixedCutLoose=1<<8,
+			PhotonIsoFixedCutTight=1<<9,
+			PhotonGood=PhotonLoose|PhotonTight,
+			PhotonIsoGood=PhotonGood|PhotonIsoFixedCutLoose|PhotonIsoFixedCutTight};
 
 enum AnalysisJetID { LooseBadJet=1<<8,
 		     TightBadJet=1<<9,
@@ -62,7 +76,12 @@ enum AnalysisJetID { LooseBadJet=1<<8,
 		     BTag80MV2c20=1<<1,
 		     BTag77MV2c20=1<<2,
 		     BTag70MV2c20=1<<3,
-		     GoodBJet=BTag85MV2c20|BTag80MV2c20|BTag77MV2c20|BTag70MV2c20|GoodJet,
+		     BTag85MV2c10=1<<4,
+		     BTag77MV2c10=1<<5,
+		     BTag70MV2c10=1<<6,
+		     BTag60MV2c10=1<<7,
+		     GoodBJet=BTag85MV2c20|BTag80MV2c20|BTag77MV2c20|BTag70MV2c20|
+		              BTag85MV2c10|BTag77MV2c10|BTag70MV2c10|BTag60MV2c10|GoodJet,
 };
 
 enum AnalysisFatJetID { LooseFatJet=1<<8,
