@@ -78,5 +78,10 @@ void ExampleAnalysis::ProcessEvent(AnalysisEvent *event)
   ntupVar("nBjets",nBjets);
   ntupVar("signalJets",signalJets); // or even a list of objects (or single object)
   if (nBjets>0) ntupVar("leadingBjet",bjets[0]);
+
+  //The following calls might disappear again once their use 
+  //is better understood and can be incorporated in the framework
+  ntupVar("susyProcess",event->getSUSYChannel());
+  ntupVar("mcDSID",event->getMCNumber());
   return;
 }

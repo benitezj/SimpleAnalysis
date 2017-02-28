@@ -28,7 +28,8 @@ Bool_t SlimReaderSelector::Process(Long64_t entry)
 
  
   TruthEvent* event=new TruthEvent(sumet,met_pt*cos(met_phi),met_pt*sin(met_phi));
-  
+  event->setChannelInfo(mcChannel,susyChannel);
+
   TLorentzVector tlv(0.,0.,0.,0.);
   for(unsigned int idx=0; idx<obj_pt[0]->size(); idx++) {
     tlv.SetPtEtaPhiM(obj_pt[0]->at(idx),

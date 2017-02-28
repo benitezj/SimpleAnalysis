@@ -21,5 +21,7 @@ void NtupleMaker::ProcessEvent(AnalysisEvent *event)
   ntupVar("fatjet",fatjets,true);
   ntupVar("met",met);
   ntupVar("sumet",sumet);
+  ntupVar("mcChannel",event->getMCNumber());
+  ntupVar("susyChannel",event->getSUSYChannel());
   return;
 }

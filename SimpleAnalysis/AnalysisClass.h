@@ -129,6 +129,8 @@ public:
   virtual AnalysisObjects getFatJets(float ptCut,float etaCut,int btag=0)=0;
   virtual AnalysisObject  getMET()=0;
   virtual float           getSumET()=0;
+  virtual int             getMCNumber()=0; //Temporary until better solution found
+  virtual int             getSUSYChannel()=0; //Temporary until better solution found
   virtual ~AnalysisEvent() {};
 };
 

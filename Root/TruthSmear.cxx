@@ -88,6 +88,8 @@ TruthEvent *TruthSmear::smearEvent(AnalysisEvent *event) {
     met_y = smearedMET.second/1000.;
   }
   TruthEvent* smeared=new TruthEvent(sumet,met_x,met_y);
+  smeared->setChannelInfo(event->getMCNumber(),event->getSUSYChannel());
+
   int idx=0;
   for(const auto& electron : electrons) {
     if (smearElectrons){

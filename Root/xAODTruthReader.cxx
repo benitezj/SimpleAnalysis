@@ -87,9 +87,11 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     throw std::runtime_error("Cannot read EventInfo");
   }
   int eventNumber = eventInfo->eventNumber();
+  int mcChannel   = eventInfo->mcChannelNumber();
+  if (mcChannel==0) mcChannel = eventInfo->runNumber();
   int susy_part_id1 = 0;
   int susy_part_id2 = 0;
-  //int susy_process  = 0;
+  int susy_process  = 0;
   
   const xAOD::TruthParticleContainer* truthparticles = 0;
   if ( xaodEvent->contains<xAOD::TruthParticleContainer>("TruthParticles")) {
@@ -104,7 +106,8 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   _susytools->FindSusyHardProc(truthparticles,susy_part_id1,susy_part_id2);
   if (susy_part_id2==0 && truthparticles->size()>1) susy_part_id2=truthparticles->at(1)->pdgId();
   if (susy_part_id1==0 && truthparticles->size()) susy_part_id1=truthparticles->at(0)->pdgId();
-  //susy_process = SUSY::finalState(susy_part_id1,susy_part_id2);
+  if ((abs(susy_part_id1)>1000000) && (abs(susy_part_id1)>1000000)) //only consider BSM particles
+    susy_process = SUSY::finalState(susy_part_id1,susy_part_id2);
   
   const xAOD::MissingETContainer* metCont = 0;
   if ( !xaodEvent->retrieve(metCont, "MET_Truth").isSuccess() ){
@@ -113,6 +116,8 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   const xAOD::MissingET* met = (*metCont)["NonInt"];
   
   TruthEvent* event=new TruthEvent(met->sumet()/1000.,met->mpx()/1000.,met->mpy()/1000.);
+  event->setChannelInfo(mcChannel,susy_process);
+
   TLorentzVector tlv(0.,0.,0.,0.);
 
   int idx=0;
