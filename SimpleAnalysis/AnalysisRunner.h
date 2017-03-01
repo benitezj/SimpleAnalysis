@@ -18,7 +18,7 @@ class AnalysisRunner
   void SetSmearing(TruthSmear *smear) { _smear=smear; };
   void SetMCWeightIndex(int mcwidx) { _mcwindex=mcwidx; };
 
-  float getMCWeightIndex(){ return _mcwindex; };
+  int getMCWeightIndex(){ return _mcwindex; };
 
   void processEvent(TruthEvent *event,double weight,int eventNumber) { 
     if (_smear) event = _smear->smearEvent(event);
@@ -35,7 +35,7 @@ class AnalysisRunner
  private:
   std::vector<AnalysisClass*>& _analysisList;
   TruthSmear *_smear;
-  float _mcwindex;
+  int _mcwindex;
 };
 
 class Reader
