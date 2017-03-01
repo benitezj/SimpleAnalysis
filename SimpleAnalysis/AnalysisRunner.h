@@ -16,8 +16,17 @@ class AnalysisRunner
   void init() { for(const auto& analysis : _analysisList) analysis->Init(); };
   void final() { for(const auto& analysis : _analysisList) analysis->Final(); };
   void SetSmearing(TruthSmear *smear) { _smear=smear; };
-  void processEvent(TruthEvent *event,double weight,int eventNumber) { 
+  void SetMCWeightIndex(int mcwidx) { _mcwindex=mcwidx; };
+
+  int getMCWeightIndex(){ return _mcwindex; };
+
+  void processEvent(TruthEvent *event,int eventNumber) { 
     if (_smear) event = _smear->smearEvent(event);
+    double weight = 1.;
+    if (_mcwindex >= int(event->getMCWeights().size())){
+      throw std::runtime_error("The specified MC weight index is out of range! ");
+    }
+    if (_mcwindex>=0) weight = event->getMCWeights()[_mcwindex];
     event->sortObjects();
     for(const auto& analysis : _analysisList) {
       analysis->getOutput()->setEventWeight(weight);
@@ -31,6 +40,7 @@ class AnalysisRunner
  private:
   std::vector<AnalysisClass*>& _analysisList;
   TruthSmear *_smear;
+  int _mcwindex;
 };
 
 class Reader
@@ -39,6 +49,10 @@ class Reader
   Reader(std::vector<AnalysisClass*>& analysisList) {_analysisRunner=new AnalysisRunner(analysisList); }
   virtual ~Reader() {};
   virtual void SetSmearing(TruthSmear *smear) { _analysisRunner->SetSmearing(smear); };
+  virtual void SetMCWeightIndex(int mcwidx) { _analysisRunner->SetMCWeightIndex(mcwidx); };
+
+  virtual int getMCWeightIndex(){ return _analysisRunner->getMCWeightIndex(); };
+
   virtual void processFiles(const std::vector<std::string>& inputNames) {
     _analysisRunner->init();
     processFilesInternal(inputNames);

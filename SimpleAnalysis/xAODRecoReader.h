@@ -38,11 +38,12 @@ class xAODRecoReader : public Reader {
  protected:
   bool processEvent(xAOD::TEvent *event,xAOD::TStore *store);
   void processFilesInternal(const std::vector<std::string>& inputNames);
+  int getTruthOrigin(const xAOD::TruthParticle *part);
   int getTruthType(const xAOD::TruthParticle *part);
   xAOD::TruthParticleContainer* findTruthParticles(xAOD::TStore *store,
 						   const xAOD::TruthParticleContainer* truthparticles,
-						   int pdgId, int status=1);
-
+						   std::vector<int> pdgIds, int status=1);
+  
  private:
   ST::SUSYObjDef_xAOD *_susytools;
   AsgElectronLikelihoodTool* _ElecVeryLooseLH;

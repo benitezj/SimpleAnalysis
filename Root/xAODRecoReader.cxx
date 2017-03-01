@@ -45,7 +45,13 @@ using std::vector;
       throw std::runtime_error("Failed in call: "#EXP);   \
     }                                                \
   } while(0)
-  
+
+#define WARN_ONCE(warning)          \
+  do {                              \
+    static bool first=true;         \
+    if (first) std::cout<<warning<<std::endl; \
+    first=false;                              \
+  } while(0)
 
 static AsgElectronLikelihoodTool* initElecLH(std::string WP) {
   AsgElectronLikelihoodTool* LHTool = new AsgElectronLikelihoodTool(WP);
@@ -81,6 +87,10 @@ static TauAnalysisTools::TauSelectionTool* initTauSel(std::string WP) {
   CHECK(tool->initialize());
   return tool;
 }
+
+static SG::AuxElement::Accessor<float> acc_filtHT("GenFiltHT");
+static SG::AuxElement::Accessor<float> acc_filtMET("GenFiltMET");
+
 
 xAODRecoReader::xAODRecoReader(std::vector<AnalysisClass*>& analysisList) : Reader(analysisList)
 {
@@ -431,8 +441,40 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
     }
   }
 
-  double weight=eventInfo->mcEventWeight();
-  _analysisRunner->processEvent(event,weight,eventNumber);
+
+  //Generator Filter HT (e.g. for ttbar/singleTop samples)
+  float gen_ht=0.;
+  if ( acc_filtHT.isAvailable(*(eventInfo)) ){
+    gen_ht = eventInfo->auxdata<float>("GenFiltHT");
+  }
+  else{
+    WARN_ONCE("Warning : No GenFiltHT decoration available. Setting HT to 0 for now...");
+  }
+  event->setGenHT( gen_ht/1000. );
+
+
+  //Generator Filter MET (e.g. for ttbar/singleTop samples)
+  float gen_met=0.;
+  if ( acc_filtMET.isAvailable(*(eventInfo)) ) 
+    gen_met = eventInfo->auxdata<float>("GenFiltMET");
+  else
+    WARN_ONCE("Warning : No GenFiltMETT decoration available. Setting MET to 0 for now...");
+  //TODO : implement GenMET building from TruthParticle container as in xAODTruthReader //M.T.
+  //...
+
+  event->setGenMET( gen_met/1000. );
+
+
+  //Get LHE3 weights                                                                                                                                                              
+  const xAOD::TruthEventContainer* truthEvtCont;
+  if( !xaodEvent->retrieve( truthEvtCont, "TruthEvents").isSuccess() )
+    throw std::runtime_error("Could not retrieve truth event container with key TruthEvents");
+  const xAOD::TruthEvent *truthevent = (*truthEvtCont)[0];
+  const std::vector<float> weights  = truthevent->weights();
+
+  event->setMCWeights(weights);
+
+  _analysisRunner->processEvent(event,eventNumber);
 
   delete event;
   return true;

@@ -35,6 +35,9 @@ It is foreseen that later different smearing functions will be supported.
 If "-r" is specified, it will try to use reco-level objects instead of truth-level.
 This allows to compare directly to the standard analysis results, though no
 trigger efficiencies etc. are applied and overall this is still experimental.
+Events are normally weighted by their event-by-event weights. In case of samples
+with multiple weights, for instance from PDF variations, the applied event weight
+can be chosen by "-w <number>". The weighting can be disabled by "-w -1".
 Finally the available analysis can be seen with the "-l" option.
 
 ### Submission on the grid:
