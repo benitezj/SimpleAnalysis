@@ -121,6 +121,8 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   if(channel_number==410002 && gen_ht>600) return;
   if(channel_number==410003 && gen_ht>600) return;
   if(channel_number==410004 && gen_ht>600) return;
+  if(channel_number==407018 && gen_ht>500) return;
+  if(channel_number==407020 && gen_ht>500) return;
 
   // baseline electrons are requested to pass the loose likelihood identification criteria
   //    and have pT > 20 GeV and |eta| < 2.47
