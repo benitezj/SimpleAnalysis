@@ -63,9 +63,8 @@ Bool_t OldSlimReaderSelector::Process(Long64_t entry)
     event->addJet(tlv,(abs(jet_AntiKt4TruthJets_flavor->at(idx))==5)?GoodBJet:GoodJet,idx);
   }
   //TODO: Add photons and fat jets
-
-  double weight=1;
-  _runner->processEvent(event,weight,entry);
+  //TODO: weights etc. are not here
+  _runner->processEvent(event,entry);
 
   delete event;
   return kTRUE;

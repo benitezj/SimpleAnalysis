@@ -165,6 +165,8 @@ public:
   void ntupVar(const std::string &label,int value)   { _output->ntupVar(label,value); };
   void ntupVar(const std::string &label,float value) { _output->ntupVar(label,value); };
   void ntupVar(const std::string &label,double value) { _output->ntupVar(label,(float) value); };
+  void ntupVar(const std::string &label,std::vector<int> values) { _output->ntupVar(label,values); };
+  void ntupVar(const std::string &label,std::vector<float> values) { _output->ntupVar(label,values); };
   void ntupVar(const std::string &label,AnalysisObject &object, bool saveMass=false, bool saveType=false);
   void ntupVar(const std::string &label,AnalysisObjects &objects, bool saveMass=false, bool saveType=false);
 

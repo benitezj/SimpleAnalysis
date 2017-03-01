@@ -29,6 +29,8 @@ Bool_t SlimReaderSelector::Process(Long64_t entry)
  
   TruthEvent* event=new TruthEvent(sumet,met_pt*cos(met_phi),met_pt*sin(met_phi));
   event->setChannelInfo(mcChannel,susyChannel);
+  event->setGenMET(genMET);
+  event->setGenHT(genHT);
 
   TLorentzVector tlv(0.,0.,0.,0.);
   for(unsigned int idx=0; idx<obj_pt[0]->size(); idx++) {
@@ -68,8 +70,9 @@ Bool_t SlimReaderSelector::Process(Long64_t entry)
     event->addFatJet(tlv,obj_id[5]->at(idx),idx);
   }
 
-  double weight=EventWeight;
-  _runner->processEvent(event,weight,EventNumber);
+  event->setMCWeights(*mcWeights);
+
+  _runner->processEvent(event,EventNumber);
 
   delete event;
   return kTRUE;

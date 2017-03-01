@@ -45,7 +45,13 @@ using std::vector;
       throw std::runtime_error("Failed in call: "#EXP);   \
     }                                                \
   } while(0)
-  
+
+#define WARN_ONCE(warning)          \
+  do {                              \
+    static bool first=true;         \
+    if (first) std::cout<<warning<<std::endl; \
+    first=false;                              \
+  } while(0)
 
 static AsgElectronLikelihoodTool* initElecLH(std::string WP) {
   AsgElectronLikelihoodTool* LHTool = new AsgElectronLikelihoodTool(WP);
@@ -442,7 +448,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
     gen_ht = eventInfo->auxdata<float>("GenFiltHT");
   }
   else{
-    std::cout << "Warning : No GenFiltHT decoration available. Setting HT to 0 for now..." << std::endl;
+    WARN_ONCE("Warning : No GenFiltHT decoration available. Setting HT to 0 for now...");
   }
   event->setGenHT( gen_ht/1000. );
 
@@ -452,7 +458,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
   if ( acc_filtMET.isAvailable(*(eventInfo)) ) 
     gen_met = eventInfo->auxdata<float>("GenFiltMET");
   else
-    std::cout << "Warning : No GenFiltMET decoration available. Setting MET to 0 for now..." << std::endl;
+    WARN_ONCE("Warning : No GenFiltMETT decoration available. Setting MET to 0 for now...");
   //TODO : implement GenMET building from TruthParticle container as in xAODTruthReader //M.T.
   //...
 
@@ -468,9 +474,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
 
   event->setMCWeights(weights);
 
-
-  double weight=eventInfo->mcEventWeight();
-  _analysisRunner->processEvent(event,weight,eventNumber);
+  _analysisRunner->processEvent(event,eventNumber);
 
   delete event;
   return true;

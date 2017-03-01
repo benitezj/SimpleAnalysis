@@ -24,11 +24,13 @@ public :
    Int_t           EventNumber;
    Int_t           mcChannel;
    Int_t           susyChannel;
-   Float_t         EventWeight;
+   vector<float>   *mcWeights;
    Float_t         sumet;
    Float_t         met_pt;
    Float_t         met_phi;
-
+   Float_t         genMET;
+   Float_t         genHT;
+   
    vector<float>   *obj_pt[NUMTYPES];
    vector<float>   *obj_eta[NUMTYPES];
    vector<float>   *obj_phi[NUMTYPES];
@@ -41,10 +43,12 @@ public :
    TBranch        *b_EventNumber;   //!
    TBranch        *b_mcChannel;   //!
    TBranch        *b_susyChannel;   //!
-   TBranch        *b_EventWeight;   //!
+   TBranch        *b_mcWeights;   //!
    TBranch        *b_sumet;   //!
    TBranch        *b_met_pt;   //!
    TBranch        *b_met_phi;   //!
+   TBranch        *b_gen_met;   //!
+   TBranch        *b_gen_ht;   //!
    TBranch        *b_obj_pt[NUMTYPES];   //!
    TBranch        *b_obj_eta[NUMTYPES];   //!
    TBranch        *b_obj_phi[NUMTYPES];   //!
@@ -87,7 +91,8 @@ class SlimReader : public Reader {
 #ifdef SlimReader_cxx
 void SlimReaderSelector::Init(TTree *tree)
 {
-   // Set object pointer
+  // Set object pointer
+  mcWeights = 0;
   for(int ii=0;ii<NUMTYPES;ii++) {
    obj_pt[ii] = 0;
    obj_eta[ii] = 0;
@@ -105,10 +110,12 @@ void SlimReaderSelector::Init(TTree *tree)
   fChain->SetBranchAddress("Event", &EventNumber, &b_EventNumber);
   fChain->SetBranchAddress("mcChannel", &mcChannel, &b_mcChannel);
   fChain->SetBranchAddress("susyChannel", &susyChannel, &b_susyChannel);
-  fChain->SetBranchAddress("eventWeight", &EventWeight, &b_EventWeight);
+  fChain->SetBranchAddress("mcWeights", &mcWeights, &b_mcWeights);
   fChain->SetBranchAddress("sumet", &sumet, &b_sumet);
   fChain->SetBranchAddress("met_pt", &met_pt, &b_met_pt);
   fChain->SetBranchAddress("met_phi", &met_phi, &b_met_phi);
+  fChain->SetBranchAddress("genMET", &genMET, &b_gen_met);
+  fChain->SetBranchAddress("genHT", &genHT, &b_gen_ht);
   int idx=0;
   std::vector<std::string> bNames({"el","mu","tau","ph","jet","fatjet"});
   for(const auto& bName : bNames) {

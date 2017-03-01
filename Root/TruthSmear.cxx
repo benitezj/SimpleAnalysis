@@ -89,6 +89,9 @@ TruthEvent *TruthSmear::smearEvent(AnalysisEvent *event) {
   }
   TruthEvent* smeared=new TruthEvent(sumet,met_x,met_y);
   smeared->setChannelInfo(event->getMCNumber(),event->getSUSYChannel());
+  smeared->setGenMET(event->getGenMET());
+  smeared->setGenHT(event->getGenHT());
+  smeared->setMCWeights(event->getMCWeights());
 
   int idx=0;
   for(const auto& electron : electrons) {

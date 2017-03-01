@@ -21,6 +21,14 @@
 
 using std::vector;
 
+#define WARN_ONCE(warning)          \
+  do {                              \
+    static bool first=true;         \
+    if (first) std::cout<<warning<<std::endl; \
+    first=false;                              \
+  } while(0)
+
+
 xAODTruthReader::xAODTruthReader(std::vector<AnalysisClass*>& analysisList) : Reader(analysisList)
 {
   _event=new xAOD::TEvent(xAOD::TEvent::kClassAccess);
@@ -227,7 +235,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     gen_ht = eventInfo->auxdata<float>("GenFiltHT");
   }
   else{
-    std::cout << "Warning : No GenFiltHT decoration available. Setting HT to 0 for now..." << std::endl;
+    WARN_ONCE("Warning : No GenFiltHT decoration available. Setting HT to 0 for now...");
   }
   event->setGenHT( gen_ht/1000. );
 
@@ -354,14 +362,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
 
   event->setMCWeights(weights);
 
-  int mcwindex = _analysisRunner->getMCWeightIndex();
-  
-  if(mcwindex > weights.size()-1){
-    throw std::runtime_error("The specified MC weight index is out of range! ");
-  }
-
-  double weight=( mcwindex>0 ? weights.at(mcwindex) : 1. ); //eventInfo->mcEventWeight();
-  _analysisRunner->processEvent(event,weight,eventNumber);
+  _analysisRunner->processEvent(event,eventNumber);
 
   delete event;
   return true;

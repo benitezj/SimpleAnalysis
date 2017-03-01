@@ -54,6 +54,7 @@ int main(int argc, char **argv) {
     ("input-files", po::value< vector<std::string> >(), "Comma-separated list of input files")
     ("readReco,r", "Use reconstructed quantities instead of truth")
     ("smear,s", po::value<std::string>(), "Comma-separated list smearing options (use help to see full list of options)")
+    ("mcweight,w", po::value<int>()->default_value(0), "MC weight index to apply (set to -1 to ignore it, i.e. =1.)")
     ;
   po::positional_options_description p;
   p.add("input-files", -1);
@@ -62,6 +63,13 @@ int main(int argc, char **argv) {
   po::store( po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
   po::notify(vm);
    
+  int mcwindex = 0;
+  if (vm.count("mcweight")) {
+    mcwindex = vm["mcweight"].as<int>();
+  }
+  std::cout << "MCWeightIndex = " << mcwindex << (mcwindex>=0 ? "" : " . No MC weight will be applied.") << std::endl; 
+
+
   if (vm.count("help") || (vm.count("input-files")==0)) {
     std::cout << desc << std::endl;
     return 1;
@@ -115,6 +123,7 @@ int main(int argc, char **argv) {
     return 2;
   }
   reader->SetSmearing(smearer);
+  reader->SetMCWeightIndex(mcwindex);
   reader->processFiles(inputFileNames);
   delete reader;
   delete smearer;

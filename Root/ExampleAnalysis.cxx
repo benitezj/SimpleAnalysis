@@ -83,5 +83,6 @@ void ExampleAnalysis::ProcessEvent(AnalysisEvent *event)
   //is better understood and can be incorporated in the framework
   ntupVar("susyProcess",event->getSUSYChannel());
   ntupVar("mcDSID",event->getMCNumber());
+  ntupVar("mcWeights",event->getMCWeights());
   return;
 }
