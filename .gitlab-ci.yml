@@ -9,7 +9,7 @@ withSmearing:
   script:
     - ls /cvmfs/atlas.cern.ch/
     - set +e && source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh; set -e
-    - rcSetup Base,2.4.28
+    - rcSetup Base,2.4.28 || echo ignore alrb
     - rc checkout_pkg atlasoff/PhysicsAnalysis/UpgradePhys/SmearingFunctions/UpgradePerformanceFunctions/tags
     - rc clean
     - rc find_packages
@@ -23,7 +23,7 @@ withoutSmearing:
   script:
     - ls /cvmfs/atlas.cern.ch/
     - set +e && source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh; set -e
-    - rcSetup Base,2.4.28
+    - rcSetup Base,2.4.28 || echo ignore alrb
     - rc clean
     - rc find_packages
     - rc compile
