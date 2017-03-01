@@ -41,7 +41,9 @@ void DMbb2016::ProcessEvent(AnalysisEvent *event)
   auto metVec     = event->getMET();
   double met      = metVec.Et();
     
-  double gen_met    = event->getGenMET();
+  float gen_met   = event->getGenMET();
+  float gen_ht    = event->getGenHT();
+
   int    mc_channel = event->getMCNumber();
 
   //MC OR
@@ -90,7 +92,8 @@ void DMbb2016::ProcessEvent(AnalysisEvent *event)
 
   //Fill in optional ntuple variables
   ntupVar("met",met);
-  ntupVar("gen_met", event->getGenMET());
+  ntupVar("gen_met", gen_met);
+  ntupVar("gen_ht", gen_ht);
   
   ntupVar("j_N",(int)candJets.size());
   ntupVar("e_N",(int)electrons.size());

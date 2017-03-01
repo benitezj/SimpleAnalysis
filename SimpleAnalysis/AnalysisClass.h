@@ -131,6 +131,7 @@ public:
   virtual AnalysisObject  getMET()=0;
   virtual float           getSumET()=0;
   virtual float           getGenMET()=0;
+  virtual float           getGenHT()=0;
   virtual int             getMCNumber()=0; //Temporary until better solution found
   virtual int             getSUSYChannel()=0; //Temporary until better solution found
   virtual std::vector<float>  getMCWeights()=0; //Temporary until better solution found

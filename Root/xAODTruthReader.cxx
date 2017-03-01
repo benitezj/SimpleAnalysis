@@ -98,6 +98,10 @@ xAODTruthReader::findTruthParticles(xAOD::TStore *store,
   return truth;
 }
 
+static SG::AuxElement::Accessor<float> acc_filtHT("GenFiltHT");
+static SG::AuxElement::Accessor<float> acc_filtMET("GenFiltMET");
+
+
 bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) {
 
   const xAOD::EventInfo* eventInfo = 0;
@@ -217,58 +221,77 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   }
 
 
-  idx=0;
-  const xAOD::TruthParticleContainer* truthneutrinos = 0;
-  std::string neutrinoName="TruthNeutrinos";
-  if ( !xaodEvent->contains<xAOD::TruthParticleContainer>(neutrinoName)) neutrinoName="TruthNeutrinos";
-  
-  if ( xaodEvent->contains<xAOD::TruthParticleContainer>(neutrinoName)) {
-    if ( !xaodEvent->retrieve( truthneutrinos, neutrinoName).isSuccess() ) {
-      throw std::runtime_error("Could not retrieve truth particles with key TruthNeutrinos");
-    }
-  } else {
-    truthneutrinos=findTruthParticles(store,truthparticles,{12,14,16});
+  //Generator Filter HT (e.g. for ttbar/singleTop samples)
+  float gen_ht=0.;
+  if ( acc_filtHT.isAvailable(*(eventInfo)) ){
+    gen_ht = eventInfo->auxdata<float>("GenFiltHT");
   }
+  else{
+    std::cout << "Warning : No GenFiltHT decoration available. Setting HT to 0 for now..." << std::endl;
+  }
+  event->setGenHT( gen_ht/1000. );
 
 
   //Generator Filter MET (e.g. for ttbar/singleTop samples)
-  tlv.SetPtEtaPhiM(0.,0.,0.,0.);
-  for ( xAOD::TruthParticleContainer::const_iterator it = truthneutrinos->begin();
-	it != truthneutrinos->end(); ++it ){
-    const auto nu = *it;
-    int iPartOrig = getTruthOrigin(nu);
-    
-    switch (iPartOrig) {
-    case MCTruthPartClassifier::PhotonConv:
-    case MCTruthPartClassifier::DalitzDec:
-    case MCTruthPartClassifier::ElMagProc:
-    case MCTruthPartClassifier::Mu:  
-    case MCTruthPartClassifier::TauLep:  
-    case MCTruthPartClassifier::LightMeson:  
-    case MCTruthPartClassifier::StrangeMeson:  
-    case MCTruthPartClassifier::CharmedMeson:
-    case MCTruthPartClassifier::BottomMeson:
-    case MCTruthPartClassifier::CCbarMeson:
-    case MCTruthPartClassifier::JPsi:
-    case MCTruthPartClassifier::BBbarMeson:
-    case MCTruthPartClassifier::LightBaryon:
-    case MCTruthPartClassifier::StrangeBaryon:
-    case MCTruthPartClassifier::CharmedBaryon:
-    case MCTruthPartClassifier::BottomBaryon:
-    case MCTruthPartClassifier::PionDecay:
-    case MCTruthPartClassifier::KaonDecay:
-      
-    case MCTruthPartClassifier::NonDefined:
-      continue;
-    default:
-      break;
-    }
-    tlv += nu->p4();
-    
+  float gen_met=0.;
+  if ( acc_filtMET.isAvailable(*(eventInfo)) ){
+    gen_met = eventInfo->auxdata<float>("GenFiltMET");
   }
-  event->setGenMET( tlv.Pt()/1000. );
+  else{ //recompute from particle containers!
+    idx=0;
+    const xAOD::TruthParticleContainer* truthneutrinos = 0;
+    std::string neutrinoName="TruthNeutrinos";
+    if ( !xaodEvent->contains<xAOD::TruthParticleContainer>(neutrinoName)) neutrinoName="TruthNeutrinos";
+    
+    if ( xaodEvent->contains<xAOD::TruthParticleContainer>(neutrinoName)) {
+      if ( !xaodEvent->retrieve( truthneutrinos, neutrinoName).isSuccess() ) {
+	throw std::runtime_error("Could not retrieve truth particles with key TruthNeutrinos");
+      }
+    } else {
+      truthneutrinos=findTruthParticles(store,truthparticles,{12,14,16});
+    }
+    
+    
+    tlv.SetPtEtaPhiM(0.,0.,0.,0.);
+    for ( xAOD::TruthParticleContainer::const_iterator it = truthneutrinos->begin();
+	  it != truthneutrinos->end(); ++it ){
+      const auto nu = *it;
+      int iPartOrig = getTruthOrigin(nu);
+      
+      switch (iPartOrig) {
+      case MCTruthPartClassifier::PhotonConv:
+      case MCTruthPartClassifier::DalitzDec:
+      case MCTruthPartClassifier::ElMagProc:
+      case MCTruthPartClassifier::Mu:  
+      case MCTruthPartClassifier::TauLep:  
+      case MCTruthPartClassifier::LightMeson:  
+      case MCTruthPartClassifier::StrangeMeson:  
+      case MCTruthPartClassifier::CharmedMeson:
+      case MCTruthPartClassifier::BottomMeson:
+      case MCTruthPartClassifier::CCbarMeson:
+      case MCTruthPartClassifier::JPsi:
+      case MCTruthPartClassifier::BBbarMeson:
+      case MCTruthPartClassifier::LightBaryon:
+      case MCTruthPartClassifier::StrangeBaryon:
+      case MCTruthPartClassifier::CharmedBaryon:
+      case MCTruthPartClassifier::BottomBaryon:
+      case MCTruthPartClassifier::PionDecay:
+      case MCTruthPartClassifier::KaonDecay:
+	
+      case MCTruthPartClassifier::NonDefined:
+	continue;
+      default:
+	break;
+      }
+      tlv += nu->p4();
+      
+    }
+    gen_met = tlv.Pt();
+  }
+  event->setGenMET( gen_met/1000. );
 
 
+    
   idx=0;
   const xAOD::JetContainer* truthjets = 0;
   if ( !xaodEvent->retrieve( truthjets, "AntiKt4TruthJets").isSuccess() ) {

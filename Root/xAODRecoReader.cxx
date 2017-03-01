@@ -82,6 +82,7 @@ static TauAnalysisTools::TauSelectionTool* initTauSel(std::string WP) {
   return tool;
 }
 
+static SG::AuxElement::Accessor<float> acc_filtHT("GenFiltHT");
 static SG::AuxElement::Accessor<float> acc_filtMET("GenFiltMET");
 
 
@@ -433,6 +434,17 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
       delete calibJet;
     }
   }
+
+
+  //Generator Filter HT (e.g. for ttbar/singleTop samples)
+  float gen_ht=0.;
+  if ( acc_filtHT.isAvailable(*(eventInfo)) ){
+    gen_ht = eventInfo->auxdata<float>("GenFiltHT");
+  }
+  else{
+    std::cout << "Warning : No GenFiltHT decoration available. Setting HT to 0 for now..." << std::endl;
+  }
+  event->setGenHT( gen_ht/1000. );
 
 
   //Generator Filter MET (e.g. for ttbar/singleTop samples)

@@ -16,7 +16,9 @@ class TruthEvent : public AnalysisEvent
   virtual AnalysisObjects getFatJets(float ptCut,float etaCut,int btag) { return AnalysisClass::filterObjects( _baseFatJets, ptCut, etaCut, btag); };
   virtual AnalysisObject  getMET() { return _met; };
   virtual float  getSumET() { return _sumet; };
+
   virtual float  getGenMET() { return _genmet; };
+  virtual float  getGenHT() { return _genht; };
 
   virtual int    getMCNumber() { return _mcChannel; }; //Temporary until better solution found
   virtual int    getSUSYChannel() { return _susyChannel; }; //Temporary until better solution found
@@ -65,6 +67,10 @@ class TruthEvent : public AnalysisEvent
     _genmet = genMET;
   };
 
+  virtual void setGenHT(float genHT=0.){
+    _genht = genHT;
+  };
+
   virtual void setMCWeights(std::vector<float> ws){
     _mcWeights = ws;
   }
@@ -79,6 +85,7 @@ class TruthEvent : public AnalysisEvent
   float           _sumet;
   AnalysisObject  _met;
   float           _genmet;
+  float           _genht;
 
   int             _mcChannel;
   int             _susyChannel;
