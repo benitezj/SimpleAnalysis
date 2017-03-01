@@ -16,9 +16,12 @@ class TruthEvent : public AnalysisEvent
   virtual AnalysisObjects getFatJets(float ptCut,float etaCut,int btag) { return AnalysisClass::filterObjects( _baseFatJets, ptCut, etaCut, btag); };
   virtual AnalysisObject  getMET() { return _met; };
   virtual float  getSumET() { return _sumet; };
+  virtual float  getGenMET() { return _genmet; };
+
   virtual int    getMCNumber() { return _mcChannel; }; //Temporary until better solution found
   virtual int    getSUSYChannel() { return _susyChannel; }; //Temporary until better solution found
   virtual void   setChannelInfo(int mcChannel, int susyChannel) {  _mcChannel=mcChannel; _susyChannel=susyChannel; };
+
   void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) { 
     _baseElectrons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,ELECTRON,idx));
   };
@@ -55,6 +58,11 @@ class TruthEvent : public AnalysisEvent
   void addFatJet(TLorentzVector tlv, int iso, int idx) { 
     _baseFatJets.push_back(AnalysisObject(tlv,0,iso,FATJET,idx));
   };
+
+  virtual void setGenMET(float genMET=0.){
+    _genmet = genMET;
+  };
+
  private:
   AnalysisObjects _baseElectrons;
   AnalysisObjects _baseMuons;
@@ -64,6 +72,8 @@ class TruthEvent : public AnalysisEvent
   AnalysisObjects _baseFatJets;
   float           _sumet;
   AnalysisObject  _met;
+  float           _genmet;
+
   int             _mcChannel;
   int             _susyChannel;
 

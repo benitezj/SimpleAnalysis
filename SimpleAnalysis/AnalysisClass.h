@@ -82,6 +82,7 @@ enum AnalysisJetID { LooseBadJet=1<<8,
 		     BTag60MV2c10=1<<7,
 		     GoodBJet=BTag85MV2c20|BTag80MV2c20|BTag77MV2c20|BTag70MV2c20|
 		              BTag85MV2c10|BTag77MV2c10|BTag70MV2c10|BTag60MV2c10|GoodJet,
+
 };
 
 enum AnalysisFatJetID { LooseFatJet=1<<8,
@@ -129,6 +130,7 @@ public:
   virtual AnalysisObjects getFatJets(float ptCut,float etaCut,int btag=0)=0;
   virtual AnalysisObject  getMET()=0;
   virtual float           getSumET()=0;
+  virtual float           getGenMET()=0;
   virtual int             getMCNumber()=0; //Temporary until better solution found
   virtual int             getSUSYChannel()=0; //Temporary until better solution found
   virtual ~AnalysisEvent() {};
@@ -187,6 +189,7 @@ public:
 
   static void sortObjectsByPt(AnalysisObjects& cands);
   static float minDphi(const AnalysisObject &met, const AnalysisObjects& cands, unsigned int maxNum=10000, float ptCut=0);
+  static float minDR(const AnalysisObjects& cands, unsigned int maxNum=10000, float ptCut=0);
   
   static float calcMCT(const AnalysisObject& o1, const AnalysisObject& o2);
   static float calcMT(const AnalysisObject &lepton, const AnalysisObject &met);

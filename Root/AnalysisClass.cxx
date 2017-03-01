@@ -191,6 +191,17 @@ float AnalysisClass::minDphi(const AnalysisObject &met, const AnalysisObjects& c
   return dphi_min;
 }
 
+float AnalysisClass::minDR(const AnalysisObjects& cands, unsigned int maxNum, float ptCut) {
+  float dr_min = 999.;
+  for(int ii=0; ii<std::min((int)maxNum, (int)cands.size()); ii++) {
+    for(int ij=ii+1; ij<std::min((int)maxNum, (int)cands.size()); ij++) {
+      float dr = fabs(cands[ii].DeltaR(cands[ij]));
+      if (dr<dr_min && cands[ii].Pt()>ptCut) dr_min = dr;
+    }
+  }
+  return dr_min;
+}
+
 AnalysisObjects AnalysisClass::reclusterJets(const AnalysisObjects &jets, float radius, float ptmin, float rclus, float ptfrac) {
   std::vector<fastjet::PseudoJet> JetVector;
   for(const auto& jet : jets) {

@@ -82,6 +82,9 @@ static TauAnalysisTools::TauSelectionTool* initTauSel(std::string WP) {
   return tool;
 }
 
+static SG::AuxElement::Accessor<float> acc_filtMET("GenFiltMET");
+
+
 xAODRecoReader::xAODRecoReader(std::vector<AnalysisClass*>& analysisList) : Reader(analysisList)
 {
   _event=new xAOD::TEvent(xAOD::TEvent::kClassAccess);
@@ -430,6 +433,17 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
       delete calibJet;
     }
   }
+
+  //Generator Filter MET (e.g. for ttbar/singleTop samples)
+  float gen_met=0.;
+  if ( acc_filtMET.isAvailable(*(eventInfo)) ) 
+    gen_met = eventInfo->auxdata<float>("GenFiltMET");
+  else
+    std::cout << "Warning : No GenFiltMET decoration available. Setting MET to 0 for now..." << std::endl;
+  //TODO : implement GenMET building from TruthParticle container as in xAODTruthReader //M.T.
+  //...
+
+  event->setGenMET( gen_met/1000. );
 
   double weight=eventInfo->mcEventWeight();
   _analysisRunner->processEvent(event,weight,eventNumber);
