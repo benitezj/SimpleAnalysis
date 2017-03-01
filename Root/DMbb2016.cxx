@@ -41,6 +41,15 @@ void DMbb2016::ProcessEvent(AnalysisEvent *event)
   auto metVec     = event->getMET();
   double met      = metVec.Et();
     
+  double gen_met    = event->getGenMET();
+  int    mc_channel = event->getMCNumber();
+
+  //MC OR
+  if(mc_channel==410000 && gen_met>200.) return; //remove ttbar inc vs MET200 overlap
+
+  for(unsigned int iw=0; iw < event->getMCWeights().size(); iw++)
+    ntupVar(("mc_weight"+std::to_string(iw)).c_str(), event->getMCWeights()[iw]);
+
   // Fill in histogram
   fill("SRMflow",0.5);
   fill("SRAflow",0.5);

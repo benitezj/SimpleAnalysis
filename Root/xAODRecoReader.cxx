@@ -434,6 +434,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
     }
   }
 
+
   //Generator Filter MET (e.g. for ttbar/singleTop samples)
   float gen_met=0.;
   if ( acc_filtMET.isAvailable(*(eventInfo)) ) 
@@ -444,6 +445,17 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
   //...
 
   event->setGenMET( gen_met/1000. );
+
+
+  //Get LHE3 weights                                                                                                                                                              
+  const xAOD::TruthEventContainer* truthEvtCont;
+  if( !xaodEvent->retrieve( truthEvtCont, "TruthEvents").isSuccess() )
+    throw std::runtime_error("Could not retrieve truth event container with key TruthEvents");
+  const xAOD::TruthEvent *truthevent = (*truthEvtCont)[0];
+  const std::vector<float> weights  = truthevent->weights();
+
+  event->setMCWeights(weights);
+
 
   double weight=eventInfo->mcEventWeight();
   _analysisRunner->processEvent(event,weight,eventNumber);

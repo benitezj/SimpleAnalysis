@@ -20,6 +20,8 @@ class TruthEvent : public AnalysisEvent
 
   virtual int    getMCNumber() { return _mcChannel; }; //Temporary until better solution found
   virtual int    getSUSYChannel() { return _susyChannel; }; //Temporary until better solution found
+  virtual std::vector<float>  getMCWeights() { return _mcWeights; }; //Temporary until better solution found
+
   virtual void   setChannelInfo(int mcChannel, int susyChannel) {  _mcChannel=mcChannel; _susyChannel=susyChannel; };
 
   void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) { 
@@ -63,6 +65,10 @@ class TruthEvent : public AnalysisEvent
     _genmet = genMET;
   };
 
+  virtual void setMCWeights(std::vector<float> ws){
+    _mcWeights = ws;
+  }
+
  private:
   AnalysisObjects _baseElectrons;
   AnalysisObjects _baseMuons;
@@ -76,6 +82,8 @@ class TruthEvent : public AnalysisEvent
 
   int             _mcChannel;
   int             _susyChannel;
+
+  std::vector<float> _mcWeights;
 
  public:
   void sortObjects() {

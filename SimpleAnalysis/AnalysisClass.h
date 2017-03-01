@@ -133,6 +133,7 @@ public:
   virtual float           getGenMET()=0;
   virtual int             getMCNumber()=0; //Temporary until better solution found
   virtual int             getSUSYChannel()=0; //Temporary until better solution found
+  virtual std::vector<float>  getMCWeights()=0; //Temporary until better solution found
   virtual ~AnalysisEvent() {};
 };
 

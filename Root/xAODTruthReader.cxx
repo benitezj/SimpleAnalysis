@@ -323,14 +323,17 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   }
 
   //Get LHE3 weights                                                                                                                                                              
-  // const xAOD::TruthEventContainer* truthEvtCont;
-  // if( !xaodEvent->retrieve( truthEvtCont, "TruthEvents").isSuccess() )
-  //   throw std::runtime_error("Could not retrieve truth event container with key TruthEvents");
-  // const xAOD::TruthEvent *truthevent = (*truthEvtCont)[0];
-  // const std::vector<float> weights  = truthevent->weights();
-  
+  const xAOD::TruthEventContainer* truthEvtCont;
+  if( !xaodEvent->retrieve( truthEvtCont, "TruthEvents").isSuccess() )
+    throw std::runtime_error("Could not retrieve truth event container with key TruthEvents");
+  const xAOD::TruthEvent *truthevent = (*truthEvtCont)[0];
+  const std::vector<float> weights  = truthevent->weights();
 
-  double weight=eventInfo->mcEventWeight();
+  event->setMCWeights(weights);
+
+  int mcwindex = _analysisRunner->getMCWeightIndex();
+  
+  double weight=( mcwindex>0 ? weights.at(mcwindex) : 1. ); //eventInfo->mcEventWeight();
   _analysisRunner->processEvent(event,weight,eventNumber);
 
   delete event;

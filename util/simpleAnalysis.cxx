@@ -44,6 +44,7 @@ int main(int argc, char **argv) {
     ("ntuple,n", "Fill ntuple")
     ("readReco,r", "Use reconstructed quantities instead of truth")
     ("smear,s", po::value<std::string>(), "Comma-separated list smearing options (use help to see full list of options)")
+    ("mcweight,w", po::value<int>()->default_value(0), "MC weight index to apply (set to -1 to ignore it, i.e. =1.)")
     ;
   po::positional_options_description p;
   p.add("input-files", -1);
@@ -73,6 +74,13 @@ int main(int argc, char **argv) {
     splitCommaString(vm["smear"].as<std::string>(),smearingOptions);
     smearer=new TruthSmear(smearingOptions);
   }
+
+  int mcwindex = 0;
+  if (vm.count("mcweight")) {
+    mcwindex = vm["mcweight"].as<int>();
+  }
+  std::cout << "MCWeightIndex = " << mcwindex << (mcwindex>=0 ? "" : " . No MC weight will be applied.") << std::endl; 
+  
 
   std::vector<std::string> inputFileNames;
   std::vector<std::string> analysisNames;
@@ -144,6 +152,7 @@ int main(int argc, char **argv) {
     return 2;
   }
   reader->SetSmearing(smearer);
+  reader->SetMCWeightIndex(mcwindex);
   reader->processFiles(inputFileNames);
   delete reader;
   delete smearer;

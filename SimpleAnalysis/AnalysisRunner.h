@@ -16,6 +16,10 @@ class AnalysisRunner
   void init() { for(const auto& analysis : _analysisList) analysis->Init(); };
   void final() { for(const auto& analysis : _analysisList) analysis->Final(); };
   void SetSmearing(TruthSmear *smear) { _smear=smear; };
+  void SetMCWeightIndex(int mcwidx) { _mcwindex=mcwidx; };
+
+  float getMCWeightIndex(){ return _mcwindex; };
+
   void processEvent(TruthEvent *event,double weight,int eventNumber) { 
     if (_smear) event = _smear->smearEvent(event);
     event->sortObjects();
@@ -31,6 +35,7 @@ class AnalysisRunner
  private:
   std::vector<AnalysisClass*>& _analysisList;
   TruthSmear *_smear;
+  float _mcwindex;
 };
 
 class Reader
@@ -39,6 +44,10 @@ class Reader
   Reader(std::vector<AnalysisClass*>& analysisList) {_analysisRunner=new AnalysisRunner(analysisList); }
   virtual ~Reader() {};
   virtual void SetSmearing(TruthSmear *smear) { _analysisRunner->SetSmearing(smear); };
+  virtual void SetMCWeightIndex(int mcwidx) { _analysisRunner->SetMCWeightIndex(mcwidx); };
+
+  virtual int getMCWeightIndex(){ return _analysisRunner->getMCWeightIndex(); };
+
   virtual void processFiles(const std::vector<std::string>& inputNames) {
     _analysisRunner->init();
     processFilesInternal(inputNames);
