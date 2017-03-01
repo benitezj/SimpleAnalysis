@@ -333,6 +333,10 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
 
   int mcwindex = _analysisRunner->getMCWeightIndex();
   
+  if(mcwindex > weights.size()-1){
+    throw std::runtime_error("The specified MC weight index is out of range! ");
+  }
+
   double weight=( mcwindex>0 ? weights.at(mcwindex) : 1. ); //eventInfo->mcEventWeight();
   _analysisRunner->processEvent(event,weight,eventNumber);
 
