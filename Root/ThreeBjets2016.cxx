@@ -135,8 +135,6 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   float gen_ht       = event->getGenHT();
   int channel_number = event->getMCNumber();
 
-#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
-
   // handle HT slicing now
   if(channel_number==410000 && gen_ht>600) return;
   if(channel_number==410001 && gen_ht>600) return;
