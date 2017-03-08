@@ -119,7 +119,7 @@ void ThreeBjets2016::Init()
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool OperatingPoint property");
   code = m_btt->setProperty("JetAuthor", "AntiKt4EMTopoJets");
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool JetAuthor property");
-  code = m_btt->setProperty("ScaleFactorFileName", "xAODBTaggingEfficiency/13TeV/2016-20_7-13TeV-MC15-CDI-May31_v1.root");
+  code = m_btt->setProperty("ScaleFactorFileName", "xAODBTaggingEfficiency/13TeV/2016-20_7-13TeV-MC15-CDI-2017-01-31_v1.root");
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool ScaleFactorFileName property");
   // call initialize() function
   code = m_btt->initialize();
