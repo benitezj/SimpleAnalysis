@@ -146,6 +146,10 @@ class AnalysisEvent
   virtual ~AnalysisEvent() {};
 };
 
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+class BTaggingTruthTaggingTool;
+#endif
+
 class AnalysisClass;
 
 std::vector<AnalysisClass*> *getAnalysisList(); //for automatically tracking which analyses have been defined
@@ -221,6 +225,14 @@ class AnalysisClass
   RestFramesHelper m_RF_helper;
 
  protected:
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+  std::vector<double>  m_TTweight_in;
+  std::vector<double>  m_TTweight_ex;
+
+  BTaggingTruthTaggingTool *m_btt;
+#endif
+
+protected:
   std::string _name;
   OutputHandler *_output;
 

@@ -1,5 +1,9 @@
 #include "SimpleAnalysis/AnalysisClass.h"
 
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+#include "BTaggingTruthTagging/BTaggingTruthTaggingTool.h"
+#endif
+
 DefineAnalysis(ThreeBjets2016)
 
 void ThreeBjets2016::Init()
@@ -106,6 +110,22 @@ void ThreeBjets2016::Init()
 
   addHistogram("GenMET",40,0,2000);
   addHistogram("GenHT",40,0,2000);
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+  m_btt = new BTaggingTruthTaggingTool("MyBTaggingTruthTaggingTool");
+  StatusCode  code = m_btt->setProperty("TaggerName",          "MV2c10");
+  if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool TaggerName property");
+  code = m_btt->setProperty("OperatingPoint", "FixedCutBEff_77");
+  if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool OperatingPoint property");
+  code = m_btt->setProperty("JetAuthor", "AntiKt4EMTopoJets");
+  if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool JetAuthor property");
+  code = m_btt->setProperty("ScaleFactorFileName", "xAODBTaggingEfficiency/13TeV/2016-20_7-13TeV-MC15-CDI-May31_v1.root");
+  if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool ScaleFactorFileName property");
+  // call initialize() function
+  code = m_btt->initialize();
+  if (code != StatusCode::SUCCESS) throw std::runtime_error("error initializing the BTaggingTruthTaggingTool");
+#endif
+
 }
 
 void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
