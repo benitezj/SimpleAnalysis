@@ -135,6 +135,8 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   float gen_ht       = event->getGenHT();
   int channel_number = event->getMCNumber();
 
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+
   // handle HT slicing now
   if(channel_number==410000 && gen_ht>600) return;
   if(channel_number==410001 && gen_ht>600) return;
@@ -192,6 +194,20 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   int n_bjets       = bjets.size();
   int n_jets        = signalJets.size();
   int n_leptons     = signalLeptons.size();
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+  m_btt->setSeed(n_jets + 10*n_leptons + 100*met + 1000*electrons.size() + 10000*muons.size());
+  std::vector<double> pt   = std::vector<double>(signalJets.size(), 0);
+  std::vector<double> eta  = std::vector<double>(signalJets.size(), 0);
+  std::vector<double> flav = std::vector<double>(signalJets.size(), 0);
+  std::vector<double> tagw = std::vector<double>(signalJets.size(), 1);
+  for (unsigned int index = 0; index < signalJets.size(); ++index){
+    auto jet = signalJets.at(index);
+    pt[index]   = jet.at(index).pt();
+    eta[index]  = jet.at(index).eta();
+    flav[index] = jet.at(index).truth_id();
+  }
+#endif
 
   // require at least 3 b-bjets and 4 signal jets
   if(n_bjets<3 || n_jets<4) return;
