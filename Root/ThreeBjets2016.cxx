@@ -189,6 +189,7 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   auto signalLeptons   = signalElectrons + signalMuons;
 
   // get b-jets
+  auto candBJets = filterObjects(signalJets, 30., 2.5);
   auto bjets = filterObjects(signalJets, 30., 2.5, BTag77MV2c10);
 
   int n_bjets       = bjets.size();
@@ -200,12 +201,12 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
 
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
   m_btt->setSeed(n_jets + 10*n_leptons + 100*met + 1000*electrons.size() + 10000*muons.size());
-  std::vector<double> pt   = std::vector<double>(signalJets.size(), 0);
-  std::vector<double> eta  = std::vector<double>(signalJets.size(), 0);
-  std::vector<int>    flav = std::vector<int>   (signalJets.size(), 1);
-  std::vector<double> tagw = std::vector<double>(signalJets.size(), 1);
-  for (unsigned int index = 0; index < signalJets.size(); ++index){
-    auto jet = signalJets.at(index);
+  std::vector<double> pt   = std::vector<double>(candBJets.size(), 0);
+  std::vector<double> eta  = std::vector<double>(candBJets.size(), 0);
+  std::vector<int>    flav = std::vector<int>   (candBJets.size(), 1);
+  std::vector<double> tagw = std::vector<double>(candBJets.size(), 1);
+  for (unsigned int index = 0; index < candBJets.size(); ++index){
+    auto jet = candBJets.at(index);
     pt[index]   = jet.Pt();
     eta[index]  = jet.Eta();
     flav[index] = jet.truth_id();
@@ -215,7 +216,6 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting the jets for truth tagging in execute()");
   code = m_btt->getTruthTagWei(4, m_TTweight_ex, m_TTweight_in);
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error in retrieving the weights");
-
 #else
   // require at least 3 b-bjets
   if(n_bjets<3) return;
