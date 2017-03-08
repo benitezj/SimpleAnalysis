@@ -38,40 +38,40 @@ class TruthEvent : public AnalysisEvent
     _id2=id2; _x2=x2; _pdf2=pdf2; _scale=scale;
   };
 
-  void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) { 
+  void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) {
     _baseElectrons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,ELECTRON,idx));
   };
-  void addElectron(TLorentzVector tlv, int charge,int iso, int idx) { 
+  void addElectron(TLorentzVector tlv, int charge,int iso, int idx) {
     _baseElectrons.push_back(AnalysisObject(tlv,charge,iso,ELECTRON,idx));
   };
-  void addMuon(double Px, double Py, double Pz, double E, int charge,int iso, int idx) { 
+  void addMuon(double Px, double Py, double Pz, double E, int charge,int iso, int idx) {
     _baseMuons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,MUON,idx));
   };
-  void addMuon(TLorentzVector tlv, int charge, int iso, int idx) { 
+  void addMuon(TLorentzVector tlv, int charge, int iso, int idx) {
     _baseMuons.push_back(AnalysisObject(tlv,charge,iso,MUON,idx));
   };
-  void addTau(double Px, double Py, double Pz, double E, int charge,int iso, int idx) { 
+  void addTau(double Px, double Py, double Pz, double E, int charge,int iso, int idx) {
     _baseTaus.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,TAU,idx));
   };
-  void addTau(TLorentzVector tlv, int charge, int iso, int idx) { 
+  void addTau(TLorentzVector tlv, int charge, int iso, int idx) {
     _baseTaus.push_back(AnalysisObject(tlv,charge,iso,TAU,idx));
   };
-  void addPhoton(double Px, double Py, double Pz, double E,int iso, int idx) { 
+  void addPhoton(double Px, double Py, double Pz, double E,int iso, int idx) {
     _basePhotons.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,PHOTON,idx));
   };
-  void addPhoton(TLorentzVector tlv, int iso, int idx) { 
+  void addPhoton(TLorentzVector tlv, int iso, int idx) {
     _basePhotons.push_back(AnalysisObject(tlv,0,iso,PHOTON,idx));
   };
-  void addJet(double Px, double Py, double Pz, double E, int iso, int idx) { 
+  void addJet(double Px, double Py, double Pz, double E, int iso, int idx) {
     _baseJets.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,JET,idx));
   };
-  void addJet(TLorentzVector tlv, int iso, int idx) { 
+  void addJet(TLorentzVector tlv, int iso, int idx) {
     _baseJets.push_back(AnalysisObject(tlv,0,iso,JET,idx));
   };
-  void addFatJet(double Px, double Py, double Pz, double E, int iso, int idx) { 
+  void addFatJet(double Px, double Py, double Pz, double E, int iso, int idx) {
     _baseFatJets.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,FATJET,idx));
   };
-  void addFatJet(TLorentzVector tlv, int iso, int idx) { 
+  void addFatJet(TLorentzVector tlv, int iso, int idx) {
     _baseFatJets.push_back(AnalysisObject(tlv,0,iso,FATJET,idx));
   };
 

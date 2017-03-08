@@ -2,11 +2,11 @@
 /*                                                                     */
 /*              RestFramesHelper                                       */
 /*                                                                     */
-/*              Author: Christopher Rogan                              */ 
+/*              Author: Christopher Rogan                              */
 /*              April, 2017                                            */
-/*                                                                     */  
+/*                                                                     */
 /***********************************************************************/
-              
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/RestFramesHelper.h"
 
 RestFramesHelper::~RestFramesHelper(){
@@ -154,5 +154,4 @@ InvisibleGroup* RestFramesHelper::getInvisibleGroup(const std::string &name){
 CombinatoricGroup* RestFramesHelper::getCombinatoricGroup(const std::string &name){
   return m_CombGroups[name];
 }
-
-
+#endif

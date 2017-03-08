@@ -1,3 +1,4 @@
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/AnalysisClass.h"
 
 DefineAnalysis(ZeroLepton2016)
@@ -21,7 +22,7 @@ void ZeroLepton2016::Init()
 
   //
   // nominal squark and gluino tree
-  // 
+  //
   LabRecoFrame* LAB = m_RF_helper.addLabFrame("LAB");
   DecayRecoFrame* PP = m_RF_helper.addDecayFrame("PP");
   DecayRecoFrame* Pa = m_RF_helper.addDecayFrame("Pa");
@@ -55,8 +56,8 @@ void ZeroLepton2016::Init()
   SAV2a->AddChildFrame(*V2a);
   SAV2b->AddChildFrame(*V2b);
 
-  LAB->InitializeTree(); 
-  
+  LAB->InitializeTree();
+
   InvisibleGroup* INV = m_RF_helper.addInvisibleGroup("INV");
   InvisibleJigsaw* InvMassJigsaw = m_RF_helper.addInvisibleJigsaw("InvMassJigsaw", kSetMass);
   InvisibleJigsaw* InvRapidityJigsaw = m_RF_helper.addInvisibleJigsaw("InvRapidityJigsaw", kSetRapidity);
@@ -104,26 +105,26 @@ void ZeroLepton2016::Init()
   CombPbJigsaw->AddFrame(*V1b,0);
   CombPbJigsaw->AddFrame(*V2b,1);
 
-  LAB->InitializeAnalysis(); 
+  LAB->InitializeAnalysis();
 
   //
   // self-assembling tree for QCD rejection variables
-  // 
+  //
   LabRecoFrame* LAB_bkg = m_RF_helper.addLabFrame("LAB_bkg");
   SelfAssemblingRecoFrame* S_bkg = m_RF_helper.addSAFrame("S_bkg");
   VisibleRecoFrame* V_bkg = m_RF_helper.addVisibleFrame("V_bkg");
   InvisibleRecoFrame* I_bkg = m_RF_helper.addInvisibleFrame("I_bkg");
-  
+
   LAB_bkg->SetChildFrame(*S_bkg);
   S_bkg->AddChildFrame(*V_bkg);
   S_bkg->AddChildFrame(*I_bkg);
-  
-  LAB_bkg->InitializeTree(); 
+
+  LAB_bkg->InitializeTree();
 
   InvisibleGroup* INV_bkg = m_RF_helper.addInvisibleGroup("INV_bkg");
   InvisibleJigsaw* InvMass_bkg = m_RF_helper.addInvisibleJigsaw("InvMass_bkg", kSetMass);
   InvisibleJigsaw* InvRapidity_bkg = m_RF_helper.addInvisibleJigsaw("InvRapidity_bkg", kSetRapidity);
-  
+
   INV_bkg->AddFrame(*I_bkg);
 
   INV_bkg->AddJigsaw(*InvMass_bkg);
@@ -136,11 +137,11 @@ void ZeroLepton2016::Init()
   VIS_bkg->AddFrame(*V_bkg);
   VIS_bkg->SetNElementsForFrame(*V_bkg,1,false);
 
-  LAB_bkg->InitializeAnalysis(); 
+  LAB_bkg->InitializeAnalysis();
 
   //
   // ISR-assisted analysis tree for compressed SR's
-  // 
+  //
   LabRecoFrame* LAB_ISR = m_RF_helper.addLabFrame("LAB_ISR");
   DecayRecoFrame* CM_ISR = m_RF_helper.addDecayFrame("CM_ISR");
   DecayRecoFrame* S_ISR = m_RF_helper.addDecayFrame("S_ISR");
@@ -188,7 +189,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   auto jets       = event->getJets(50., 2.8);
   auto metVec     = event->getMET();
   double met      = metVec.Et();
-    
+
   // Reject events with bad jets
   if (countObjects(jets, 50, 2.8, NOT(LooseBadJet))!=0) return;
   //if (jets.size()>0 && jets[0].Pt()>100 && jets[0].pass(NOT(TightBadJet))) return;
@@ -209,7 +210,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 
   // baseline lepton veto
   auto leptons=electrons + muons;
-  if (leptons.size() > 0) { 
+  if (leptons.size() > 0) {
     return;
   }
 
@@ -225,34 +226,34 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 
   // Meff based analysis regions and selections
   float meff[7];
-  for(int nJet=2; nJet<=6; nJet++) 
+  for(int nJet=2; nJet<=6; nJet++)
     meff[nJet] = sumObjectsPt(jets, nJet) + met;
   float metSig      = met/sqrt(meffIncl - met);
   float dphiMin3    = minDphi(metVec, jets, 3);
   float dphiMinRest = minDphi(metVec, jets);
   float Ap          = aplanarity(jets);
-  
+
   // Meff-2j SR's
   if(Njets >= 2){
-    if(met > 250. && jets[0].Pt() > 250. && jets[1].Pt() > 250. && fabs(jets[0].Eta()) < 0.8 && fabs(jets[1].Eta()) < 0.8 && 
+    if(met > 250. && jets[0].Pt() > 250. && jets[1].Pt() > 250. && fabs(jets[0].Eta()) < 0.8 && fabs(jets[1].Eta()) < 0.8 &&
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 14 && meffIncl > 1200)
       accept("SR_Meff_2j_1200");
-    if(met > 250. && jets[0].Pt() > 300. && jets[1].Pt() > 300. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
+    if(met > 250. && jets[0].Pt() > 300. && jets[1].Pt() > 300. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 1600)
       accept("SR_Meff_2j_1600");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
+    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2000)
       accept("SR_Meff_2j_2000");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
+    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
       accept("SR_Meff_2j_2400");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
+    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
       accept("SR_Meff_2j_2800");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && 
+    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. &&
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
       accept("SR_Meff_2j_3600");
-    if(met > 250. && jets[0].Pt() > 600. && jets[1].Pt() > 50. && 
+    if(met > 250. && jets[0].Pt() > 600. && jets[1].Pt() > 50. &&
        dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 26 && meffIncl > 2400)
       accept("SR_Meff_2j_2100");
   }
@@ -264,67 +265,67 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   }
   // Meff-4j SR's
   if(Njets >= 4){
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
-       fabs(jets[2].Eta()) < 1.2 && fabs(jets[3].Eta()) < 1.2 && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.3 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
+       fabs(jets[2].Eta()) < 1.2 && fabs(jets[3].Eta()) < 1.2 && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.3 &&
        Ap > 0.04 && meffIncl > 1000)
       accept("SR_Meff_4j_1000");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
+       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 &&
        Ap > 0.04 && meffIncl > 1400)
       accept("SR_Meff_4j_1400");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
+       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 &&
        Ap > 0.04 && meffIncl > 1800)
       accept("SR_Meff_4j_1800");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
+       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 &&
        Ap > 0.04 && meffIncl > 2200)
       accept("SR_Meff_4j_2200");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
+       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 &&
        Ap > 0.04 && meffIncl > 2600)
       accept("SR_Meff_4j_2600");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
+       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 &&
        Ap > 0.04 && meffIncl > 3000)
       accept("SR_Meff_4j_3000");
   }
   // Meff-5j SR's
   if(Njets >= 5){
-    if(met > 250. && jets[0].Pt() > 700. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.3 && 
+    if(met > 250. && jets[0].Pt() > 700. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.3 &&
        meffIncl > 1700)
       accept("SR_Meff_5j_1700");
-    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.15 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.15 &&
        Ap > 0.08 && meffIncl > 1600)
       accept("SR_Meff_5j_1600");
-    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && metSig > 15 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && metSig > 15 &&
        meffIncl > 2000)
       accept("SR_Meff_5j_2000");
-    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 &&
        meffIncl > 2600)
       accept("SR_Meff_5j_2600");
   }
   // Meff-6j SR's
   if(Njets >= 6){
     if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 50. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && fabs(jets[2].Eta()) < 2. &&
-       fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
+       fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
        met/meff[6] > 0.25 && meffIncl > 1200)
       accept("SR_Meff_6j_1200");
     if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && fabs(jets[2].Eta()) < 2. &&
-       fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
+       fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
        met/meff[6] > 0.2 && Ap > 0.04 && meffIncl > 1800)
       accept("SR_Meff_6j_1800");
-    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
        met/meff[6] > 0.2 && Ap > 0.08 && meffIncl > 2200)
       accept("SR_Meff_6j_2200");
-    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
+    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
        met/meff[6] > 0.15 && Ap > 0.08 && meffIncl > 2600)
       accept("SR_Meff_6j_2600");
   }
   // Meff boosted boson regions
   auto fatjets = reclusterJets(jets, 1., 50.);
   if(fatjets.size() >= 2){
-    if(met < 250 && fatjets[0].Pt() > 200. && fatjets[1].Pt() > 200. && fatjets[0].M() > 60. && fatjets[0].M() < 110. && 
+    if(met < 250 && fatjets[0].Pt() > 200. && fatjets[1].Pt() > 200. && fatjets[0].M() > 60. && fatjets[0].M() < 110. &&
        fatjets[1].M() > 60. && fatjets[1].M() < 110. && dphiMin3 > 0.6 && dphiMinRest > 0.4 && metSig > 20.){
       if(meffIncl > 1600.)
 	accept("SR_Meff_2jB_1600");
@@ -335,14 +336,14 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 
 
   // RestFrames analysis for different RJR SR's and event trees:
-  
+
   // nominal tree
   LabRecoFrame* LAB = m_RF_helper.getLabFrame("LAB");
   InvisibleGroup* INV = m_RF_helper.getInvisibleGroup("INV");
   CombinatoricGroup* VIS = m_RF_helper.getCombinatoricGroup("VIS");
 
   LAB->ClearEvent();
-  std::vector<RFKey> jetID; 
+  std::vector<RFKey> jetID;
   for(int i = 0; i < Njets; i++){
     jetID.push_back(VIS->AddLabFrameFourVector(jets[i]));
   }
@@ -353,9 +354,9 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   LabRecoFrame* LAB_bkg = m_RF_helper.getLabFrame("LAB_bkg");
   InvisibleGroup* INV_bkg = m_RF_helper.getInvisibleGroup("INV_bkg");
   CombinatoricGroup* VIS_bkg = m_RF_helper.getCombinatoricGroup("VIS_bkg");
-  
+
   LAB_bkg->ClearEvent();
-  std::vector<RFKey> jetID_bkg; 
+  std::vector<RFKey> jetID_bkg;
   for(int i = 0; i < Njets; i++){
     TLorentzVector jet = jets[i];
     jet.SetPtEtaPhiM(jets[i].Pt(),0.0,jets[i].Phi(),jets[i].M());
@@ -363,14 +364,14 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   }
   INV_bkg->SetLabFrameThreeVector(metVec.Vect());
   LAB_bkg->AnalyzeEvent();
-  
+
   // ISR-assisted tree
   LabRecoFrame* LAB_ISR = m_RF_helper.getLabFrame("LAB_ISR");
   InvisibleGroup* INV_ISR = m_RF_helper.getInvisibleGroup("INV_ISR");
   CombinatoricGroup* VIS_ISR = m_RF_helper.getCombinatoricGroup("VIS_ISR");
 
   LAB_ISR->ClearEvent();
-  std::vector<RFKey> jetID_ISR; 
+  std::vector<RFKey> jetID_ISR;
   for(int i = 0; i < Njets; i++){
     TLorentzVector jet = jets[i];
     jet.SetPtEtaPhiM(jets[i].Pt(),0.0,jets[i].Phi(),jets[i].M());
@@ -387,17 +388,17 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 
   TLorentzVector Psib = I_bkg->GetSiblingFrame().GetFourVector(*LAB_bkg);
   TLorentzVector Pmet = I_bkg->GetFourVector(*LAB_bkg);
-  
+
   double Rsib = std::max(0.,Psib.Vect().Dot(Pmet.Vect().Unit()));
   Rsib = Rsib / (Pmet.Pt() + Rsib);
-  
+
   TVector3 boostQCD = (Pmet+Psib).BoostVector();
   Psib.Boost(-boostQCD);
   double cosQCD = -1.*Psib.Vect().Unit().Dot(boostQCD.Unit());
   cosQCD = (1.-cosQCD)/2.;
-  
+
   // deltaQCD definition
-  double deltaQCD = (cosQCD-Rsib)/(cosQCD+Rsib); 
+  double deltaQCD = (cosQCD-Rsib)/(cosQCD+Rsib);
 
   // nominal tree variables
   DecayRecoFrame* PP = m_RF_helper.getDecayFrame("PP");
@@ -428,7 +429,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   double H5PP = vP_V1aPP.P() + vP_V2aPP.P() + vP_V1bPP.P() + vP_V2bPP.P() + (vP_IaPP + vP_IbPP).P();
 
   double eta12 = std::max(fabs(jets[0].Eta()),fabs(jets[1].Eta()));
- 
+
   double pTPP_Va  = PP->GetTransverseMomentum(V1a->GetFourVector()+V2a->GetFourVector());
   double pTPP_V1a = V1a->GetTransverseMomentum(*PP);
   double pTPP_V2a = V2a->GetTransverseMomentum(*PP);
@@ -437,7 +438,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   double pTPP_V2b = V2b->GetTransverseMomentum(*PP);
   double pTPP_Ia = Ia->GetTransverseMomentum(*PP);
   double pTPP_Ib = Ib->GetTransverseMomentum(*PP);
-  
+
   double pPP_Va  = (V1a->GetFourVector(*PP)+V2a->GetFourVector(*PP)).P();
   double pPP_V1a = V1a->GetMomentum(*PP);
   double pPP_V2a = V2a->GetMomentum(*PP);
@@ -472,7 +473,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 	if(pT > pTPP_jet2a){
 	  pTPP_jet2a = pT;
 	  eta_jet2a  = eta;
-	} 
+	}
       }
     }
     if(V1b->IsSame(frame) || V2b->IsSame(frame)){
@@ -485,7 +486,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 	if(pT > pTPP_jet2b){
 	  pTPP_jet2b = pT;
 	  eta_jet2b  = eta;
-	} 
+	}
       }
     }
   }
@@ -504,7 +505,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   double HT3PP = pTPP_Va + pTPP_Vb + H2PP/2.;
   double HT5PP = pTPP_V1a + pTPP_V1b +
     pTPP_V2a + pTPP_V2b + H2PP/2.;
-  
+
   /// squark ratios
   double R_H2PP_H3PP = H2PP/H3PP;
   double R_pTj2_HT3PP = pTPP_jet2 / HT3PP;
@@ -519,7 +520,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   TVector3 vP_PP = PP->GetFourVector(*LAB).Vect();
   double pTCM = vP_PP.Pt();
   double pZCM = fabs(vP_PP.Pz());
-  
+
   //double RPZ_HT3PP = pZCM / (pZCM + HT3PP);
   double RPZ_HT5PP = pZCM / (pZCM + HT5PP);
   double RPT_HT3PP = pTCM / (pTCM + HT3PP);
@@ -585,7 +586,7 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   }
 
   // ISR-assisted analysis
-  
+
   DecayRecoFrame* CM_ISR = m_RF_helper.getDecayFrame("CM_ISR");
   DecayRecoFrame* S_ISR = m_RF_helper.getDecayFrame("S_ISR");
   VisibleRecoFrame* V_ISR = m_RF_helper.getVisibleFrame("V_ISR");
@@ -652,3 +653,4 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 
   return;
 }
+#endif

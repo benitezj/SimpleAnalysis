@@ -1,3 +1,4 @@
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/AnalysisClass.h"
 
 DefineAnalysis(StopZeroLepton2016)
@@ -23,7 +24,7 @@ void StopZeroLepton2016::Init()
   S->AddChildFrame(*V);
   S->AddChildFrame(*I);
 
-  LAB->InitializeTree(); 
+  LAB->InitializeTree();
 
   InvisibleGroup*  INV = m_RF_helper.addInvisibleGroup("INV");
   INV->AddFrame(*I);
@@ -53,18 +54,18 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 {
   auto baseElectrons  = event->getElectrons(7, 2.47, EVeryLooseLH);
   auto baseMuons      = event->getMuons(6,2.7, MuLoose);
-  auto baseJets       = event->getJets(20., 2.8); 
-  //auto baseTaus       = event->getTaus(20., 2.5, TauLoose); 
+  auto baseJets       = event->getJets(20., 2.8);
+  //auto baseTaus       = event->getTaus(20., 2.5, TauLoose);
   auto metVec         = event->getMET();
   float Met = metVec.Pt();
-  
+
   // Reject events with bad jets
   // CHECK: right place?
   if (countObjects(baseJets, 20, 4.5, NOT(LooseBadJet))!=0) return;
 
   // overlap removal
   auto radiusCalcLepton = [] (const AnalysisObject& lepton, const AnalysisObject& ) { return std::min(0.4, 0.04 + 10/lepton.Pt()); };
-  auto muJetSpecial = [] (const AnalysisObject& jet, const AnalysisObject& muon) { 
+  auto muJetSpecial = [] (const AnalysisObject& jet, const AnalysisObject& muon) {
     if (jet.pass(NOT(BTag77MV2c20)) && (jet.pass(LessThan3Tracks) || muon.Pt()/jet.Pt()>0.7)) return 0.2;
     else return 0.;
   };
@@ -79,7 +80,7 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 
   baseMuons     = overlapRemoval(baseMuons,baseJets, radiusCalcLepton);
   baseElectrons = overlapRemoval(baseElectrons,baseJets, radiusCalcLepton);
-  
+
   //baseTaus      = overlapRemoval(baseTaus, baseElectrons, 0.1);
 
   auto baseLeptons     = baseElectrons+baseMuons;
@@ -89,9 +90,9 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   auto signalElectrons = filterObjects(baseElectrons, 20, 2.47, ELooseLH|ED0Sigma5|EZ05mm|EIsoLooseTrack);
   auto signalMuons     = filterObjects(baseMuons, 20, 2.7, MuD0Sigma3|MuZ05mm|MuIsoLooseTrack);
   auto signalLeptons   = signalElectrons+signalMuons;
-  
-  auto fatJetsR8 = reclusterJets(signalJets, 0.8, 150, 0.2, 0.05);  
-  auto fatJetsR12 = reclusterJets(signalJets, 1.2, 150, 0.2, 0.05);  
+
+  auto fatJetsR8 = reclusterJets(signalJets, 0.8, 150, 0.2, 0.05);
+  auto fatJetsR12 = reclusterJets(signalJets, 1.2, 150, 0.2, 0.05);
 
   if (Met<250 || baseLeptons.size()>0 || signalJets.size()<4 || signalBJets.size()<1 || signalJets[3].Pt()<40)  return;
 
@@ -103,15 +104,15 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   float AntiKt12M_0 = 0;
   float AntiKt12M_1 = 0;
   float MtTauCand = -1 ;
-  float MtBMin = 0 ; 
-  float MtBMax = 0 ; 
+  float MtBMin = 0 ;
+  float MtBMax = 0 ;
 
   if (fatJetsR8.size()>0)  AntiKt8M_0 = fatJetsR8[0].M() ;
   if (fatJetsR8.size()>1)  AntiKt8M_1 = fatJetsR8[1].M() ;
-  if (fatJetsR12.size()>0) AntiKt12M_0 = fatJetsR12[0].M() ; 
-  if (fatJetsR12.size()>1) AntiKt12M_1 = fatJetsR12[1].M() ; 
+  if (fatJetsR12.size()>0) AntiKt12M_0 = fatJetsR12[0].M() ;
+  if (fatJetsR12.size()>1) AntiKt12M_1 = fatJetsR12[1].M() ;
   if (NBJets>1) DRBB = signalBJets[1].DeltaR(signalBJets[0]);
-  
+
   double dPhi_min = 1000.;
   double dPhi_max = 0.;
   if (signalBJets.size()>=2)  {
@@ -129,13 +130,13 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   }
   float realWMass = 80.385;
   float realTopMass = 173.210;
-    
+
   //Chi2 method
   double Chi2min = DBL_MAX;
   int W1j1_low = -1,W1j2_low = -1,W2j1_low = -1,W2j2_low = -1,b1_low = -1,b2_low = -1;
-    
+
   double m_mt2Chi2 = 0;
-    
+
   if (signalJets.size()>=4 && signalBJets.size()>=2 && nonBJets.size()>=2)
     {
       for(int W1j1=0; W1j1<(int)nonBJets.size(); W1j1++) {// <------------------This lines has to be replaced
@@ -145,19 +146,19 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 	  //		for(int W2j1=W1j1+1;W2j1<(int)ljets.size(); W2j1++) {
 	  for(int b1=0;b1<(int)signalBJets.size();b1++){
 	    for(int b2=0;b2<(int)signalBJets.size();b2++){
-	      if(b2==b1) continue;	
+	      if(b2==b1) continue;
 	      double chi21, chi22, mW1, mW2, mt1, mt2;
-	      
+
 	      if(W2j1>W1j1){
-		
+
 		mW1 = nonBJets[W1j1].M();
 		mW2 = nonBJets[W2j1].M();
 		mt1 = (nonBJets[W1j1]+signalBJets[b1]).M();
 	        mt2 = (nonBJets[W2j1]+signalBJets[b2]).M();
-		
+
 		chi21 = (mW1-realWMass)*(mW1-realWMass)/realWMass + (mt1-realTopMass)*(mt1-realTopMass)/realTopMass;
 		chi22 = (mW2-realWMass)*(mW2-realWMass)/realWMass + (mt2-realTopMass)*(mt2-realTopMass)/realTopMass;
-		
+
 		if(Chi2min > (chi21 + chi22)){
 		  Chi2min = chi21 + chi22;
 		  if(chi21 < chi22){
@@ -178,13 +179,13 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 		  }
 		}
 	      }
-	     
+
 	      if (nonBJets.size()<3)
 		continue;
-		  
+
 	      for(int W1j2=W1j1+1;W1j2 < (int)nonBJets.size(); W1j2++) {
 		if(W1j2==W2j1) continue;
-		    
+
 		//try bll,bl top candidates
 		mW1 = (nonBJets[W1j1] + nonBJets[W1j2]).M();
 		mW2 = (nonBJets[W2j1]).M();
@@ -242,16 +243,16 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 		    }
 		  }
 		}
-	      }		  
+	      }
 	    }
 	  }
 	}
       }
-	
+
       AnalysisObject WCand0=nonBJets[W1j1_low];
       if (W1j2_low != -1) WCand0 +=nonBJets[W1j2_low];
       AnalysisObject topCand0 = WCand0 + signalBJets[b1_low];
-	
+
       AnalysisObject WCand1 = nonBJets[W2j1_low];
       if(W2j2_low != -1) WCand1 += nonBJets[W2j2_low];
       AnalysisObject topCand1 = WCand1 + signalBJets[b2_low];
@@ -266,7 +267,7 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 	AnalysisObject top1(top1Chi2.Px(),top1Chi2.Py(),0,Energy1,0,0,COMBINED,0);
 	m_mt2Chi2 = calcMT2(top0,top1,metVec);
       }
-      
+
     }
 
 
@@ -282,7 +283,7 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   double CA_dphiISRI=0;
   double CA_pTjV4=0;
   double CA_pTbV1=0;
- 
+
   LabRecoFrame* LAB = m_RF_helper.getLabFrame("LAB");
   InvisibleGroup* INV = m_RF_helper.getInvisibleGroup("INV");
   CombinatoricGroup* VIS = m_RF_helper.getCombinatoricGroup("VIS");
@@ -291,7 +292,7 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   std::vector<RFKey> jetID;
 
   // use transverse view of jet 4-vectors
-  for(const auto & jet : signalJets) 
+  for(const auto & jet : signalJets)
     jetID.push_back(VIS->AddLabFrameFourVector(jet.transFourVect()));
 
   INV->SetLabFrameThreeVector(metVec.Vect());
@@ -325,19 +326,19 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
       if (signalJets[i].pass(BTag77MV2c20) && fabs(signalJets[i].Eta())<2.5)
 	m_NbISR++;
     }
-  }    
+  }
 
   // need at least one jet associated with MET-side of event
   if(m_NjV >= 1)
     {
       TVector3 vP_ISR = ISR->GetFourVector(*CM).Vect();
       TVector3 vP_I   = I->GetFourVector(*CM).Vect();
-	
+
       m_PTISR = vP_ISR.Mag();
       m_RISR = fabs(vP_I.Dot(vP_ISR.Unit())) / m_PTISR;
 
       m_MS = S->GetMass();
- 
+
       m_dphiISRI = fabs(vP_ISR.DeltaPhi(vP_I));
 
       CA_PTISR=m_PTISR;
@@ -350,16 +351,16 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
       CA_pTbV1=m_pTbV1;
     }
 
-  double Ht = sumObjectsPt(signalJets); 
-  double HtSig = Met/sqrt(Ht); 
+  double Ht = sumObjectsPt(signalJets);
+  double HtSig = Met/sqrt(Ht);
   double sumTagJetPt = sumObjectsPt(signalBJets,2);
 
   if ( AntiKt12M_0>120. && AntiKt12M_1 > 120. && Met > 400. && AntiKt8M_0>60. && MtBMin > 200. && MtTauCand < 0 && DRBB > 1. && MT2Chi2>400. && NBJets>=2 )
-    accept("SRA_TT"); 
-  
+    accept("SRA_TT");
+
   if ( AntiKt12M_0>120. && AntiKt12M_1 < 120. && AntiKt12M_1 > 60. && Met > 500. && AntiKt8M_0>60. && MtBMin > 200. && MtTauCand < 0 && MT2Chi2>400. && NBJets>=2)
     accept("SRA_TW");
-  
+
   if (AntiKt12M_0>120. && AntiKt12M_1 < 60. &&  AntiKt8M_0 > 60. && Met>550. && MtBMin > 200. && MtTauCand < 0 && MT2Chi2>500. && NBJets>=2 )
     accept("SRA_T0");
 
@@ -398,3 +399,4 @@ void StopZeroLepton2016::ProcessEvent(AnalysisEvent *event)
 
     return;
 }
+#endif

@@ -6,8 +6,15 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <RootCore/Packages.h>
 
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/RestFramesHelper.h"
+#endif
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+#include "BTaggingTruthTagging/BTaggingTruthTaggingTool.h"
+#endif
 
 enum AnalysisObjectType { ELECTRON,MUON,TAU,PHOTON,JET,FATJET,MET,COMBINED};
 
@@ -156,6 +163,10 @@ class AnalysisEvent
   virtual ~AnalysisEvent() {};
 };
 
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+class BTaggingTruthTaggingTool;
+#endif
+
 class AnalysisClass;
 
 std::vector<AnalysisClass*> *getAnalysisList(); //for automatically tracking which analyses have been defined
@@ -228,7 +239,13 @@ class AnalysisClass
 
   static AnalysisObjects reclusterJets(const AnalysisObjects &jets, float radius, float ptmin, float rclus=-1, float ptfrac=-1);
 
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
   RestFramesHelper m_RF_helper;
+#endif
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+  BTaggingTruthTaggingTool *m_btt;
+#endif
 
 protected:
   std::string _name;

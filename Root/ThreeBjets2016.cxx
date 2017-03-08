@@ -1,11 +1,4 @@
 #include "SimpleAnalysis/AnalysisClass.h"
-#include <RootCore/Packages.h>
-
-#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
-#pragma message "Compiling BTaggingTruthTagging for TRF usage"
-#include "BTaggingTruthTagging/BTaggingTruthTaggingTool.h"
-static  BTaggingTruthTaggingTool *m_btt;
-#endif
 
 DefineAnalysis(ThreeBjets2016)
 
@@ -118,6 +111,7 @@ void ThreeBjets2016::Init()
   addHistogram("mc_weight", 1, 0, 1);
 
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+#pragma message "Compiling BTaggingTruthTagging for TRF usage"
   m_btt = new BTaggingTruthTaggingTool("MyBTaggingTruthTaggingTool");
   StatusCode code = m_btt->setProperty("TaggerName",          "MV2c10");
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool TaggerName property");
