@@ -113,7 +113,7 @@ void ThreeBjets2016::Init()
 
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
   m_btt = new BTaggingTruthTaggingTool("MyBTaggingTruthTaggingTool");
-  StatusCode  code = m_btt->setProperty("TaggerName",          "MV2c10");
+  StatusCode code = m_btt->setProperty("TaggerName",          "MV2c10");
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool TaggerName property");
   code = m_btt->setProperty("OperatingPoint", "FixedCutBEff_77");
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting BTaggingTruthTaggingTool OperatingPoint property");
@@ -195,6 +195,9 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   int n_jets        = signalJets.size();
   int n_leptons     = signalLeptons.size();
 
+  // require at least 4 signal jets
+  if(n_jets < 4) return;
+
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
   m_btt->setSeed(n_jets + 10*n_leptons + 100*met + 1000*electrons.size() + 10000*muons.size());
   std::vector<double> pt   = std::vector<double>(signalJets.size(), 0);
@@ -207,10 +210,16 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
     eta[index]  = jet.at(index).eta();
     flav[index] = jet.at(index).truth_id();
   }
-#endif
 
-  // require at least 3 b-bjets and 4 signal jets
-  if(n_bjets<3 || n_jets<4) return;
+  StatusCode code = m_btt->setJets(&pt, &eta, &flav, &tagw);
+  if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting the jets for truth tagging in execute()");
+  code = m_btt->getTruthTagWei(4, m_TTweight_ex, m_TTweight_in);
+  if (code != StatusCode::SUCCESS) throw std::runtime_error("error in retrieving the weights");
+
+#else
+  // require at least 3 b-bjets
+  if(n_bjets<3) return;
+#endif
 
   // inclusive - all jets + leptons
   float meffi  = met + sumObjectsPt(signalJets) + sumObjectsPt(signalLeptons);
@@ -422,6 +431,11 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   ntupVar("truth_id1", signalJets[1].truth_id());
   ntupVar("truth_id2", signalJets[2].truth_id());
   ntupVar("truth_id3", signalJets[3].truth_id());
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+  ntupVar("weight_3b_in", m_TTweight_in.at(3));
+  ntupVar("weight_4b_in", m_TTweight_in.at(4));
+#endif
 
   return;
 }
