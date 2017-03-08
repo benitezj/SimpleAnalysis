@@ -1,6 +1,7 @@
 #include "SimpleAnalysis/AnalysisClass.h"
 
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+#pragma message "Compiling BTaggingTruthTagging for TRF usage"
 #include "BTaggingTruthTagging/BTaggingTruthTaggingTool.h"
 #endif
 
@@ -124,6 +125,7 @@ void ThreeBjets2016::Init()
   // call initialize() function
   code = m_btt->initialize();
   if (code != StatusCode::SUCCESS) throw std::runtime_error("error initializing the BTaggingTruthTaggingTool");
+  std::cout << "Initialized BTaggingTruthTagging tool" << std::endl;
 #endif
 
 }
@@ -200,13 +202,13 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   m_btt->setSeed(n_jets + 10*n_leptons + 100*met + 1000*electrons.size() + 10000*muons.size());
   std::vector<double> pt   = std::vector<double>(signalJets.size(), 0);
   std::vector<double> eta  = std::vector<double>(signalJets.size(), 0);
-  std::vector<double> flav = std::vector<double>(signalJets.size(), 0);
+  std::vector<int>    flav = std::vector<int>   (signalJets.size(), 1);
   std::vector<double> tagw = std::vector<double>(signalJets.size(), 1);
   for (unsigned int index = 0; index < signalJets.size(); ++index){
     auto jet = signalJets.at(index);
-    pt[index]   = jet.at(index).pt();
-    eta[index]  = jet.at(index).eta();
-    flav[index] = jet.at(index).truth_id();
+    pt[index]   = jet.Pt();
+    eta[index]  = jet.Eta();
+    flav[index] = jet.truth_id();
   }
 
   StatusCode code = m_btt->setJets(&pt, &eta, &flav, &tagw);
