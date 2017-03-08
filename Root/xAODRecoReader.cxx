@@ -90,6 +90,7 @@ static TauAnalysisTools::TauSelectionTool* initTauSel(std::string WP) {
 
 static SG::AuxElement::Accessor<float> acc_filtHT("GenFiltHT");
 static SG::AuxElement::Accessor<float> acc_filtMET("GenFiltMET");
+static SG::AuxElement::ConstAccessor<int> acc_HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
 xAODRecoReader::xAODRecoReader(std::vector<AnalysisClass*>& analysisList) : Reader(analysisList)
 {
@@ -435,7 +436,8 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
     else                 id |= TrueLightJet; //FIXME: could be a pile-up jet as well
 
     tlv.SetPtEtaPhiM(calibJet->pt()/1000.,calibJet->eta(),calibJet->phi(),calibJet->m()/1000.);
-    event->addJet(tlv,id,idx);
+    int truth_id = (acc_HadronConeExclTruthLabelID.isAvailable(*(calibJet))) ? acc_HadronConeExclTruthLabelID(*(calibJet)) : 1;
+    event->addJet(tlv,id,truth_id,idx);
     delete calibJet;
   }
 

@@ -381,5 +381,10 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   ntupVar("signalJets0_Pt", signalJets[0].Pt());
   ntupVar("signalJets3_Pt", signalJets[3].Pt());
 
+  ntupVar("truth_id0", signalJets[0].truth_id());
+  ntupVar("truth_id1", signalJets[1].truth_id());
+  ntupVar("truth_id2", signalJets[2].truth_id());
+  ntupVar("truth_id3", signalJets[3].truth_id());
+
   return;
 }

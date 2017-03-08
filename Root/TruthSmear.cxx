@@ -6,7 +6,7 @@
 #include <UpgradePerformanceFunctions/UpgradePerformanceFunctions.h>
 #endif
 
-TruthSmear::TruthSmear(std::vector<std::string>& 
+TruthSmear::TruthSmear(std::vector<std::string>&
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
 options
 #endif
@@ -87,7 +87,7 @@ event
   auto fatjets    = event->getFatJets(10.,5.2);
   auto met        = event->getMET();
   auto sumet      = event->getSumET();
-  
+
   double met_x = met.Px();
   double met_y = met.Py();
   if (smearMET) {
@@ -106,13 +106,13 @@ event
     if (smearElectrons){
       float eff = m_upgrade->getElectronEfficiency(electron.Pt()*1000., electron.Eta());
       if (m_random.Uniform(1.0)<eff) {
-	float electron_e = m_upgrade->getElectronSmearedEnergy(electron.E()*1000., electron.Eta())/1000.; 
+	float electron_e = m_upgrade->getElectronSmearedEnergy(electron.E()*1000., electron.Eta())/1000.;
 	TLorentzVector eLV;
 	eLV.SetPtEtaPhiM(electron.Pt()*electron_e/electron.E(),electron.Eta(),electron.Phi(),0.000510998910);
 	int echarge = electron.charge();
 	if (m_random.Uniform(1.0)< m_upgrade->getElectronChargeFlipProb(electron.Pt()*1000., electron.Eta())) echarge*=-1;
 	smeared->addElectron(eLV,echarge,electron.id(),idx);
-	if (m_random.Uniform(1.0)<m_upgrade->getElectronToPhotonFakeRate(electron.Pt()*1000., electron.Eta())) 
+	if (m_random.Uniform(1.0)<m_upgrade->getElectronToPhotonFakeRate(electron.Pt()*1000., electron.Eta()))
 	  smeared->addPhoton(eLV,PhotonIsoGood,-2);
       }
       idx++;
@@ -150,7 +150,7 @@ event
       if (tau.pass(TauThreeProng)) prong=3;
       float eff = m_upgrade->getTauEfficiency(tau.Pt()*1000., tau.Eta(), prong);
       if (m_random.Uniform(1.0)<eff) {
-	float tau_E = m_upgrade->getTauSmearedEnergy(tau.E()*1000., tau.Eta(), prong)/1000.; 
+	float tau_E = m_upgrade->getTauSmearedEnergy(tau.E()*1000., tau.Eta(), prong)/1000.;
 	TLorentzVector tauLV;
 	tauLV.SetPtEtaPhiM(tau.Pt()*tau_E/tau.E(),tau.Eta(),tau.Phi(),1.777682);
 	smeared->addTau(tauLV,tau.charge(),tau.id(),idx);
@@ -189,7 +189,7 @@ event
       char jetType = 'L';
       if (jet.pass(TrueBJet)) jetType = 'B';
       if (jet.pass(TrueCJet)) jetType = 'C';
-      
+
       float tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 70, m_upgrade->getPileupTrackConfSetting());
       float tagEff85 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 85, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
@@ -212,7 +212,7 @@ event
       if (jetpt) {
 	TLorentzVector j;
 	j.SetPtEtaPhiE(jetpt,jeteta,jetphi,jetE);
-	smeared->addJet(j,jetid,idx);
+	smeared->addJet(j,jetid,1,idx);
 	// Add jets faking electrons
 	if (m_random.Uniform(1.0)<m_upgrade->getElectronFakeRate(jet.Pt()*1000, jet.Eta())) {
 	  float electron_e = m_upgrade->getElectronFakeRescaledEnergy(jet.E()*1000., jet.Eta())/1000.;
@@ -245,14 +245,14 @@ event
 
     }
     else {
-      smeared->addJet(jet,jet.id(),idx++);
+      smeared->addJet(jet,jet.id(),1,idx++);
     }
   }
   if (addPileupJets) {
     for (const auto& pujet : m_upgrade->getPileupJets()) {
       float trackEff = m_upgrade->getTrackJetConfirmEff(pujet.Pt(), pujet.Eta(), "PU");
       float puProb = m_random.Uniform(1.0);
-            
+
       if (puProb > trackEff) continue; // FIXME: should couple this to JVT flag
       float tagEff70 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 70, m_upgrade->getPileupTrackConfSetting());
       float tagEff85 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 85, m_upgrade->getPileupTrackConfSetting());
@@ -260,7 +260,7 @@ event
       int jetid=GoodJet;
       if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
       if (tag<tagEff70) jetid=GoodBJet;
-      smeared->addJet(pujet.Px()/1000., pujet.Py()/1000., pujet.Pz()/1000., pujet.E()/1000., jetid, -1);
+      smeared->addJet(pujet.Px()/1000., pujet.Py()/1000., pujet.Pz()/1000., pujet.E()/1000., jetid, 1, -1);
       // Add jets faking photon
       if (m_random.Uniform(1.0)<m_upgrade->getPhotonPileupFakeRate(pujet.Pt()/*, pujet.Eta()*/)) {
 	float photon_et = m_upgrade->getPhotonPileupFakeRescaledET(pujet.Pt()/*., pujet.Eta()*/)/1000.;

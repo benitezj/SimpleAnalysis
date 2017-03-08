@@ -7,7 +7,7 @@
 class TruthEvent : public AnalysisEvent
 {
  public:
- TruthEvent(float sumet, double Ex, double Ey) : _sumet(sumet), _met(Ex,Ey,0,sqrt(Ex*Ex+Ey*Ey),0,0,MET,0) {};
+ TruthEvent(float sumet, double Ex, double Ey) : _sumet(sumet), _met(Ex,Ey,0,sqrt(Ex*Ex+Ey*Ey),0,0,MET,-1,0) {};
   virtual AnalysisObjects getElectrons(float ptCut,float etaCut,int isolation) { return AnalysisClass::filterObjects( _baseElectrons, ptCut, etaCut, isolation); };
   virtual AnalysisObjects getMuons(float ptCut,float etaCut,int isolation)  { return AnalysisClass::filterObjects( _baseMuons, ptCut, etaCut, isolation); };
   virtual AnalysisObjects getTaus(float ptCut,float etaCut,int isolation) { return AnalysisClass::filterObjects( _baseTaus, ptCut, etaCut, isolation); };
@@ -26,41 +26,41 @@ class TruthEvent : public AnalysisEvent
 
   virtual void   setChannelInfo(int mcChannel, int susyChannel) {  _mcChannel=mcChannel; _susyChannel=susyChannel; };
 
-  void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) { 
-    _baseElectrons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,ELECTRON,idx));
+  void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) {
+    _baseElectrons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,ELECTRON,-1,idx));
   };
-  void addElectron(TLorentzVector tlv, int charge,int iso, int idx) { 
-    _baseElectrons.push_back(AnalysisObject(tlv,charge,iso,ELECTRON,idx));
+  void addElectron(TLorentzVector tlv, int charge,int iso, int idx) {
+    _baseElectrons.push_back(AnalysisObject(tlv,charge,iso,ELECTRON,-1,idx));
   };
-  void addMuon(double Px, double Py, double Pz, double E, int charge,int iso, int idx) { 
-    _baseMuons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,MUON,idx));
+  void addMuon(double Px, double Py, double Pz, double E, int charge,int iso, int idx) {
+    _baseMuons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,MUON,-1,idx));
   };
-  void addMuon(TLorentzVector tlv, int charge, int iso, int idx) { 
-    _baseMuons.push_back(AnalysisObject(tlv,charge,iso,MUON,idx));
+  void addMuon(TLorentzVector tlv, int charge, int iso, int idx) {
+    _baseMuons.push_back(AnalysisObject(tlv,charge,iso,MUON,-1,idx));
   };
-  void addTau(double Px, double Py, double Pz, double E, int charge,int iso, int idx) { 
-    _baseTaus.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,TAU,idx));
+  void addTau(double Px, double Py, double Pz, double E, int charge,int iso, int idx) {
+    _baseTaus.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,TAU,-1,idx));
   };
-  void addTau(TLorentzVector tlv, int charge, int iso, int idx) { 
-    _baseTaus.push_back(AnalysisObject(tlv,charge,iso,TAU,idx));
+  void addTau(TLorentzVector tlv, int charge, int iso, int idx) {
+    _baseTaus.push_back(AnalysisObject(tlv,charge,iso,TAU,-1,idx));
   };
-  void addPhoton(double Px, double Py, double Pz, double E,int iso, int idx) { 
-    _basePhotons.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,PHOTON,idx));
+  void addPhoton(double Px, double Py, double Pz, double E,int iso, int idx) {
+    _basePhotons.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,PHOTON,-1,idx));
   };
-  void addPhoton(TLorentzVector tlv, int iso, int idx) { 
-    _basePhotons.push_back(AnalysisObject(tlv,0,iso,PHOTON,idx));
+  void addPhoton(TLorentzVector tlv, int iso, int idx) {
+    _basePhotons.push_back(AnalysisObject(tlv,0,iso,PHOTON,-1,idx));
   };
-  void addJet(double Px, double Py, double Pz, double E, int iso, int idx) { 
-    _baseJets.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,JET,idx));
+  void addJet(double Px, double Py, double Pz, double E, int iso, int truth_id, int idx) {
+    _baseJets.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,JET,truth_id,idx));
   };
-  void addJet(TLorentzVector tlv, int iso, int idx) { 
-    _baseJets.push_back(AnalysisObject(tlv,0,iso,JET,idx));
+  void addJet(TLorentzVector tlv, int iso, int truth_id, int idx) {
+    _baseJets.push_back(AnalysisObject(tlv,0,iso,JET,truth_id,idx));
   };
-  void addFatJet(double Px, double Py, double Pz, double E, int iso, int idx) { 
-    _baseFatJets.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,FATJET,idx));
+  void addFatJet(double Px, double Py, double Pz, double E, int iso, int idx) {
+    _baseFatJets.push_back(AnalysisObject(Px,Py,Pz,E,0,iso,FATJET,-1,idx));
   };
-  void addFatJet(TLorentzVector tlv, int iso, int idx) { 
-    _baseFatJets.push_back(AnalysisObject(tlv,0,iso,FATJET,idx));
+  void addFatJet(TLorentzVector tlv, int iso, int idx) {
+    _baseFatJets.push_back(AnalysisObject(tlv,0,iso,FATJET,-1,idx));
   };
 
   virtual void setGenMET(float genMET=0.){

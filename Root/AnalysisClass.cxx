@@ -17,7 +17,7 @@
 
 AnalysisObject operator+(const AnalysisObject& lhs, const AnalysisObject& rhs) {
   const TLorentzVector &tlhs=lhs;
-  return AnalysisObject(tlhs+rhs,lhs.charge()+rhs.charge(),0,COMBINED,0);
+  return AnalysisObject(tlhs+rhs,lhs.charge()+rhs.charge(),0,COMBINED,-1,0);
 }
 
 
@@ -232,9 +232,9 @@ AnalysisObjects AnalysisClass::reclusterJets(const AnalysisObjects &jets, float 
     if (ptfrac>=0) {
       fastjet::PseudoJet trimmed_jet=trimmer(fat_jet);
       if (trimmed_jet.pt()>ptmin)
-	fatJets.push_back(AnalysisObject(trimmed_jet.px(), trimmed_jet.py(), trimmed_jet.pz(), trimmed_jet.E(), 0, 0, COMBINED, 0));
+	fatJets.push_back(AnalysisObject(trimmed_jet.px(), trimmed_jet.py(), trimmed_jet.pz(), trimmed_jet.E(), 0, 0, COMBINED, -1, 0));
     } else {
-      fatJets.push_back(AnalysisObject(fat_jet.px(), fat_jet.py(), fat_jet.pz(), fat_jet.E(), 0, 0, COMBINED, 0));
+      fatJets.push_back(AnalysisObject(fat_jet.px(), fat_jet.py(), fat_jet.pz(), fat_jet.E(), 0, 0, COMBINED, -1, 0));
     }
   }
   sortObjectsByPt(fatJets);
