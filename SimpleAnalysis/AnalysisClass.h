@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <RootCore/Packages.h>
 
 #include "SimpleAnalysis/RestFramesHelper.h"
 
