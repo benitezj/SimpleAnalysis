@@ -358,6 +358,7 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
                     && signalJets[0].pass(BTag77MV2c10)           && dphi1jet > 2.9            && signalJets[0].Pt() > 400                              ) accept("CR_IStR");
   }
 
+  ntupVar("mc_weight", event->getMCWeights()[0]);
 
   ntupVar("gen_met", gen_met);
   ntupVar("gen_ht", gen_ht);
