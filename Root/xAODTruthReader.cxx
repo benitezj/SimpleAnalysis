@@ -330,6 +330,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     else                 id |= TrueLightJet;
     int truth_id = (acc_HadronConeExclTruthLabelID.isAvailable(*(jet))) ? acc_HadronConeExclTruthLabelID(*(jet)) : 1;
     event->addJet(tlv,id,truth_id,idx);
+    //event->addJet(tlv,id,flavor,idx);
   }
 
   idx=0;

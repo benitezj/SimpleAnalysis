@@ -112,6 +112,8 @@ void ThreeBjets2016::Init()
   addHistogram("GenMET",40,0,2000);
   addHistogram("GenHT",40,0,2000);
 
+  addHistogram("mc_weight", 1, 0, 1);
+
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
   m_btt = new BTaggingTruthTaggingTool("MyBTaggingTruthTaggingTool");
   StatusCode code = m_btt->setProperty("TaggerName",          "MV2c10");
@@ -136,6 +138,8 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   float gen_met      = event->getGenMET();
   float gen_ht       = event->getGenHT();
   int channel_number = event->getMCNumber();
+
+  fill("mc_weight", event->getMCWeights()[0]);
 
   // handle HT slicing now
   if(channel_number==410000 && gen_ht>600) return;
@@ -207,7 +211,7 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   std::vector<double> tagw = std::vector<double>(candBJets.size(), 1);
   for (unsigned int index = 0; index < candBJets.size(); ++index){
     auto jet = candBJets.at(index);
-    pt[index]   = jet.Pt();
+    pt[index]   = jet.Pt()*1.e3;
     eta[index]  = jet.Eta();
     flav[index] = jet.truth_id();
   }
