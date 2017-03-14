@@ -145,7 +145,7 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   if(channel_number==410000 && gen_ht>600) return;
   if(channel_number==410001 && gen_ht>600) return;
   if(channel_number==410002 && gen_ht>600) return;
-  if(channel_number==410003 && gen_ht>600) return;
+  if(channel_number==410225 && gen_ht>600) return;
   if(channel_number==410004 && gen_ht>600) return;
   if(channel_number==407018 && gen_ht>500) return;
   if(channel_number==407020 && gen_ht>500) return;
