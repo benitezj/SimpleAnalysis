@@ -310,7 +310,11 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     const auto jet = *it;
     tlv.SetPtEtaPhiM(jet->pt()/1000.,jet->eta(),jet->phi(),jet->m()/1000.);
     int flavor=0;
-    if (jet->isAvailable<int>("PartonTruthLabelID"))
+    if (jet->isAvailable<int>("HadronConeExclusionID"))
+      flavor=jet->auxdata<int>("HadronConeExclusionID"); 
+    else if (jet->isAvailable<int>("ConeTruthLabelID"))
+      flavor=jet->auxdata<int>("ConeTruthLabelID"); 
+    else if (jet->isAvailable<int>("PartonTruthLabelID"))
       flavor=abs(jet->auxdata<int>("PartonTruthLabelID"));
     else if (jet->isAvailable<int>("GhostBHadronsFinalCount")) {
       if (jet->auxdata<int>("GhostBHadronsFinalCount")) {
@@ -319,10 +323,13 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
 	flavor=4;
       } else flavor=1;
     }
-    event->addJet(tlv,(flavor==5)?GoodBJet:GoodJet,idx);
+    int id=(flavor==5)?GoodBJet:GoodJet;
+    if (flavor==4)       id |= TrueCJet;
+    else if (flavor==5)  id |= TrueBJet;
+    else if (flavor==15) id |= TrueTau;
+    else                 id |= TrueLightJet;
+    event->addJet(tlv,id,idx);
   }
-
-  //TODO: Add fat jets
 
   idx=0;
   const xAOD::JetContainer* truthfatjets = 0;
@@ -337,7 +344,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   	it != truthfatjets->end(); ++it ){
       const auto jet = *it;
       tlv.SetPtEtaPhiM(jet->pt()/1000.,jet->eta(),jet->phi(),jet->m()/1000.);
-      int flavor=0;
+      int flavor=0; //FIXME check if there are more recent labels for fat jets
       if (jet->isAvailable<int>("PartonTruthLabelID"))
         flavor=abs(jet->auxdata<int>("PartonTruthLabelID"));
       else {

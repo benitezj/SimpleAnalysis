@@ -82,6 +82,10 @@ enum AnalysisJetID { LooseBadJet=1<<8,
 		     BTag60MV2c10=1<<7,
 		     GoodBJet=BTag85MV2c20|BTag80MV2c20|BTag77MV2c20|BTag70MV2c20|
 		              BTag85MV2c10|BTag77MV2c10|BTag70MV2c10|BTag60MV2c10|GoodJet,
+		     TrueLightJet=1<<27, //These should not be used for actual analysis selection, only for understanding
+		     TrueCJet=1<<28,
+		     TrueBJet=1<<29,
+		     TrueTau=1<<30,
 
 };
 

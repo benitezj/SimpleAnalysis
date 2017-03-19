@@ -179,15 +179,20 @@ TruthEvent *TruthSmear::smearEvent(AnalysisEvent *event) {
       float jetphi = jet.Phi();
       float jetE   = jet.E()*jetpt/jet.Pt();
       char jetType = 'L';
-      if (jet.pass(GoodBJet)) jetType = 'B'; // FIXME: Need to check for charm jet as well
+      if (jet.pass(TrueBJet)) jetType = 'B';
+      if (jet.pass(TrueCJet)) jetType = 'C';
       
       float tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 70, m_upgrade->getPileupTrackConfSetting());
       float tagEff85 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 85, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
       if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
-      if (tag<tagEff70) jetid=GoodBJet;
-      
+      if (tag<tagEff70) jetid = GoodBJet;
+      if (jet.pass(TrueLightJet)) jetid|=TrueLightJet;
+      if (jet.pass(TrueCJet))     jetid|=TrueCJet;
+      if (jet.pass(TrueBJet))     jetid|=TrueBJet;
+      if (jet.pass(TrueTau))      jetid|=TrueTau;
+
       if (addPileupJets) {
 	if ( (jetpt*1000) < m_upgrade->getPileupJetPtThresholdMeV()) jetpt=0;
 	else {

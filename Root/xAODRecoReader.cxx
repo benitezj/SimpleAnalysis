@@ -416,6 +416,24 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
     if (_Btagging77Tool->accept(*calibJet)) id |= (BTag77MV2c10|BTag77MV2c20);
     if (_Btagging70Tool->accept(*calibJet)) id |= (BTag70MV2c10|BTag70MV2c20);
     if (_Btagging60Tool->accept(*calibJet)) id |= (BTag60MV2c10);
+    int flavor=0;
+    if (jet->isAvailable<int>("HadronConeExclusionID"))
+      flavor=jet->auxdata<int>("HadronConeExclusionID");
+    else if (jet->isAvailable<int>("ConeTruthLabelID"))
+      flavor=jet->auxdata<int>("ConeTruthLabelID"); 
+    else if (jet->isAvailable<int>("PartonTruthLabelID"))
+      flavor=abs(jet->auxdata<int>("PartonTruthLabelID"));
+    else if (jet->isAvailable<int>("GhostBHadronsFinalCount")) {
+      if (jet->auxdata<int>("GhostBHadronsFinalCount")) {
+	flavor=5;
+      } else if (jet->auxdata<int>("GhostCHadronsFinalCount")) {
+	flavor=4;
+      } else flavor=1;
+    }
+    if (flavor==4)       id |= TrueCJet;
+    else if (flavor==5)  id |= TrueBJet;
+    else if (flavor==15) id |= TrueTau;
+    else                 id |= TrueLightJet; //FIXME: could be a pile-up jet as well
 
     tlv.SetPtEtaPhiM(calibJet->pt()/1000.,calibJet->eta(),calibJet->phi(),calibJet->m()/1000.);
     event->addJet(tlv,id,idx);
