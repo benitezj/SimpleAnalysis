@@ -32,6 +32,20 @@ void OutputHandler::addHistogram(const std::string &label,int bins,float min,flo
   histograms[label]=hist; 
 }
 
+void OutputHandler::addHistogram(const std::string &label,int bins,float *edges) {
+  TH1 *hist=new TH1D((_title+label).c_str(),label.c_str(),bins,edges);
+  hist->SetDirectory(_oFile);
+  histograms[label]=hist;
+}
+
+void OutputHandler::addHistogram(const std::string &label,std::vector<float> &edges) {
+  float* my_edges = new float[ edges.size() ];
+  for (unsigned int e=0;e<edges.size();++e) my_edges[e] = edges[e];
+  TH1 *hist=new TH1D((_title+label).c_str(),label.c_str(),edges.size(),my_edges);
+  hist->SetDirectory(_oFile);
+  histograms[label]=hist;
+}
+
 void OutputHandler::addHistogram(const std::string &label,
 				 int binsX,float minX,float maxX,
 				 int binsY,float minY,float maxY) {
