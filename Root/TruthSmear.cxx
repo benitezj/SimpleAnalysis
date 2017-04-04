@@ -6,7 +6,11 @@
 #include <UpgradePerformanceFunctions/UpgradePerformanceFunctions.h>
 #endif
 
-TruthSmear::TruthSmear(std::vector<std::string>& options) :
+TruthSmear::TruthSmear(std::vector<std::string>& 
+#ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
+options
+#endif
+) :
 smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false) {
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
 
@@ -69,7 +73,11 @@ smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), sme
 #endif
 }
 
-TruthEvent *TruthSmear::smearEvent(AnalysisEvent *event) {
+TruthEvent *TruthSmear::smearEvent(AnalysisEvent *
+#ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
+event
+#endif
+) {
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
   auto electrons  = event->getElectrons(1.,4.2); // Filter on pT, eta and "ID"
   auto muons      = event->getMuons(1.,4.2);

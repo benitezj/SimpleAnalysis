@@ -13,8 +13,8 @@ class UpgradePerformanceFunctions;
 class TruthSmear
 {
  public:
-  TruthSmear(std::vector<std::string>& options);
-  TruthEvent *smearEvent(AnalysisEvent *event);
+  TruthSmear(std::vector<std::string>&);
+  TruthEvent *smearEvent(AnalysisEvent*);
 
  private:
   bool smearElectrons;

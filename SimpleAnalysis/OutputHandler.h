@@ -17,6 +17,8 @@ class OutputHandler {
   int addEntry(const std::string &label);
   void addEntries(const std::vector<std::string> &labels);
   void addHistogram(const std::string &label,int bins,float min,float max);
+  void addHistogram(const std::string &label,int bins,float *edges);
+  void addHistogram(const std::string &label,std::vector<float> &edges);
   void addHistogram(const std::string &label,
 		    int binsX,float minX,float maxX,
 		    int binsY,float minY,float maxY);
