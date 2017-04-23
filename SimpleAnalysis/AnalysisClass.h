@@ -138,6 +138,13 @@ public:
   virtual float           getGenHT()=0;
   virtual int             getMCNumber()=0; //Temporary until better solution found
   virtual int             getSUSYChannel()=0; //Temporary until better solution found
+  virtual int   getPDF_id1()  =0;
+  virtual float getPDF_x1()   =0;
+  virtual float getPDF_pdf1() =0;
+  virtual int   getPDF_id2()  =0;
+  virtual float getPDF_x2()   =0;
+  virtual float getPDF_pdf2() =0;
+  virtual float getPDF_scale()=0;
   virtual std::vector<float>  getMCWeights()=0; //Temporary until better solution found
   virtual ~AnalysisEvent() {};
 };
