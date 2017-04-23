@@ -25,6 +25,18 @@ class TruthEvent : public AnalysisEvent
   virtual std::vector<float>  getMCWeights() { return _mcWeights; }; //Temporary until better solution found
 
   virtual void   setChannelInfo(int mcChannel, int susyChannel) {  _mcChannel=mcChannel; _susyChannel=susyChannel; };
+  virtual int   getPDF_id1()  { return _id1; };
+  virtual float getPDF_x1()   { return _x1; };
+  virtual float getPDF_pdf1() { return _pdf1; };
+  virtual int   getPDF_id2()  { return _id2; };
+  virtual float getPDF_x2()   { return _x2; };
+  virtual float getPDF_pdf2() { return _pdf2; };
+  virtual float getPDF_scale() { return _scale; };
+  virtual void setPDFInfo(int id1, float x1, float pdf1,
+			  int id2, float x2, float pdf2, float scale) {
+    _id1=id1; _x1=x1; _pdf1=pdf1;
+    _id2=id2; _x2=x2; _pdf2=pdf2; _scale=scale;
+  };
 
   void addElectron(double Px, double Py, double Pz, double E, int charge, int iso, int idx) { 
     _baseElectrons.push_back(AnalysisObject(Px,Py,Pz,E,charge,iso,ELECTRON,idx));
@@ -89,6 +101,13 @@ class TruthEvent : public AnalysisEvent
 
   int             _mcChannel;
   int             _susyChannel;
+  int             _id1;
+  float           _x1;
+  float           _pdf1;
+  int             _id2;
+  float           _x2;
+  float           _pdf2;
+  float           _scale;
 
   std::vector<float> _mcWeights;
 

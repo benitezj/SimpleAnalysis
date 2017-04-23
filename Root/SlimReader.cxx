@@ -31,6 +31,7 @@ Bool_t SlimReaderSelector::Process(Long64_t entry)
   event->setChannelInfo(mcChannel,susyChannel);
   event->setGenMET(genMET);
   event->setGenHT(genHT);
+  event->setPDFInfo(pdf_id1,pdf_x1,pdf_pdf1,pdf_id2,pdf_x2,pdf_pdf2,pdf_scale);
 
   TLorentzVector tlv(0.,0.,0.,0.);
   for(unsigned int idx=0; idx<obj_pt[0]->size(); idx++) {

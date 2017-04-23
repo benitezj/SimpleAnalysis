@@ -11,7 +11,7 @@
 namespace po = boost::program_options;
 
 #include "SimpleAnalysis/SlimReader.h"
-#include "SimpleAnalysis/OldSlimReader.h"
+#include "SimpleAnalysis/D3PDReader.h"
 #include "SimpleAnalysis/xAODTruthReader.h"
 #include "SimpleAnalysis/xAODRecoReader.h"
 #include "SimpleAnalysis/AnalysisClass.h"
@@ -106,8 +106,8 @@ int main(int argc, char **argv) {
   }
   Reader *reader=0;
   if (fh->FindKey("truth")) {
-    std::cout<<"Reading (old-style) slimmed input"<<std::endl;
-    reader=new OldSlimReader(analysisList);
+    std::cout<<"Reading Run-1 NTUP_TRUTH input"<<std::endl;
+    reader=new D3PDReader(analysisList);
   } else if (fh->FindKey("ntuple")) {
     std::cout<<"Reading slimmed input"<<std::endl;
     reader=new SlimReader(analysisList);

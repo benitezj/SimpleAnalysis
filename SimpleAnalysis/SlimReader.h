@@ -30,6 +30,14 @@ public :
    Float_t         met_phi;
    Float_t         genMET;
    Float_t         genHT;
+
+   Int_t           pdf_id1;
+   Float_t         pdf_x1;
+   Float_t         pdf_pdf1;
+   Int_t           pdf_id2;
+   Float_t         pdf_x2;
+   Float_t         pdf_pdf2;
+   Float_t         pdf_scale;
    
    vector<float>   *obj_pt[NUMTYPES];
    vector<float>   *obj_eta[NUMTYPES];
@@ -49,6 +57,15 @@ public :
    TBranch        *b_met_phi;   //!
    TBranch        *b_gen_met;   //!
    TBranch        *b_gen_ht;   //!
+
+   TBranch        *b_pdf_id1;   //!
+   TBranch        *b_pdf_x1;    //!
+   TBranch        *b_pdf_pdf1;  //!
+   TBranch        *b_pdf_id2;   //!
+   TBranch        *b_pdf_x2;    //!
+   TBranch        *b_pdf_pdf2;  //!
+   TBranch        *b_pdf_scale; //!
+
    TBranch        *b_obj_pt[NUMTYPES];   //!
    TBranch        *b_obj_eta[NUMTYPES];   //!
    TBranch        *b_obj_phi[NUMTYPES];   //!
@@ -116,6 +133,14 @@ void SlimReaderSelector::Init(TTree *tree)
   fChain->SetBranchAddress("met_phi", &met_phi, &b_met_phi);
   fChain->SetBranchAddress("genMET", &genMET, &b_gen_met);
   fChain->SetBranchAddress("genHT", &genHT, &b_gen_ht);
+  fChain->SetBranchAddress("pdf_id1", &pdf_id1, &b_pdf_id1);
+  fChain->SetBranchAddress("pdf_x1", &pdf_x1, &b_pdf_x1);
+  fChain->SetBranchAddress("pdf_pdf1", &pdf_pdf1, &b_pdf_pdf1);
+  fChain->SetBranchAddress("pdf_id2", &pdf_id2, &b_pdf_id2);
+  fChain->SetBranchAddress("pdf_x2", &pdf_x2, &b_pdf_x2);
+  fChain->SetBranchAddress("pdf_pdf2", &pdf_pdf2, &b_pdf_pdf2);
+  fChain->SetBranchAddress("pdf_scale", &pdf_scale, &b_pdf_scale);
+
   int idx=0;
   std::vector<std::string> bNames({"el","mu","tau","ph","jet","fatjet"});
   for(const auto& bName : bNames) {
