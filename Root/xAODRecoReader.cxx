@@ -489,7 +489,12 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
     throw std::runtime_error("Could not retrieve truth event container with key TruthEvents");
   const xAOD::TruthEvent *truthevent = (*truthEvtCont)[0];
   const std::vector<float> weights  = truthevent->weights();
-
+  xAOD::TruthEvent::PdfInfo pdfInfo = truthevent->pdfInfo();
+  if (pdfInfo.valid()) {
+    event->setPDFInfo(pdfInfo.pdgId1,pdfInfo.x1,pdfInfo.xf1,
+		      pdfInfo.pdgId2,pdfInfo.x2,pdfInfo.xf2,
+		      pdfInfo.Q);
+  }
   event->setMCWeights(weights);
 
   _analysisRunner->processEvent(event,eventNumber);
