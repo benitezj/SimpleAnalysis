@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "SimpleAnalysis/RestFramesHelper.h"
+
 enum AnalysisObjectType { ELECTRON,MUON,TAU,PHOTON,JET,FATJET,MET,COMBINED};
 
 enum AnalysisCommonID { NotBit=1<<31 };
@@ -81,7 +83,7 @@ enum AnalysisJetID { LooseBadJet=1<<8,
 		     BTag70MV2c10=1<<6,
 		     BTag60MV2c10=1<<7,
 		     GoodBJet=BTag85MV2c20|BTag80MV2c20|BTag77MV2c20|BTag70MV2c20|
-		              BTag85MV2c10|BTag77MV2c10|BTag70MV2c10|BTag60MV2c10|GoodJet,
+		     BTag85MV2c10|BTag77MV2c10|BTag70MV2c10|BTag60MV2c10|GoodJet,
 		     TrueLightJet=1<<27, //These should not be used for actual analysis selection, only for understanding
 		     TrueCJet=1<<28,
 		     TrueBJet=1<<29,
@@ -125,7 +127,7 @@ AnalysisObjects operator+(const AnalysisObjects& lhs, const AnalysisObjects& rhs
 
 class AnalysisEvent
 {
-public:
+ public:
   virtual AnalysisObjects getElectrons(float ptCut,float etaCut,int isolation=1)=0;
   virtual AnalysisObjects getMuons(float ptCut,float etaCut,int isolation=1)=0;
   virtual AnalysisObjects getTaus(float ptCut,float etaCut,int isolation=1)=0;
@@ -148,9 +150,9 @@ std::vector<AnalysisClass*> *getAnalysisList(); //for automatically tracking whi
 
 class AnalysisClass
 {
-public:
+ public:
  AnalysisClass(const std::string &name) : _name(name),_output(0) { getAnalysisList()->push_back(this); };
- AnalysisClass() {};
+  AnalysisClass() {};
   virtual void Init() {};
   virtual void ProcessEvent(AnalysisEvent *event)=0;
   virtual void Final() {};
@@ -211,20 +213,22 @@ public:
 
   static AnalysisObjects reclusterJets(const AnalysisObjects &jets, float radius, float ptmin, float rclus=-1, float ptfrac=-1);
 
-protected:
+  RestFramesHelper m_RF_helper;
+
+ protected:
   std::string _name;
   OutputHandler *_output;
 
 };
 
 
-#define DefineAnalysis(ANALYSISNAME) \
-  class ANALYSISNAME : public AnalysisClass { \
-public: \
-  ANALYSISNAME() : AnalysisClass(#ANALYSISNAME) {}; \
-  void Init(); \
-  void ProcessEvent(AnalysisEvent *event); \
-  };  \
+#define DefineAnalysis(ANALYSISNAME)					\
+  class ANALYSISNAME : public AnalysisClass {				\
+  public:								\
+  ANALYSISNAME() : AnalysisClass(#ANALYSISNAME) {};			\
+    void Init();							\
+    void ProcessEvent(AnalysisEvent *event);				\
+  };									\
   static const AnalysisClass * ANALYSISNAME_instance __attribute__((used)) = new ANALYSISNAME(); 
   
 
