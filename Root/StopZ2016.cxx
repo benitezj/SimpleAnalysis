@@ -23,8 +23,8 @@ void StopZ2016::ProcessEvent(AnalysisEvent *event)
   muons      = overlapRemoval(muons, jets, 0.4);
 
   // object counting
-  auto signalElectrons = filterObjects(electrons, 10, 2.0, EMediumLH | EZ05mm | EIsoGradientLoose);
-  auto signalMuons     = filterObjects(muons, 10, 2.5, MuD0Sigma3 | MuZ05mm | MuIsoGradientLoose);
+  auto signalElectrons = filterObjects(electrons, 10, 2.47, EMediumLH | EZ05mm | EIsoGradientLoose);
+  auto signalMuons     = filterObjects(muons, 10, 2.4, MuD0Sigma3 | MuZ05mm | MuIsoGradientLoose);
   auto signalJets      = filterObjects(jets, 30, 2.5);
   auto bjets           = filterObjects(jets, 30., 2.5, BTag77MV2c10);
 
@@ -35,21 +35,17 @@ void StopZ2016::ProcessEvent(AnalysisEvent *event)
 
   AnalysisObjects signalLeptons = signalElectrons + signalMuons;
 
-  if (signalLeptons.size() > 2 && signalJets.size() > 1 ) {
+  if (signalLeptons.size() > 2 && njet30 > 1 && nbjet>0) {
     auto lep1pT = signalLeptons[0].Pt();
 
-    double bjet1pT;
-    if (bjets.size() > 0) bjet1pT = bjets[0].Pt();
-
-    double jet1pT;
-    if (signalJets.size() > 0) jet1pT = signalJets[0].Pt();
+    double bjet1pT = bjets[0].Pt();
+    double jet1pT = signalJets[0].Pt();
 
     //index and flavor of selected two leptons
     auto flavlep1 = -1;
     auto flavlep2 = -1;
     float closest_mll = -1;
     float closest_ptll = 0.;
-    float closest_dphill = 0.;
 
     for (UInt_t ilep = 0; ilep < signalLeptons.size(); ilep++) {
 
@@ -72,11 +68,9 @@ void StopZ2016::ProcessEvent(AnalysisEvent *event)
         double mll_12 = (lep1 + lep2).M();
         double isOS_12 = flavlep1 * flavlep2;
 
-        if (lep1.charge()*lep2.charge() < 0 && isSF && (((fabs(mll_12 - mZ) < fabs(closest_mll - mZ)) || (closest_mll == -1) ))) {
-
+        if (lep1.charge()*lep2.charge() < 0 && isOS_12 && isSF && (((fabs(mll_12 - mZ) < fabs(closest_mll - mZ)) || (closest_mll == -1) ))) {
           closest_mll = mll_12;
           closest_ptll = (lep1 + lep2).Perp();
-          closest_dphill = fabs(lep1.DeltaPhi(lep2));
         }
       }
     }

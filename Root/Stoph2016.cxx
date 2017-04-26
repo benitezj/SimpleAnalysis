@@ -23,8 +23,8 @@ void Stoph2016::ProcessEvent(AnalysisEvent *event)
   muons      = overlapRemoval(muons, jets, 0.4);
 
   // object counting
-  auto signalElectrons = filterObjects(electrons, 10, 2.0, EMediumLH | EZ05mm | EIsoGradientLoose);
-  auto signalMuons     = filterObjects(muons, 10, 2.5, MuD0Sigma3 | MuZ05mm | MuIsoGradientLoose);
+  auto signalElectrons = filterObjects(electrons, 10, 2.47, EMediumLH | EZ05mm | EIsoGradientLoose);
+  auto signalMuons     = filterObjects(muons, 10, 2.4, MuD0Sigma3 | MuZ05mm | MuIsoGradientLoose);
   auto signalJets      = filterObjects(jets, 30, 2.5);
   auto bjets           = filterObjects(jets, 30., 2.5, BTag77MV2c10);
 
