@@ -15,6 +15,8 @@ It should compile out-of-the-box on top of any recent AnalysisBase release
 (tested in AnalysisBase,2.4.28):
 ```
  rcSetup Base,2.4.28
+ #following line gets Ext_RestFrames RootCore package
+ git clone https://github.com/crogan/Ext_RestFrames.git
  #The following line is optional and is only needed if one wants to enable smearing 
  rc checkout_pkg $SVNOFF/PhysicsAnalysis/UpgradePhys/SmearingFunctions/UpgradePerformanceFunctions/tags
  rc find_packages

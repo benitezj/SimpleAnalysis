@@ -37,6 +37,7 @@ withoutSmearing:
     - rsync -a $CI_PROJECT_DIR $BUILD_DIR_ABS  --exclude $BUILD_DIR
     - set +e && source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh; set -e
     - rcSetup Base,2.4.28 || echo ignore alrb
+    - git clone https://github.com/crogan/Ext_RestFrames.git
     - rc clean
     - rc find_packages
     - rc compile
