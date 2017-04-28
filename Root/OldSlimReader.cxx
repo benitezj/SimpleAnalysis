@@ -12,7 +12,7 @@
 void OldSlimReaderSelector::Begin(TTree * /*tree*/)
 {
   //  TString option = GetOption();
-
+ 
 }
 
 void OldSlimReaderSelector::SlaveBegin(TTree * /*tree*/)
@@ -32,9 +32,9 @@ Bool_t OldSlimReaderSelector::Process(Long64_t entry)
       xAODTruth=1;
     }
   }
-
+  
   TruthEvent* event=new TruthEvent(0,MET_Truth_NonInt_etx/1000.,MET_Truth_NonInt_ety/1000.); //FIXME: need sumet as well
-
+  
   TLorentzVector tlv(0.,0.,0.,0.);
   for(int idx=0; idx<el_n; idx++) {
     int pdgID=fabs(el_origin->at(idx));
@@ -60,7 +60,7 @@ Bool_t OldSlimReaderSelector::Process(Long64_t entry)
   }
   for(int idx=0; idx<jet_AntiKt4TruthJets_n; idx++) {
     tlv.SetPtEtaPhiM(jet_AntiKt4TruthJets_pt->at(idx)/1000.,jet_AntiKt4TruthJets_eta->at(idx),jet_AntiKt4TruthJets_phi->at(idx),jet_AntiKt4TruthJets_m->at(idx)/1000.);
-    event->addJet(tlv,(abs(jet_AntiKt4TruthJets_flavor->at(idx))==5)?GoodBJet:GoodJet,1,idx);
+    event->addJet(tlv,(abs(jet_AntiKt4TruthJets_flavor->at(idx))==5)?GoodBJet:GoodJet,idx);
   }
   //TODO: Add photons and fat jets
   //TODO: weights etc. are not here
@@ -81,10 +81,10 @@ void OldSlimReaderSelector::Terminate()
 void OldSlimReader::processFilesInternal(const std::vector<std::string>& inputFileNames) {
   TChain *tree=new TChain("truth");
   for(const auto& fileName : inputFileNames) {
-    if (tree->Add(fileName.c_str())<1)
+    if (tree->Add(fileName.c_str())<1) 
       throw std::runtime_error("Could not find truth tree in input file !");
   }
-
+  
   OldSlimReaderSelector* selector = new OldSlimReaderSelector(_analysisRunner);
   tree->Process(selector);
   delete selector;

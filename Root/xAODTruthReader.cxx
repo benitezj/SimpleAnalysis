@@ -60,7 +60,7 @@ int xAODTruthReader::getTruthType(const xAOD::TruthParticle *part) {
   return 0;
 }
 
-xAOD::TruthParticleContainer*
+xAOD::TruthParticleContainer* 
 xAODTruthReader::findTruthParticles(xAOD::TStore *store,
 				  const xAOD::TruthParticleContainer* truthparticles,
 				    std::vector<int> pdgIds, int status) {
@@ -71,12 +71,12 @@ xAODTruthReader::findTruthParticles(xAOD::TStore *store,
   int idx=0;
   for ( xAOD::TruthParticleContainer::const_iterator it = truthparticles->begin();
 	it != truthparticles->end(); ++it ) {
-
+    
     if ( std::find(pdgIds.begin(), pdgIds.end(), abs((*it)->pdgId()) ) != pdgIds.end()
 	 && (*it)->status()==status && (*it)->barcode()<200000) {
       const auto result = _mctool->particleTruthClassifier(*it);
       MCTruthPartClassifier::ParticleOutCome outcome=_mctool->getParticleOutCome();
-      if (outcome==MCTruthPartClassifier::DecaytoElectron ||
+      if (outcome==MCTruthPartClassifier::DecaytoElectron || 
 	  outcome==MCTruthPartClassifier::DecaytoMuon) continue;
       xAOD::TruthParticle* part = new xAOD::TruthParticle();
       truth->push_back(part);
@@ -95,20 +95,20 @@ xAODTruthReader::findTruthParticles(xAOD::TStore *store,
     }
     idx++;
   }
-
+  
   std::string pid;
   for(auto ipdg : pdgIds)  pid += std::to_string(ipdg);
-
-  if (!store->record( truth, (std::string("Good")+pid).c_str()).isSuccess())
+ 
+  if (!store->record( truth, (std::string("Good")+pid).c_str()).isSuccess()) 
     throw std::runtime_error("Could not record truth particles");
-  if (!store->record( truthAux, (std::string("Good")+pid+"Aux.").c_str()).isSuccess())
+  if (!store->record( truthAux, (std::string("Good")+pid+"Aux.").c_str()).isSuccess()) 
     throw std::runtime_error("Could not record truth particles Aux");
   return truth;
 }
 
 static SG::AuxElement::Accessor<float> acc_filtHT("GenFiltHT");
 static SG::AuxElement::Accessor<float> acc_filtMET("GenFiltMET");
-static SG::AuxElement::ConstAccessor<int> acc_HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
+
 
 bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) {
 
@@ -116,14 +116,14 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   if ( !xaodEvent->retrieve( eventInfo, "EventInfo").isSuccess() ) {
     throw std::runtime_error("Cannot read EventInfo");
   }
-
+  
   int eventNumber = eventInfo->eventNumber();
   int mcChannel   = eventInfo->mcChannelNumber();
   if (mcChannel==0) mcChannel = eventInfo->runNumber();
   int susy_part_id1 = 0;
   int susy_part_id2 = 0;
   int susy_process  = 0;
-
+  
   const xAOD::TruthParticleContainer* truthparticles = 0;
   if ( xaodEvent->contains<xAOD::TruthParticleContainer>("TruthParticles")) {
     if ( !xaodEvent->retrieve( truthparticles, "TruthParticles").isSuccess() ) {
@@ -139,13 +139,13 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   if (susy_part_id1==0 && truthparticles->size()) susy_part_id1=truthparticles->at(0)->pdgId();
   if ((abs(susy_part_id1)>1000000) && (abs(susy_part_id1)>1000000)) //only consider BSM particles
     susy_process = SUSY::finalState(susy_part_id1,susy_part_id2);
-
+  
   const xAOD::MissingETContainer* metCont = 0;
   if ( !xaodEvent->retrieve(metCont, "MET_Truth").isSuccess() ){
     throw std::runtime_error("Could not retrieve truth met with key MET_Truth");
   }
   const xAOD::MissingET* met = (*metCont)["NonInt"];
-
+  
   TruthEvent* event=new TruthEvent(met->sumet()/1000.,met->mpx()/1000.,met->mpy()/1000.);
   event->setChannelInfo(mcChannel,susy_process);
 
@@ -167,7 +167,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     tlv.SetPtEtaPhiM(electron->pt()/1000.,electron->eta(),electron->phi(),electron->m()/1000.);
     event->addElectron(tlv,electron->charge(),iso?EIsoGood:0,idx++);
   }
-
+  
   idx=0;
   const xAOD::TruthParticleContainer* truthmuons = 0;
   if ( xaodEvent->contains<xAOD::TruthParticleContainer>("TruthMuons")) {
@@ -211,7 +211,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   const xAOD::TruthParticleContainer* truthphotons = 0;
   std::string photonName="TruthPhotons";
   if ( !xaodEvent->contains<xAOD::TruthParticleContainer>(photonName)) photonName="Truth3Photons";
-
+  
   if ( xaodEvent->contains<xAOD::TruthParticleContainer>(photonName)) {
     if ( !xaodEvent->retrieve( truthphotons, photonName).isSuccess() ) {
       throw std::runtime_error("Could not retrieve truth particles with key TruthPhotons");
@@ -250,7 +250,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     const xAOD::TruthParticleContainer* truthneutrinos = 0;
     std::string neutrinoName="TruthNeutrinos";
     if ( !xaodEvent->contains<xAOD::TruthParticleContainer>(neutrinoName)) neutrinoName="TruthNeutrinos";
-
+    
     if ( xaodEvent->contains<xAOD::TruthParticleContainer>(neutrinoName)) {
       if ( !xaodEvent->retrieve( truthneutrinos, neutrinoName).isSuccess() ) {
 	throw std::runtime_error("Could not retrieve truth particles with key TruthNeutrinos");
@@ -258,22 +258,22 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     } else {
       truthneutrinos=findTruthParticles(store,truthparticles,{12,14,16});
     }
-
-
+    
+    
     tlv.SetPtEtaPhiM(0.,0.,0.,0.);
     for ( xAOD::TruthParticleContainer::const_iterator it = truthneutrinos->begin();
 	  it != truthneutrinos->end(); ++it ){
       const auto nu = *it;
       int iPartOrig = getTruthOrigin(nu);
-
+      
       switch (iPartOrig) {
       case MCTruthPartClassifier::PhotonConv:
       case MCTruthPartClassifier::DalitzDec:
       case MCTruthPartClassifier::ElMagProc:
-      case MCTruthPartClassifier::Mu:
-      case MCTruthPartClassifier::TauLep:
-      case MCTruthPartClassifier::LightMeson:
-      case MCTruthPartClassifier::StrangeMeson:
+      case MCTruthPartClassifier::Mu:  
+      case MCTruthPartClassifier::TauLep:  
+      case MCTruthPartClassifier::LightMeson:  
+      case MCTruthPartClassifier::StrangeMeson:  
       case MCTruthPartClassifier::CharmedMeson:
       case MCTruthPartClassifier::BottomMeson:
       case MCTruthPartClassifier::CCbarMeson:
@@ -285,21 +285,21 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
       case MCTruthPartClassifier::BottomBaryon:
       case MCTruthPartClassifier::PionDecay:
       case MCTruthPartClassifier::KaonDecay:
-
+	
       case MCTruthPartClassifier::NonDefined:
 	continue;
       default:
 	break;
       }
       tlv += nu->p4();
-
+      
     }
     gen_met = tlv.Pt();
   }
   event->setGenMET( gen_met/1000. );
 
 
-
+    
   idx=0;
   const xAOD::JetContainer* truthjets = 0;
   if ( !xaodEvent->retrieve( truthjets, "AntiKt4TruthJets").isSuccess() ) {
@@ -310,10 +310,10 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     const auto jet = *it;
     tlv.SetPtEtaPhiM(jet->pt()/1000.,jet->eta(),jet->phi(),jet->m()/1000.);
     int flavor=0;
-    if (jet->isAvailable<int>("HadronConeExclusionID"))
-      flavor=jet->auxdata<int>("HadronConeExclusionID");
+    if (jet->isAvailable<int>("HadronConeExclTruthLabelID"))
+      flavor=jet->auxdata<int>("HadronConeExclTruthLabelID"); 
     else if (jet->isAvailable<int>("ConeTruthLabelID"))
-      flavor=jet->auxdata<int>("ConeTruthLabelID");
+      flavor=jet->auxdata<int>("ConeTruthLabelID"); 
     else if (jet->isAvailable<int>("PartonTruthLabelID"))
       flavor=abs(jet->auxdata<int>("PartonTruthLabelID"));
     else if (jet->isAvailable<int>("GhostBHadronsFinalCount")) {
@@ -328,18 +328,16 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     else if (flavor==5)  id |= TrueBJet;
     else if (flavor==15) id |= TrueTau;
     else                 id |= TrueLightJet;
-    int truth_id = (acc_HadronConeExclTruthLabelID.isAvailable(*(jet))) ? acc_HadronConeExclTruthLabelID(*(jet)) : 1;
-    event->addJet(tlv,id,truth_id,idx);
-    //event->addJet(tlv,id,flavor,idx);
+    event->addJet(tlv,id,idx);
   }
 
   idx=0;
   const xAOD::JetContainer* truthfatjets = 0;
   std::string fatjetName="AntiKt10TruthTrimmedPtFrac5SmallR20Jets";
   if ( !xaodEvent->contains<xAOD::JetContainer>(fatjetName)) fatjetName="TrimmedAntiKt10TruthJets";
-
+  
   if ( xaodEvent->contains<xAOD::JetContainer>(fatjetName)) {
-    if ( !xaodEvent->retrieve( truthfatjets, fatjetName).isSuccess() ) {
+    if ( !xaodEvent->retrieve( truthfatjets, fatjetName).isSuccess() ) { 
       throw std::runtime_error("Could not retrieve truth particles with key "+fatjetName);
     }
     for ( xAOD::JetContainer::const_iterator it = truthfatjets->begin();
@@ -362,7 +360,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     }
   }
 
-  //Get LHE3 weights
+  //Get LHE3 weights                                                                                                                                                              
   const xAOD::TruthEventContainer* truthEvtCont;
   if( !xaodEvent->retrieve( truthEvtCont, "TruthEvents").isSuccess() )
     throw std::runtime_error("Could not retrieve truth event container with key TruthEvents");

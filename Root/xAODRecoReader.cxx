@@ -90,7 +90,7 @@ static TauAnalysisTools::TauSelectionTool* initTauSel(std::string WP) {
 
 static SG::AuxElement::Accessor<float> acc_filtHT("GenFiltHT");
 static SG::AuxElement::Accessor<float> acc_filtMET("GenFiltMET");
-static SG::AuxElement::ConstAccessor<int> acc_HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
+
 
 xAODRecoReader::xAODRecoReader(std::vector<AnalysisClass*>& analysisList) : Reader(analysisList)
 {
@@ -194,7 +194,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
   int susy_part_id1 = 0;
   int susy_part_id2 = 0;
   int susy_process  = 0;
-
+  
   const xAOD::TruthParticleContainer* truthparticles = 0;
   if ( xaodEvent->contains<xAOD::TruthParticleContainer>("TruthParticles")) {
     if ( !xaodEvent->retrieve( truthparticles, "TruthParticles").isSuccess() ) {
@@ -210,7 +210,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
   if (susy_part_id1==0 && truthparticles->size()) susy_part_id1=truthparticles->at(0)->pdgId();
   if ((abs(susy_part_id1)>1000000) && (abs(susy_part_id1)>1000000)) //only consider BSM particles
     susy_process = SUSY::finalState(susy_part_id1,susy_part_id2);
-
+  
   //FIXME: should recalculate MET
   const xAOD::MissingETContainer* metCont = 0;
   if ( !xaodEvent->retrieve(metCont, "MET_Reference_AntiKt4EMTopo").isSuccess() ){
@@ -350,7 +350,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
       if (_TauBDTLooseTool->accept(*corrTau)) tauId |= TauLoose;
       if (_TauBDTMediumTool->accept(*corrTau)) tauId |= TauMedium;
       if (_TauBDTTightTool->accept(*corrTau)) tauId |= TauTight;
-
+      
       tlv.SetPtEtaPhiM(corrTau->pt()/1000.,corrTau->eta(),corrTau->phi(),corrTau->m()/1000.);
       event->addTau(tlv,corrTau->charge(),tauId,idx++);
       delete corrTau;
@@ -359,7 +359,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
 
   idx=0;
   const xAOD::PhotonContainer* photons = 0;
-
+  
   if ( !xaodEvent->retrieve( photons, "Photons").isSuccess() ) {
       throw std::runtime_error("Could not retrieve photon particles with key Photons");
   }
@@ -382,7 +382,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
 	     ||(corrPhoton->OQ()&67108864)!=0)
 	    ) ) ){
       //This a good photon wrt the photon cleaning
-      if (_electronPhotonShowerShapeFudgeTool->applyCorrection(*corrPhoton) != CP::CorrectionCode::Ok)
+      if (_electronPhotonShowerShapeFudgeTool->applyCorrection(*corrPhoton) != CP::CorrectionCode::Ok) 
 	throw std::runtime_error("Failed to apply photon shower shape correction");
       int id = 0;
       if (_photonLoose->accept(*corrPhoton))      id |= PhotonLoose;
@@ -436,17 +436,16 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
     else                 id |= TrueLightJet; //FIXME: could be a pile-up jet as well
 
     tlv.SetPtEtaPhiM(calibJet->pt()/1000.,calibJet->eta(),calibJet->phi(),calibJet->m()/1000.);
-    int truth_id = (acc_HadronConeExclTruthLabelID.isAvailable(*(calibJet))) ? acc_HadronConeExclTruthLabelID(*(calibJet)) : 1;
-    event->addJet(tlv,id,truth_id,idx);
+    event->addJet(tlv,id,idx);
     delete calibJet;
   }
 
   idx=0;
   const xAOD::JetContainer* fatjets = 0;
   std::string fatjetName="AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets";
-
+  
   if ( xaodEvent->contains<xAOD::JetContainer>(fatjetName)) {
-    if ( !xaodEvent->retrieve( fatjets, fatjetName).isSuccess() ) {
+    if ( !xaodEvent->retrieve( fatjets, fatjetName).isSuccess() ) { 
       throw std::runtime_error("Could not retrieve fat jets with key "+fatjetName);
     }
     for ( const auto& jet : *fatjets) {
@@ -474,7 +473,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
 
   //Generator Filter MET (e.g. for ttbar/singleTop samples)
   float gen_met=0.;
-  if ( acc_filtMET.isAvailable(*(eventInfo)) )
+  if ( acc_filtMET.isAvailable(*(eventInfo)) ) 
     gen_met = eventInfo->auxdata<float>("GenFiltMET");
   else
     WARN_ONCE("Warning : No GenFiltMETT decoration available. Setting MET to 0 for now...");
@@ -484,7 +483,7 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
   event->setGenMET( gen_met/1000. );
 
 
-  //Get LHE3 weights
+  //Get LHE3 weights                                                                                                                                                              
   const xAOD::TruthEventContainer* truthEvtCont;
   if( !xaodEvent->retrieve( truthEvtCont, "TruthEvents").isSuccess() )
     throw std::runtime_error("Could not retrieve truth event container with key TruthEvents");

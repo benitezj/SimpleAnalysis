@@ -1,11 +1,14 @@
 #include "SimpleAnalysis/AnalysisClass.h"
+#include <RootCore/Packages.h>
 
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
 #pragma message "Compiling BTaggingTruthTagging for TRF usage"
 #include "BTaggingTruthTagging/BTaggingTruthTaggingTool.h"
+static  BTaggingTruthTaggingTool *m_btt;
 #endif
 
 DefineAnalysis(ThreeBjets2016)
+
 
 void ThreeBjets2016::Init()
 {
@@ -132,6 +135,13 @@ void ThreeBjets2016::Init()
 
 }
 
+static int jetFlavor(AnalysisObject &jet) {
+  if (jet.pass(TrueBJet)) return 5;
+  if (jet.pass(TrueCJet)) return 4;
+  if (jet.pass(TrueTau)) return 15;
+  return 0;
+}
+
 void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
 {
 
@@ -204,22 +214,27 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   if(n_jets < 4) return;
 
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
-  m_btt->setSeed(n_jets + 10*n_leptons + 100*met + 1000*electrons.size() + 10000*muons.size());
+  std::vector<double>  m_TTweight_in;
+  std::vector<double>  m_TTweight_ex;
+  StatusCode code = m_btt->setSeed(n_jets + 10*n_leptons + 100*met + 1000*electrons.size() + 10000*muons.size());
+  if (!code.isSuccess()) throw std::runtime_error("error in setting the seed");
+
   std::vector<double> pt   = std::vector<double>(candBJets.size(), 0);
   std::vector<double> eta  = std::vector<double>(candBJets.size(), 0);
   std::vector<int>    flav = std::vector<int>   (candBJets.size(), 1);
   std::vector<double> tagw = std::vector<double>(candBJets.size(), 1);
+
   for (unsigned int index = 0; index < candBJets.size(); ++index){
     auto jet = candBJets.at(index);
     pt[index]   = jet.Pt()*1.e3;
     eta[index]  = jet.Eta();
-    flav[index] = jet.truth_id();
+    flav[index] = jetFlavor(jet);
   }
 
-  StatusCode code = m_btt->setJets(&pt, &eta, &flav, &tagw);
-  if (code != StatusCode::SUCCESS) throw std::runtime_error("error setting the jets for truth tagging in execute()");
+  code = m_btt->setJets(&pt, &eta, &flav, &tagw);
+  if (!code.isSuccess()) throw std::runtime_error("error setting the jets for truth tagging in execute()");
   code = m_btt->getTruthTagWei(4, m_TTweight_ex, m_TTweight_in);
-  if (code != StatusCode::SUCCESS) throw std::runtime_error("error in retrieving the weights");
+  if (!code.isSuccess()) throw std::runtime_error("error in retrieving the weights");
 #else
   // require at least 3 b-bjets
   if(n_bjets<3) return;
@@ -431,10 +446,10 @@ void ThreeBjets2016::ProcessEvent(AnalysisEvent *event)
   ntupVar("signalJets0_Pt", signalJets[0].Pt());
   ntupVar("signalJets3_Pt", signalJets[3].Pt());
 
-  ntupVar("truth_id0", signalJets[0].truth_id());
-  ntupVar("truth_id1", signalJets[1].truth_id());
-  ntupVar("truth_id2", signalJets[2].truth_id());
-  ntupVar("truth_id3", signalJets[3].truth_id());
+  ntupVar("truth_id0", jetFlavor(signalJets[0]));
+  ntupVar("truth_id1", jetFlavor(signalJets[1]));
+  ntupVar("truth_id2", jetFlavor(signalJets[2]));
+  ntupVar("truth_id3", jetFlavor(signalJets[3]));
 
 #ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
   ntupVar("weight_3b_in", m_TTweight_in.at(3));

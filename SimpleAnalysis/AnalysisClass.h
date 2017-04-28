@@ -6,7 +6,6 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include <RootCore/Packages.h>
 
 #include "SimpleAnalysis/RestFramesHelper.h"
 
@@ -99,11 +98,11 @@ class AnalysisObject : public TLorentzVector
 {
  public:
  AnalysisObject(double Px, double Py, double Pz, double E, int charge,
-		int id, AnalysisObjectType type, int truthID, int orgIndex) :
-  TLorentzVector(Px,Py,Pz,E), _charge(charge), _id(id), _type(type), _truthID(truthID), _orgIndex(orgIndex) {};
+		int id, AnalysisObjectType type, int orgIndex) :
+  TLorentzVector(Px,Py,Pz,E), _charge(charge), _id(id), _type(type), _orgIndex(orgIndex) {};
  AnalysisObject(TLorentzVector tlv, int charge,
-		int id, AnalysisObjectType type, int truthID, int orgIndex) :
-  TLorentzVector(tlv), _charge(charge), _id(id), _type(type), _truthID(truthID), _orgIndex(orgIndex) {};
+		int id, AnalysisObjectType type, int orgIndex) :
+  TLorentzVector(tlv), _charge(charge), _id(id), _type(type), _orgIndex(orgIndex) {};
   virtual bool pass(int id) const {
     if (id&NotBit)
       return (id&_id)==0;
@@ -113,12 +112,10 @@ class AnalysisObject : public TLorentzVector
   virtual int charge() const { return _charge; };
   virtual int type() const { return _type; };
   virtual int id() const { return _id; }; // not supposed to be used directly except to store in ntuples
-  virtual int truth_id() const { return _truthID; }; // represents HadronConeExclTruthLabelID
  private:
   int _charge; //not used for jets or photons
   int _id;
   AnalysisObjectType _type;
-  int _truthID;
   int _orgIndex;
 };
 
@@ -146,10 +143,6 @@ class AnalysisEvent
   virtual std::vector<float>  getMCWeights()=0; //Temporary until better solution found
   virtual ~AnalysisEvent() {};
 };
-
-#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
-class BTaggingTruthTaggingTool;
-#endif
 
 class AnalysisClass;
 
@@ -224,14 +217,6 @@ class AnalysisClass
   static AnalysisObjects reclusterJets(const AnalysisObjects &jets, float radius, float ptmin, float rclus=-1, float ptfrac=-1);
 
   RestFramesHelper m_RF_helper;
-
- protected:
-#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
-  std::vector<double>  m_TTweight_in;
-  std::vector<double>  m_TTweight_ex;
-
-  BTaggingTruthTaggingTool *m_btt;
-#endif
 
 protected:
   std::string _name;
