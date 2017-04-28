@@ -19,6 +19,8 @@ It should compile out-of-the-box on top of any recent AnalysisBase release
  git clone https://github.com/crogan/Ext_RestFrames.git
  #The following line is optional and is only needed if one wants to enable smearing 
  rc checkout_pkg $SVNOFF/PhysicsAnalysis/UpgradePhys/SmearingFunctions/UpgradePerformanceFunctions/tags
+ #The following line is optional and is only needed if one wants to enable b-jet weighting (for 3-bjet analysis) 
+ rc checkout_pkg $SVNOFF/PhysicsAnalysis/JetTagging/JetTagPerformanceCalibration/BTaggingTruthTagging/tags
  rc find_packages
  rc compile
 ```

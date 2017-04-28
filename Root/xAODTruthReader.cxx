@@ -310,8 +310,8 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
     const auto jet = *it;
     tlv.SetPtEtaPhiM(jet->pt()/1000.,jet->eta(),jet->phi(),jet->m()/1000.);
     int flavor=0;
-    if (jet->isAvailable<int>("HadronConeExclusionID"))
-      flavor=jet->auxdata<int>("HadronConeExclusionID"); 
+    if (jet->isAvailable<int>("HadronConeExclTruthLabelID"))
+      flavor=jet->auxdata<int>("HadronConeExclTruthLabelID"); 
     else if (jet->isAvailable<int>("ConeTruthLabelID"))
       flavor=jet->auxdata<int>("ConeTruthLabelID"); 
     else if (jet->isAvailable<int>("PartonTruthLabelID"))

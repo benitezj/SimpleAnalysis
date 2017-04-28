@@ -103,18 +103,18 @@ class AnalysisObject : public TLorentzVector
  AnalysisObject(TLorentzVector tlv, int charge,
 		int id, AnalysisObjectType type, int orgIndex) :
   TLorentzVector(tlv), _charge(charge), _id(id), _type(type), _orgIndex(orgIndex) {};
-  virtual bool pass(int id) const { 
+  virtual bool pass(int id) const {
     if (id&NotBit)
       return (id&_id)==0;
-    else 
-      return (id&_id)==id; 
+    else
+      return (id&_id)==id;
   } ;
   virtual int charge() const { return _charge; };
   virtual int type() const { return _type; };
   virtual int id() const { return _id; }; // not supposed to be used directly except to store in ntuples
  private:
   int _charge; //not used for jets or photons
-  int _id; 
+  int _id;
   AnalysisObjectType _type;
   int _orgIndex;
 };
@@ -185,11 +185,11 @@ class AnalysisClass
 
   static AnalysisObjects overlapRemoval(const AnalysisObjects &cands,
 					const AnalysisObjects &others,
-					std::function<float(const AnalysisObject&,const AnalysisObject&)> radiusFunc, 
+					std::function<float(const AnalysisObject&,const AnalysisObject&)> radiusFunc,
 					int passId=0);
 
   static AnalysisObjects filterObjects(const AnalysisObjects& cands,
-				       float ptCut,float etaCut=100.,int id=0); 
+				       float ptCut,float etaCut=100.,int id=0);
 
   static AnalysisObjects filterCrack(const AnalysisObjects& cands,float minEta=1.37,float maxEta=1.52);
 
@@ -199,10 +199,13 @@ class AnalysisClass
   static float sumObjectsPt(const AnalysisObjects& cands,
 			    unsigned int maxNum=10000,float ptCut=0);
 
+  static float sumObjectsM(const AnalysisObjects& cands,
+			    unsigned int maxNum=10000,float mCut=0);
+
   static void sortObjectsByPt(AnalysisObjects& cands);
   static float minDphi(const AnalysisObject &met, const AnalysisObjects& cands, unsigned int maxNum=10000, float ptCut=0);
   static float minDR(const AnalysisObjects& cands, unsigned int maxNum=10000, float ptCut=0);
-  
+
   static float calcMCT(const AnalysisObject& o1, const AnalysisObject& o2);
   static float calcMT(const AnalysisObject &lepton, const AnalysisObject &met);
   static float calcMTmin(const AnalysisObjects& cands, const AnalysisObject& met, int maxNum=10000);
@@ -215,7 +218,7 @@ class AnalysisClass
 
   RestFramesHelper m_RF_helper;
 
- protected:
+protected:
   std::string _name;
   OutputHandler *_output;
 
@@ -229,7 +232,7 @@ class AnalysisClass
     void Init();							\
     void ProcessEvent(AnalysisEvent *event);				\
   };									\
-  static const AnalysisClass * ANALYSISNAME_instance __attribute__((used)) = new ANALYSISNAME(); 
-  
+  static const AnalysisClass * ANALYSISNAME_instance __attribute__((used)) = new ANALYSISNAME();
+
 
 #endif
