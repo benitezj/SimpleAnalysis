@@ -110,8 +110,13 @@ class AnalysisObject : public TLorentzVector
       return (id&_id)==id;
   } ;
   virtual int charge() const { return _charge; };
-  virtual int type() const { return _type; };
+  virtual AnalysisObjectType type() const { return _type; };
   virtual int id() const { return _id; }; // not supposed to be used directly except to store in ntuples
+  AnalysisObject transFourVect() const { 
+    TLorentzVector tlv;
+    tlv.SetPtEtaPhiM(Pt(),0.0,Phi(),M());
+    return AnalysisObject(tlv,charge(),id(),type(),_orgIndex);
+  };
  private:
   int _charge; //not used for jets or photons
   int _id;
