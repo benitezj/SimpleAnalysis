@@ -18,6 +18,7 @@ namespace po = boost::program_options;
 #include "SimpleAnalysis/OutputHandler.h"
 #include "SimpleAnalysis/AnalysisRunner.h"
 #include "SimpleAnalysis/TruthSmear.h"
+#include "SimpleAnalysis/PDFReweight.h"
 
 static void splitCommaString(const std::string& names,std::vector<std::string>& result) {
   std::stringstream ss(names);
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
     ("input-files", po::value< vector<std::string> >(), "Comma-separated list of input files")
     ("ntuple,n", "Fill ntuple")
     ("readReco,r", "Use reconstructed quantities instead of truth")
+    ("pdfReweight,p",  po::value<std::string>(), "PDF reweight to '<pdfName>[,energyIn,energyOut]'")
     ("smear,s", po::value<std::string>(), "Comma-separated list smearing options (use help to see full list of options)")
     ("mcweight,w", po::value<int>()->default_value(0), "MC weight index to apply (set to -1 to ignore it, i.e. =1.)")
     ;
@@ -73,6 +75,17 @@ int main(int argc, char **argv) {
     std::vector<std::string> smearingOptions;
     splitCommaString(vm["smear"].as<std::string>(),smearingOptions);
     smearer=new TruthSmear(smearingOptions);
+  }
+
+  PDFReweighter *pdfReweighter=0;
+  if (vm.count("pdfReweight")) {
+    std::vector<std::string> reweightOptions;
+    splitCommaString(vm["pdfReweight"].as<std::string>(),reweightOptions);
+    if ((reweightOptions.size()!=1) && (reweightOptions.size()!=3)) {
+      std::cout<<"Please specify PDF name and optionally input and output CM energies"<<std::endl;
+      return 1;
+    }
+    pdfReweighter=new PDFReweighter(reweightOptions);
   }
 
   int mcwindex = 0;
@@ -128,6 +141,10 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  std::sort(analysisList.begin(), analysisList.end(), [](AnalysisClass* a, AnalysisClass* b) {
+      return b->name() > a->name();   
+    });
+  
   TFile *fh=TFile::Open(inputFileNames[0].c_str());
   if (fh==0) {
     std::cerr<<"Failed to open the first file: "<<inputFileNames[0]<<std::endl;
@@ -152,6 +169,7 @@ int main(int argc, char **argv) {
     return 2;
   }
   reader->SetSmearing(smearer);
+  reader->SetReweighting(pdfReweighter);
   reader->SetMCWeightIndex(mcwindex);
   reader->processFiles(inputFileNames);
   delete reader;

@@ -28,7 +28,7 @@ PACKAGE_BINFLAGS     = -std=c++11 -lfastjet -lboost_program_options
 PACKAGE_LIBFLAGS     = -std=c++11
 
 # the list of packages we depend on:
-PACKAGE_DEP          = xAODCore xAODRootAccess xAODCore xAODTruth xAODEventInfo xAODJet xAODMissingET SUSYTools MCTruthClassifier Asg_FastJet Asg_Boost Ext_RestFrames
+PACKAGE_DEP          = Asg_Lhapdf xAODCore xAODRootAccess xAODCore xAODTruth xAODEventInfo xAODJet xAODMissingET SUSYTools MCTruthClassifier Asg_FastJet Asg_Boost Ext_RestFrames
 
 # the list of packages we use if present, but that we can work without :
 PACKAGE_TRYDEP       = UpgradePerformanceFunctions BTaggingTruthTagging

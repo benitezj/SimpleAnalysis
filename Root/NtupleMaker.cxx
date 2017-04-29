@@ -27,5 +27,12 @@ void NtupleMaker::ProcessEvent(AnalysisEvent *event)
   ntupVar("mcWeights",event->getMCWeights());
   ntupVar("genMET",event->getGenMET());
   ntupVar("genHT",event->getGenHT());
+  ntupVar("pdf_id1",event->getPDF_id1());
+  ntupVar("pdf_x1",event->getPDF_x1());
+  ntupVar("pdf_pdf1",event->getPDF_pdf1());
+  ntupVar("pdf_id2",event->getPDF_id2());
+  ntupVar("pdf_x2",event->getPDF_x2());
+  ntupVar("pdf_pdf2",event->getPDF_pdf2());
+  ntupVar("pdf_scale",event->getPDF_scale());
   return;
 }

@@ -7,15 +7,17 @@
 #include "SimpleAnalysis/TruthEvent.h"
 #include "SimpleAnalysis/AnalysisClass.h"
 #include "SimpleAnalysis/TruthSmear.h"
+#include "SimpleAnalysis/PDFReweight.h"
 
 
 class AnalysisRunner
 {
  public:
- AnalysisRunner(std::vector<AnalysisClass*>& analysisList) : _analysisList(analysisList) {};
+ AnalysisRunner(std::vector<AnalysisClass*>& analysisList) : _analysisList(analysisList), _reweighter(0) {};
   void init() { for(const auto& analysis : _analysisList) analysis->Init(); };
   void final() { for(const auto& analysis : _analysisList) analysis->Final(); };
   void SetSmearing(TruthSmear *smear) { _smear=smear; };
+  void SetReweighting(PDFReweighter *reweighter) { _reweighter=reweighter; };
   void SetMCWeightIndex(int mcwidx) { _mcwindex=mcwidx; };
 
   int getMCWeightIndex(){ return _mcwindex; };
@@ -28,6 +30,7 @@ class AnalysisRunner
     }
     if (_mcwindex>=0) weight = event->getMCWeights()[_mcwindex];
     event->sortObjects();
+    if (_reweighter) weight *= _reweighter->reweightEvent(event);
     for(const auto& analysis : _analysisList) {
       analysis->getOutput()->setEventWeight(weight);
       analysis->getOutput()->ntupVar("Event", eventNumber);
@@ -40,6 +43,7 @@ class AnalysisRunner
  private:
   std::vector<AnalysisClass*>& _analysisList;
   TruthSmear *_smear;
+  PDFReweighter *_reweighter;
   int _mcwindex;
 };
 
@@ -49,6 +53,7 @@ class Reader
   Reader(std::vector<AnalysisClass*>& analysisList) {_analysisRunner=new AnalysisRunner(analysisList); }
   virtual ~Reader() {};
   virtual void SetSmearing(TruthSmear *smear) { _analysisRunner->SetSmearing(smear); };
+  virtual void SetReweighting(PDFReweighter *reweighter) { _analysisRunner->SetReweighting(reweighter); };
   virtual void SetMCWeightIndex(int mcwidx) { _analysisRunner->SetMCWeightIndex(mcwidx); };
 
   virtual int getMCWeightIndex(){ return _analysisRunner->getMCWeightIndex(); };
