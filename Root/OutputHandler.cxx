@@ -13,6 +13,11 @@ int OutputHandler::addEntry(const std::string &name) {
     std::cerr<<"Duplicate signal region label: "<<name<<std::endl;
     exit(1);
   }
+  if (name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_") != std::string::npos) {
+    std::cerr << "Illegal signal region name: "<<name<<std::endl;
+    std::cerr << "Signal region names should only have alphanumeric characters and '_'\n"<<std::endl;
+    exit(1);
+  }
   label2idx[name]=num;
   idx2label[num]=name;
   eventCounts.push_back(0);

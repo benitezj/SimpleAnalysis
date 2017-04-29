@@ -55,7 +55,7 @@ void StopTwoLepton2016::ProcessEvent(AnalysisEvent *event)
   int DX                                = fabs((2 * (lep0.Pz() + lep1.Pz())) / 13000.);
 
   bool isSF = false;
-  if(lep0.M() == lep1.M()) isSF = true;
+  if(lep0.type() == lep1.type()) isSF = true;
 
   //Opposite Sign leptons
   if (lep0.charge() == lep1.charge()) return;

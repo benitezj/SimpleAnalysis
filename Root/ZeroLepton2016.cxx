@@ -5,15 +5,15 @@ DefineAnalysis(ZeroLepton2016)
 void ZeroLepton2016::Init()
 {
   // Meff based SR's
-  addRegions({"SR-Meff-2j-1200","SR-Meff-2j-1600","SR-Meff-2j-2000","SR-Meff-2j-2400","SR-Meff-2j-2800","SR-Meff-2j-3600","SR-Meff-2j-2100","SR-Meff-3j-1300"});
-  addRegions({"SR-Meff-4j-1000","SR-Meff-4j-1400","SR-Meff-4j-1800","SR-Meff-4j-2200","SR-Meff-4j-2600","SR-Meff-4j-3000","SR-Meff-5j-1700"});
-  addRegions({"SR-Meff-5j-1600","SR-Meff-5j-2000","SR-Meff-5j-2600","SR-Meff-6j-1200","SR-Meff-6j-1800","SR-Meff-6j-2200","SR-Meff-6j-2600"});
-  addRegions({"SR-Meff-2jB-1600","SR-Meff-2jB-2400"});
+  addRegions({"SR_Meff_2j_1200","SR_Meff_2j_1600","SR_Meff_2j_2000","SR_Meff_2j_2400","SR_Meff_2j_2800","SR_Meff_2j_3600","SR_Meff_2j_2100","SR_Meff_3j_1300"});
+  addRegions({"SR_Meff_4j_1000","SR_Meff_4j_1400","SR_Meff_4j_1800","SR_Meff_4j_2200","SR_Meff_4j_2600","SR_Meff_4j_3000","SR_Meff_5j_1700"});
+  addRegions({"SR_Meff_5j_1600","SR_Meff_5j_2000","SR_Meff_5j_2600","SR_Meff_6j_1200","SR_Meff_6j_1800","SR_Meff_6j_2200","SR_Meff_6j_2600"});
+  addRegions({"SR_Meff_2jB_1600","SR_Meff_2jB_2400"});
 
   // RJR based SR's
-  addRegions({"SR-RJR-S1a","SR-RJR-S1b","SR-RJR-S2a","SR-RJR-S2b","SR-RJR-S3a","SR-RJR-S3b","SR-RJR-S4"});
-  addRegions({"SR-RJR-G1a","SR-RJR-G1b","SR-RJR-G2a","SR-RJR-G2b","SR-RJR-G3a","SR-RJR-G3b","SR-RJR-G4"});
-  addRegions({"SR-RJR-C1","SR-RJR-C2","SR-RJR-C3","SR-RJR-C4","SR-RJR-C5"});
+  addRegions({"SR_RJR_S1a","SR_RJR_S1b","SR_RJR_S2a","SR_RJR_S2b","SR_RJR_S3a","SR_RJR_S3b","SR_RJR_S4"});
+  addRegions({"SR_RJR_G1a","SR_RJR_G1b","SR_RJR_G2a","SR_RJR_G2b","SR_RJR_G3a","SR_RJR_G3b","SR_RJR_G4"});
+  addRegions({"SR_RJR_C1","SR_RJR_C2","SR_RJR_C3","SR_RJR_C4","SR_RJR_C5"});
 
   //
   // Set up RestFrames trees through m_RF_Helper (RestFramesHelper class)
@@ -236,90 +236,90 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   if(Njets >= 2){
     if(met > 250. && jets[0].Pt() > 250. && jets[1].Pt() > 250. && fabs(jets[0].Eta()) < 0.8 && fabs(jets[1].Eta()) < 0.8 && 
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 14 && meffIncl > 1200)
-      accept("SR-Meff-2j-1200");
+      accept("SR_Meff_2j_1200");
     if(met > 250. && jets[0].Pt() > 300. && jets[1].Pt() > 300. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 1600)
-      accept("SR-Meff-2j-1600");
+      accept("SR_Meff_2j_1600");
     if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2000)
-      accept("SR-Meff-2j-2000");
+      accept("SR_Meff_2j_2000");
     if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
-      accept("SR-Meff-2j-2400");
+      accept("SR_Meff_2j_2400");
     if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
-      accept("SR-Meff-2j-2800");
+      accept("SR_Meff_2j_2800");
     if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && 
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
-      accept("SR-Meff-2j-3600");
+      accept("SR_Meff_2j_3600");
     if(met > 250. && jets[0].Pt() > 600. && jets[1].Pt() > 50. && 
        dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 26 && meffIncl > 2400)
-      accept("SR-Meff-2j-2100");
+      accept("SR_Meff_2j_2100");
   }
   // Meff-3j SR's
   if(Njets >= 3){
     if(met > 250. && jets[0].Pt() > 700. && jets[1].Pt() > 50. && jets[2].Pt() > 50. &&
        dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 16 && meffIncl > 1300)
-      accept("SR-Meff-3j-1300");
+      accept("SR_Meff_3j_1300");
   }
   // Meff-4j SR's
   if(Njets >= 4){
     if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 && 
        fabs(jets[2].Eta()) < 1.2 && fabs(jets[3].Eta()) < 1.2 && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.3 && 
        Ap > 0.04 && meffIncl > 1000)
-      accept("SR-Meff-4j-1000");
+      accept("SR_Meff_4j_1000");
     if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
        fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 && 
        Ap > 0.04 && meffIncl > 1400)
-      accept("SR-Meff-4j-1400");
+      accept("SR_Meff_4j_1400");
     if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
        fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 && 
        Ap > 0.04 && meffIncl > 1800)
-      accept("SR-Meff-4j-1800");
+      accept("SR_Meff_4j_1800");
     if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
        fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 && 
        Ap > 0.04 && meffIncl > 2200)
-      accept("SR-Meff-4j-2200");
+      accept("SR_Meff_4j_2200");
     if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
        fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 && 
        Ap > 0.04 && meffIncl > 2600)
-      accept("SR-Meff-4j-2600");
+      accept("SR_Meff_4j_2600");
     if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && 
        fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 && 
        Ap > 0.04 && meffIncl > 3000)
-      accept("SR-Meff-4j-3000");
+      accept("SR_Meff_4j_3000");
   }
   // Meff-5j SR's
   if(Njets >= 5){
     if(met > 250. && jets[0].Pt() > 700. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.3 && 
        meffIncl > 1700)
-      accept("SR-Meff-5j-1700");
+      accept("SR_Meff_5j_1700");
     if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.15 && 
        Ap > 0.08 && meffIncl > 1600)
-      accept("SR-Meff-5j-1600");
+      accept("SR_Meff_5j_1600");
     if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && metSig > 15 && 
        meffIncl > 2000)
-      accept("SR-Meff-5j-2000");
+      accept("SR_Meff_5j_2000");
     if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && 
        meffIncl > 2600)
-      accept("SR-Meff-5j-2600");
+      accept("SR_Meff_5j_2600");
   }
   // Meff-6j SR's
   if(Njets >= 6){
     if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 50. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && fabs(jets[2].Eta()) < 2. &&
        fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
        met/meff[6] > 0.25 && meffIncl > 1200)
-      accept("SR-Meff-6j-1200");
+      accept("SR_Meff_6j_1200");
     if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && fabs(jets[2].Eta()) < 2. &&
        fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
        met/meff[6] > 0.2 && Ap > 0.04 && meffIncl > 1800)
-      accept("SR-Meff-6j-1800");
+      accept("SR_Meff_6j_1800");
     if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
        met/meff[6] > 0.2 && Ap > 0.08 && meffIncl > 2200)
-      accept("SR-Meff-6j-2200");
+      accept("SR_Meff_6j_2200");
     if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && 
        met/meff[6] > 0.15 && Ap > 0.08 && meffIncl > 2600)
-      accept("SR-Meff-6j-2600");
+      accept("SR_Meff_6j_2600");
   }
   // Meff boosted boson regions
   auto fatjets = reclusterJets(jets, 1., 50.);
@@ -327,9 +327,9 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
     if(met < 250 && fatjets[0].Pt() > 200. && fatjets[1].Pt() > 200. && fatjets[0].M() > 60. && fatjets[0].M() < 110. && 
        fatjets[1].M() > 60. && fatjets[1].M() < 110. && dphiMin3 > 0.6 && dphiMinRest > 0.4 && metSig > 20.){
       if(meffIncl > 1600.)
-	accept("SR-Meff-2jB-1600");
+	accept("SR_Meff_2jB_1600");
       if(meffIncl > 1400.)
-	accept("SR-Meff-2jB-2400");
+	accept("SR_Meff_2jB_2400");
     }
   }
 
@@ -529,28 +529,29 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   // SR-S1
   if(R_H2PP_H3PP > 0.55 && R_H2PP_H3PP < 0.9 && R_pTj2_HT3PP > 0.16 && eta12 < 0.8 && deltaQCD > 0.1 && RPT_HT3PP < 0.08){
     if(HT3PP > 1000.)
-      accept("SR-RJR-S1a");
+      accept("SR_RJR_S1a");
     if(HT3PP > 1200.)
-      accept("SR-RJR-S1b");
+      accept("SR_RJR_S1b");
   }
   // SR-S2
+
   if(R_H2PP_H3PP > 0.5 && R_H2PP_H3PP < 0.95 && R_pTj2_HT3PP > 0.14 && eta12 < 1.1 && deltaQCD > 0.05 && RPT_HT3PP < 0.08){
     if(HT3PP > 1400.)
-      accept("SR-RJR-S2a");
+      accept("SR_RJR_S2a");
     if(HT3PP > 1600.)
-      accept("SR-RJR-S2b");
+      accept("SR_RJR_S2b");
   }
   // SR-S3
   if(R_H2PP_H3PP > 0.45 && R_H2PP_H3PP < 0.98 && R_pTj2_HT3PP > 0.13 && eta12 < 1.4 && deltaQCD > 0.025 && RPT_HT3PP < 0.08){
     if(HT3PP > 1800.)
-      accept("SR-RJR-S3a");
+      accept("SR_RJR_S3a");
     if(HT3PP > 2100.)
-      accept("SR-RJR-S3b");
+      accept("SR_RJR_S3b");
   }
   // SR-S4
   if(R_pTj2_HT3PP > 0.13 && deltaQCD > 0. && RPT_HT3PP < 0.08){
     if(HT3PP > 2400.)
-      accept("SR-RJR-S4");
+      accept("SR_RJR_S4");
   }
 
   // gluino SR's
@@ -558,28 +559,28 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
     // SR-G1
     if(R_H2PP_H5PP > 0.45 && R_HT5PP_H5PP > 0.7 && maxR_H1PPi_H2PPi < 0.96 && minR_pTj2i_HT3PPi > 0.12 && eta12ab < 1.4 && deltaQCD > 0.05 && RPZ_HT5PP < 0.5 && RPT_HT5PP < 0.08){
       if(HT5PP > 1200.)
-	accept("SR-RJR-G1a");
+	accept("SR_RJR_G1a");
       if(HT5PP > 1400.)
-	accept("SR-RJR-G1b");
+	accept("SR_RJR_G1b");
     }
     // SR-G2
     if(R_H2PP_H5PP > 0.3 && R_HT5PP_H5PP > 0.7 && maxR_H1PPi_H2PPi < 0.97 && minR_pTj2i_HT3PPi > 0.1 && eta12ab < 2.0 && deltaQCD > 0.025 && RPZ_HT5PP < 0.55 && RPT_HT5PP < 0.08){
       if(HT5PP > 1600.)
-	accept("SR-RJR-G2a");
+	accept("SR_RJR_G2a");
       if(HT5PP > 2000.)
-	accept("SR-RJR-G2b");
+	accept("SR_RJR_G2b");
     }
     // SR-G3
     if(R_H2PP_H5PP > 0.2 && R_HT5PP_H5PP > 0.65 && maxR_H1PPi_H2PPi < 0.98 && minR_pTj2i_HT3PPi > 0.08 && deltaQCD > 0.0 && RPZ_HT5PP < 0.6 && RPT_HT5PP < 0.08){
       if(HT5PP > 2400.)
-	accept("SR-RJR-G3a");
+	accept("SR_RJR_G3a");
       if(HT5PP > 2800.)
-	accept("SR-RJR-G3b");
+	accept("SR_RJR_G3b");
     }
     // SR-G4
     if(R_HT5PP_H5PP > 0.65 && maxR_H1PPi_H2PPi < 0.98 && minR_pTj2i_HT3PPi > 0.07 && deltaQCD > 0.0 && RPZ_HT5PP < 0.65 && RPT_HT5PP < 0.08){
       if(HT5PP > 3000.)
-	accept("SR-RJR-G4");
+	accept("SR_RJR_G4");
     }
   }
 
@@ -630,23 +631,23 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   // compressed SR's
   // SR-C1
   if(RISR > 0.95 && PTISR > 1000. && dphiISRI > acos(-1.)*0.95 && MS >= 0. && NV > 0 && etaV1 <= 2.8){
-    accept("SR-RJR-C1");
+    accept("SR_RJR_C1");
   }
   // SR-C2
   if(RISR > 0.9 && PTISR > 1000. && dphiISRI > acos(-1.)*0.97 && MS >= 100. && NV > 0 && etaV1 <= 1.2){
-    accept("SR-RJR-C2");
+    accept("SR_RJR_C2");
   }
   // SR-C3
   if(RISR > 0.8 && PTISR > 800. && dphiISRI > acos(-1.)*0.98 && MS >= 200. && NV > 1 && etaV2 <= 1.4){
-    accept("SR-RJR-C3");
+    accept("SR_RJR_C3");
   }
   // SR-C4
   if(RISR > 0.7 && PTISR > 700. && dphiISRI > acos(-1.)*0.95 && MS >= 450. && NV > 1 && etaV2 <= 1.4){
-    accept("SR-RJR-C4");
+    accept("SR_RJR_C4");
   }
   // SR-C5
   if(RISR > 0.7 && PTISR > 700. && dphiISRI > acos(-1.)*0.95 && MS >= 450. && NV > 2 && etaV3 <= 1.4){
-    accept("SR-RJR-C5");
+    accept("SR_RJR_C5");
   }
 
   return;
