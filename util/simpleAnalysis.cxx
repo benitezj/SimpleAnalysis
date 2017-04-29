@@ -141,6 +141,10 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  std::sort(analysisList.begin(), analysisList.end(), [](AnalysisClass* a, AnalysisClass* b) {
+      return b->name() > a->name();   
+    });
+  
   TFile *fh=TFile::Open(inputFileNames[0].c_str());
   if (fh==0) {
     std::cerr<<"Failed to open the first file: "<<inputFileNames[0]<<std::endl;
