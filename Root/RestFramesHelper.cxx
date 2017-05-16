@@ -6,8 +6,9 @@
 /*              April, 2017                                            */
 /*                                                                     */
 /***********************************************************************/
-#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/RestFramesHelper.h"
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
+#pragma message "Compiling with RestFrames"
 
 RestFramesHelper::~RestFramesHelper(){
   int N = m_Objects.size();

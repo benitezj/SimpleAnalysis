@@ -119,7 +119,7 @@ class AnalysisObject : public TLorentzVector
   virtual int charge() const { return _charge; };
   virtual AnalysisObjectType type() const { return _type; };
   virtual int id() const { return _id; }; // not supposed to be used directly except to store in ntuples
-  AnalysisObject transFourVect() const { 
+  AnalysisObject transFourVect() const {
     TLorentzVector tlv;
     tlv.SetPtEtaPhiM(Pt(),0.0,Phi(),M());
     return AnalysisObject(tlv,charge(),id(),type(),_orgIndex);

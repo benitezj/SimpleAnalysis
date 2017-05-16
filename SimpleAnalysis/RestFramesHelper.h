@@ -1,9 +1,8 @@
 #include <RootCore/Packages.h>
 
-#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #ifndef RESTFRAMESHELPER_H
 #define RESTFRAMESHELPER_H
-
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "RestFrames/RestFrames.hh"
 
 using namespace RestFrames;
@@ -50,5 +49,5 @@ class RestFramesHelper {
 
 };
 
+#endif // if ext_restframes
 #endif // restframes helper
-#endif // restframes
