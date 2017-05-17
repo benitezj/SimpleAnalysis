@@ -2,23 +2,23 @@ image: lukasheinrich/recast_cvmfs_assisted:20161231
 
 variables:
    ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
-   BUILD_DIR: TestArea   
+   BUILD_DIR: TestArea
    BUILD_DIR_ABS: "${CI_PROJECT_DIR}/${BUILD_DIR}"
    PACKAGE_NAME: SimpleAnalysis
 
 before_script:
   - echo "Project Directory    ${CI_PROJECT_DIR}"
   - echo "Build Directory      ${BUILD_DIR_ABS}"
-  - echo "Directory Name       ${BUILD_DIR}"   
-  - mkdir -p $BUILD_DIR_ABS   
-  - cd $BUILD_DIR_ABS 
+  - echo "Directory Name       ${BUILD_DIR}"
+  - mkdir -p $BUILD_DIR_ABS
+  - cd $BUILD_DIR_ABS
 
-#withSmearing:
+#withSmearingWithoutRestFrames:
 # disabled until figure out how get SVN access
 #  tags:
 #    # Make you job be executed in a shared runner that has CVMFS mounted
 #    - cvmfs
-#  
+#
 #  script:
 #    - ls /cvmfs/atlas.cern.ch/
 #    - set +e && source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh; set -e
@@ -28,16 +28,30 @@ before_script:
 #    - rc find_packages
 #    - rc compile
 
-withoutSmearing:
+withoutSmearingWithRestFrames:
 #  tags:
 #    # Make you job be executed in a shared runner that has CVMFS mounted
 #    - cvmfs
-  
+
   script:
     - rsync -a $CI_PROJECT_DIR $BUILD_DIR_ABS  --exclude $BUILD_DIR
     - set +e && source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh; set -e
     - rcSetup Base,2.4.28 || echo ignore alrb
     - git clone https://github.com/crogan/Ext_RestFrames.git
+    - rc clean
+    - rc find_packages
+    - rc compile
+    - simpleAnalysis -l
+
+withoutSmearingWithoutRestFrames:
+#  tags:
+#    # Make you job be executed in a shared runner that has CVMFS mounted
+#    - cvmfs
+
+  script:
+    - rsync -a $CI_PROJECT_DIR $BUILD_DIR_ABS  --exclude $BUILD_DIR
+    - set +e && source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh; set -e
+    - rcSetup Base,2.4.28 || echo ignore alrb
     - rc clean
     - rc find_packages
     - rc compile

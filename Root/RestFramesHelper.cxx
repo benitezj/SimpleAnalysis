@@ -2,12 +2,13 @@
 /*                                                                     */
 /*              RestFramesHelper                                       */
 /*                                                                     */
-/*              Author: Christopher Rogan                              */ 
+/*              Author: Christopher Rogan                              */
 /*              April, 2017                                            */
-/*                                                                     */  
+/*                                                                     */
 /***********************************************************************/
-              
 #include "SimpleAnalysis/RestFramesHelper.h"
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
+#pragma message "Compiling with RestFrames"
 
 RestFramesHelper::~RestFramesHelper(){
   int N = m_Objects.size();
@@ -154,5 +155,4 @@ InvisibleGroup* RestFramesHelper::getInvisibleGroup(const std::string &name){
 CombinatoricGroup* RestFramesHelper::getCombinatoricGroup(const std::string &name){
   return m_CombGroups[name];
 }
-
-
+#endif

@@ -6,8 +6,15 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <RootCore/Packages.h>
 
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/RestFramesHelper.h"
+#endif
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+#include "BTaggingTruthTagging/BTaggingTruthTaggingTool.h"
+#endif
 
 enum AnalysisObjectType { ELECTRON,MUON,TAU,PHOTON,JET,FATJET,MET,COMBINED};
 
@@ -112,7 +119,7 @@ class AnalysisObject : public TLorentzVector
   virtual int charge() const { return _charge; };
   virtual AnalysisObjectType type() const { return _type; };
   virtual int id() const { return _id; }; // not supposed to be used directly except to store in ntuples
-  AnalysisObject transFourVect() const { 
+  AnalysisObject transFourVect() const {
     TLorentzVector tlv;
     tlv.SetPtEtaPhiM(Pt(),0.0,Phi(),M());
     return AnalysisObject(tlv,charge(),id(),type(),_orgIndex);
@@ -155,6 +162,10 @@ class AnalysisEvent
   virtual std::vector<float>  getMCWeights()=0; //Temporary until better solution found
   virtual ~AnalysisEvent() {};
 };
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+class BTaggingTruthTaggingTool;
+#endif
 
 class AnalysisClass;
 
@@ -228,7 +239,13 @@ class AnalysisClass
 
   static AnalysisObjects reclusterJets(const AnalysisObjects &jets, float radius, float ptmin, float rclus=-1, float ptfrac=-1);
 
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
   RestFramesHelper m_RF_helper;
+#endif
+
+#ifdef ROOTCORE_PACKAGE_BTaggingTruthTagging
+  BTaggingTruthTaggingTool *m_btt;
+#endif
 
 protected:
   std::string _name;

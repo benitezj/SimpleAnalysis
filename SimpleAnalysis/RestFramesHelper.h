@@ -1,6 +1,8 @@
+#include <RootCore/Packages.h>
+
 #ifndef RESTFRAMESHELPER_H
 #define RESTFRAMESHELPER_H
-
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "RestFrames/RestFrames.hh"
 
 using namespace RestFrames;
@@ -8,7 +10,7 @@ using namespace RestFrames;
 enum InvJigsawType { kSetMass, kSetRapidity, kContraBoost };
 enum CombJigsawType { kMinMasses };
 
-class RestFramesHelper {  
+class RestFramesHelper {
  public:
   RestFramesHelper() {}
   virtual ~RestFramesHelper();
@@ -31,8 +33,8 @@ class RestFramesHelper {
   MinMassesCombJigsaw*     getCombinatoricJigsaw(const std::string &name);
   InvisibleGroup*          getInvisibleGroup(const std::string &name);
   CombinatoricGroup*       getCombinatoricGroup(const std::string &name);
-   
- private:  
+
+ private:
   std::map<std::string,LabRecoFrame*> m_LabFrames;
   std::map<std::string,DecayRecoFrame*> m_DecayFrames;
   std::map<std::string,SelfAssemblingRecoFrame*> m_SAFrames;
@@ -47,4 +49,5 @@ class RestFramesHelper {
 
 };
 
-#endif
+#endif // if ext_restframes
+#endif // restframes helper

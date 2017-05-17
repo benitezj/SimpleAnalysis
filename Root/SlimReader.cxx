@@ -12,7 +12,7 @@
 void SlimReaderSelector::Begin(TTree * /*tree*/)
 {
   //  TString option = GetOption();
- 
+
 }
 
 void SlimReaderSelector::SlaveBegin(TTree * /*tree*/)
@@ -26,7 +26,7 @@ Bool_t SlimReaderSelector::Process(Long64_t entry)
   if ((entry%10000)==0) std::cout<<"At event "<<entry<<std::endl;
   GetEntry(entry);
 
- 
+
   TruthEvent* event=new TruthEvent(sumet,met_pt*cos(met_phi),met_pt*sin(met_phi));
   event->setChannelInfo(mcChannel,susyChannel);
   event->setGenMET(genMET);
@@ -55,19 +55,19 @@ Bool_t SlimReaderSelector::Process(Long64_t entry)
   for(unsigned int idx=0; idx<obj_pt[3]->size(); idx++) {
     tlv.SetPtEtaPhiM(obj_pt[3]->at(idx),
 		     obj_eta[3]->at(idx),
-		     obj_phi[3]->at(idx),0); 
+		     obj_phi[3]->at(idx),0);
     event->addPhoton(tlv,obj_id[3]->at(idx),idx);
   }
   for(unsigned int idx=0; idx<obj_pt[4]->size(); idx++) {
     tlv.SetPtEtaPhiM(obj_pt[4]->at(idx),
 		     obj_eta[4]->at(idx),
-		     obj_phi[4]->at(idx),jet_m->at(idx)); 
+		     obj_phi[4]->at(idx),jet_m->at(idx));
     event->addJet(tlv,obj_id[4]->at(idx),idx);
   }
   for(unsigned int idx=0; idx<obj_pt[5]->size(); idx++) {
     tlv.SetPtEtaPhiM(obj_pt[5]->at(idx),
 		     obj_eta[5]->at(idx),
-		     obj_phi[5]->at(idx),fatjet_m->at(idx)); 
+		     obj_phi[5]->at(idx),fatjet_m->at(idx));
     event->addFatJet(tlv,obj_id[5]->at(idx),idx);
   }
 
@@ -90,10 +90,10 @@ void SlimReaderSelector::Terminate()
 void SlimReader::processFilesInternal(const std::vector<std::string>& inputFileNames) {
   TChain *tree=new TChain("ntuple");
   for(const auto& fileName : inputFileNames) {
-    if (tree->Add(fileName.c_str())<1) 
+    if (tree->Add(fileName.c_str())<1)
       throw std::runtime_error("Could not find slimmed tree in input file !");
   }
-  
+
   SlimReaderSelector* selector = new SlimReaderSelector(_analysisRunner);
   tree->Process(selector);
   delete selector;
