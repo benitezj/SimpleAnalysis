@@ -1,5 +1,5 @@
-#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/AnalysisClass.h"
+#ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 
 DefineAnalysis(ZeroLepton2016)
 
