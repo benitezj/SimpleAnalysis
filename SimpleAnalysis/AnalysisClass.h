@@ -151,10 +151,10 @@ class AnalysisClass {
                     _output(0) {
             getAnalysisList()->push_back(this);
         }
-        ;
+
         AnalysisClass() {
         }
-        ;
+
         virtual void Init() {
         }
         ;
@@ -226,11 +226,11 @@ class AnalysisClass {
         void ntupVar(const std::string &label, std::vector<int> values) {
             _output->ntupVar(label, values);
         }
-        ;
+
         void ntupVar(const std::string &label, std::vector<float> values) {
             _output->ntupVar(label, values);
         }
-        ;
+
         void ntupVar(const std::string &label, AnalysisObject &object, bool saveMass = false, bool saveType = false);
         void ntupVar(const std::string &label, AnalysisObjects &objects, bool saveMass = false, bool saveType = false);
 
@@ -238,6 +238,8 @@ class AnalysisClass {
         static AnalysisObjects overlapRemoval(const AnalysisObjects &cands, const AnalysisObjects &others, float deltaR, int passId = 0);
 
         static AnalysisObjects overlapRemoval(const AnalysisObjects &cands, const AnalysisObjects &others, std::function<float(const AnalysisObject&, const AnalysisObject&)> radiusFunc, int passId = 0);
+        //Remove low-mass resonances
+        static AnalysisObjects lowMassRemoval(const AnalysisObjects & cand , std::function<bool(const AnalysisObject&, const AnalysisObject&)>, float MinMass= 0, float MaxMass = FLT_MAX, int type = -1);
 
         static AnalysisObjects filterObjects(const AnalysisObjects& cands, float ptCut, float etaCut = 100., int id = 0);
 

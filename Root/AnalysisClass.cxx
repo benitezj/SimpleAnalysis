@@ -15,7 +15,7 @@
 #include "fastjet/tools/Filter.hh"
 #endif
 
-static float Z_Mass = 91.2;
+static float Z_Mass = 91.2e3;
 
 AnalysisObject operator+(const AnalysisObject& lhs, const AnalysisObject& rhs) {
     const TLorentzVector &tlhs = lhs;
@@ -89,9 +89,35 @@ AnalysisObjects AnalysisClass::overlapRemoval(const AnalysisObjects &cands, cons
     }
     return reducedList;
 }
-
 AnalysisObjects AnalysisClass::overlapRemoval(const AnalysisObjects &cands, const AnalysisObjects &others, float deltaR, int passId) {
     return overlapRemoval(cands, others, [deltaR] (const AnalysisObject& , const AnalysisObject&) {return deltaR;}, passId);
+}
+
+AnalysisObjects AnalysisClass::lowMassRemoval(const AnalysisObjects & cand, std::function<bool(const AnalysisObject&, const AnalysisObject&)> RemoveSwitch, float MinMass, float MaxMass, int type) {
+    AnalysisObjects reducedList;
+    unsigned int NObj = cand.size();
+    AnalysisObjects::const_iterator begin_cand = cand.begin();
+    std::vector<bool> Good(NObj, true);
+    for (unsigned int obj = 0; obj != NObj; ++obj) {
+        //Check if the object is already rejected
+        if (!Good.at(obj)) continue;
+        const AnalysisObject& Object = *(begin_cand + obj);
+        for (unsigned int obj1 = 0; obj1 != obj; ++obj) {
+            if (!Good.at(obj1)) continue;
+            //Remove the pair
+            const AnalysisObject& Object1 = *(begin_cand + obj1);
+            float InvMass = (Object + Object1).M();
+            if (MinMass < InvMass && InvMass < MaxMass && RemoveSwitch(Object, Object1)) {
+                Good.at(obj) = false;
+                Good.at(obj1) = false;
+                break;
+            }
+        }
+    }
+    for (unsigned int o = 0; o < NObj; ++o) {
+        if ((type == -1  || cand.at(o).type() == type) && Good.at(o)) reducedList.push_back(cand.at(o));
+    }
+    return reducedList;
 }
 AnalysisObjects AnalysisClass::filterObjects(const AnalysisObjects& cands, float ptCut, float etaCut, int id) {
     AnalysisObjects reducedList;
@@ -321,8 +347,8 @@ bool AnalysisClass::PassZVeto(const AnalysisObjects& electrons, const AnalysisOb
                 for (AnalysisObjects::const_iterator L3 = Lep_begin; L3 != L2; ++L3) {
                     const AnalysisObject& FourthLep = (*L3);
                     bool FourLepSFOS = (IsSFOS(FirstLep, SecondLep) && IsSFOS(ThirdLep, FourthLep)) //eemumu
-                                    || (IsSFOS(FirstLep, ThirdLep) && IsSFOS(SecondLep, FourthLep)) //e mu e mu
-                                    || (IsSFOS(FirstLep, FourthLep) && IsSFOS(ThirdLep, SecondLep)); //e mu mu e
+                    || (IsSFOS(FirstLep, ThirdLep) && IsSFOS(SecondLep, FourthLep)) //e mu e mu
+                            || (IsSFOS(FirstLep, FourthLep) && IsSFOS(ThirdLep, SecondLep)); //e mu mu e
                     if (FourLepSFOS && fabs((TriLep + FourthLep).M() - Z_Mass) < Window) return false;
                 }
             }
