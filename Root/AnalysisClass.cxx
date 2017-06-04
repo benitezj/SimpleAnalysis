@@ -15,7 +15,7 @@
 #include "fastjet/tools/Filter.hh"
 #endif
 
-static float Z_Mass = 91.2e3;
+const float Z_Mass = 91.2;
 
 AnalysisObject operator+(const AnalysisObject& lhs, const AnalysisObject& rhs) {
     const TLorentzVector &tlhs = lhs;

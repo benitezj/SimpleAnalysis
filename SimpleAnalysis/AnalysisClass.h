@@ -23,7 +23,6 @@ enum AnalysisObjectType {
 enum AnalysisCommonID {
     NotBit = 1 << 31
 };
-
 #define NOT(x) (NotBit|x)
 
 enum AnalysisElectronID {

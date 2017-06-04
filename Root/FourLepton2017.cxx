@@ -3,8 +3,11 @@
 
 DefineAnalysis(FourLepton2017)
 
+const float Z_Mass = 91.2;
+
+
 void FourLepton2017::Init() {
-    addRegions( { "SR0A", "SR0B", "SR0C", "SR0D" });
+    addRegions( { "SR0A", "SR0B", "SR0C", "SR0D", "SR1", "SR2" });
 
 }
 
@@ -38,43 +41,28 @@ void FourLepton2017::ProcessEvent(AnalysisEvent *event) {
     passLMR_electrons = lowMassRemoval(passLMR_electrons, IsSFOS, 8.4, 10.4);
     passLMR_muons = lowMassRemoval(passLMR_muons, IsSFOS, 8.4, 10.4);
     //final signal selections
-    auto signalJets = filterObjects(baselineJets, 20.,2.8,JVT50Jet);
-    auto signalElectrons = filterObjects(passLMR_electrons,7,2.47, EMediumLH | ED0Sigma5 | EZ05mm | EIsoGradientLoose );
-    auto signalMuons = filterObjects(passLMR_muons,5,2.7, MuD0Sigma3 | MuZ05mm | MuIsoGradientLoose);
+    auto signalJets = filterObjects(baselineJets, 20., 2.8, JVT50Jet);
+    auto signalElectrons = filterObjects(passLMR_electrons, 7, 2.47, EMediumLH | ED0Sigma5 | EZ05mm | EIsoGradientLoose);
+    auto signalMuons = filterObjects(passLMR_muons, 5, 2.7, MuD0Sigma3 | MuZ05mm | MuIsoGradientLoose);
 
     //Count the number of signal leptons
     unsigned int N_SignalEle = signalElectrons.size();
     unsigned int N_SignalMuo = signalMuons.size();
-    unsigned int N_SignalTau  = signalTaus.size();
+    unsigned int N_SignalTau = signalTaus.size();
     unsigned int N_SignalLep = N_SignalEle + N_SignalMuo;
-    float Ht_Lep = sumObjectsPt(signalElectrons,-1,999) + sumObjectsPt(signalMuons,-1,999) + sumObjectsPt(signalTaus,-1,999);
-    float Ht_Jet = sumObjectsPt(signalJets,40, 999);
+    float Ht_Lep = sumObjectsPt(signalElectrons, -1, 999) + sumObjectsPt(signalMuons, -1, 999) + sumObjectsPt(signalTaus, -1, 999);
+    float Ht_Jet = sumObjectsPt(signalJets, 40, 999);
     float Meff = met + Ht_Lep + Ht_Jet;
-    bool ZVeto = PassZVeto(signalElectrons,signalMuons);
-
-    if (ZVeto && N_SignalLep >= 4 && N_SignalTau == 0) {
-        if (Meff > 600) accept("SROA");
-        if (Meff > 1100) accept("SR0B");
-    }
-
-
-    //                else accept("SRs2j4bT");
-//            }
-//        }
-//        // b-Veto signal region
-//        else {
-//            if (softJets.size() >= 2 && met > 430 && mt > 100 && met / meff > 0.25 && meff > 700) {
-//                if (meff < 1100) accept("SRs2j1bV");
-//                else if (meff < 1500) accept("SRs2j2bV");
-//                else if (meff < 1900) accept("SRs2j3bV");
-//                else accept("SRs2j4bV");
-//            }
-//        }
-//        // b-inclusive discovery SR
-//        if (softJets.size() >= 2 && met > 430 && mt > 100 && met / meff > 0.25 && meff > 700) {
-//            if (meff > 1100) accept("SRs2j");
-//        }
-//    }
-
+    bool ZVeto = PassZVeto(signalElectrons, signalMuons);
+    std::pair<float, float> DiZ = DiZSelection(signalElectrons, signalMuons);
+    if (N_SignalLep >= 4 && N_SignalTau == 0) {
+        if (ZVeto && Meff > 600) accept("SROA");
+        if (ZVeto && Meff > 1100) accept("SR0B");
+        if (fabs(DiZ.first - Z_Mass) < 10. && 61.2 < DiZ.second && DiZ.second < 101.2) {
+            if (met > 50) accept("SR0C");
+            if (met > 100) accept("SR0D");
+        }
+    } else if (N_SignalLep == 3 && N_SignalTau >= 1 && Meff > 700) accept("SR1");
+    else if (N_SignalLep == 2 && N_SignalTau >= 2 && Meff > 650) accept("SR2");
     return;
 }
