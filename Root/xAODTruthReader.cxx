@@ -40,6 +40,10 @@ int xAODTruthReader::getTruthOrigin(const xAOD::TruthParticle *part) {
   if (part->isAvailable<unsigned int>("classifierParticleOrigin")) {
     return part->auxdata<unsigned int>("classifierParticleOrigin");
   }
+  if (part->isAvailable<unsigned int>("particleOrigin")) {
+    return part->auxdata<unsigned int>("particleOrigin");
+  }
+
   const ElementLink < xAOD::TruthParticleContainer > origPart = part->auxdata< ElementLink< xAOD::TruthParticleContainer > >("originalTruthParticle" );
   if (origPart.isValid()) {
     const auto result = _mctool->particleTruthClassifier(*origPart);
@@ -52,6 +56,10 @@ int xAODTruthReader::getTruthType(const xAOD::TruthParticle *part) {
   if (part->isAvailable<unsigned int>("classifierParticleType")) {
     return part->auxdata<unsigned int>("classifierParticleType");
   }
+  if (part->isAvailable<unsigned int>("particleType")) {
+    return part->auxdata<unsigned int>("particleType");
+  }
+
   const ElementLink < xAOD::TruthParticleContainer > origPart = part->auxdata< ElementLink< xAOD::TruthParticleContainer > >("originalTruthParticle" );
   if (origPart.isValid()) {
     const auto result = _mctool->particleTruthClassifier(*origPart);
