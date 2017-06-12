@@ -77,19 +77,19 @@ void ZeroLeptonMeff2016::ProcessEvent(AnalysisEvent *event)
        dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
       accept("SR_Meff_2j_2400");
     if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
+       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2800)
       accept("SR_Meff_2j_2800");
     if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
+       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 3600)
       accept("SR_Meff_2j_3600");
     if(met > 250. && jets[0].Pt() > 600. && jets[1].Pt() > 50. &&
-       dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 26 && meffIncl > 2400)
+       dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 26 && meffIncl > 2100)
       accept("SR_Meff_2j_2100");
   }
   // Meff-3j SR's
   if(Njets >= 3){
     if(met > 250. && jets[0].Pt() > 700. && jets[1].Pt() > 50. && jets[2].Pt() > 50. &&
-       dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 16 && meffIncl > 1300)
+       dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 18 && meffIncl > 1300)
       accept("SR_Meff_3j_1300");
   }
   // Meff-4j SR's
