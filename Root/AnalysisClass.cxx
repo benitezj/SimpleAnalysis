@@ -241,11 +241,10 @@ AnalysisObjects AnalysisClass::reclusterJets(const AnalysisObjects &jets, float 
   return fatJets;
 }
 
-float AnalysisClass::aplanarity(const AnalysisObjects& jets) {
+static TVectorD calcEigenValues(const AnalysisObjects& jets) {
   TMatrixDSym momTensor(3);
   TVectorD eigenValues(3);
   momTensor.Zero();
-  if (jets.size()<2) return 0;
   double norm=0;
   for(const auto& jet : jets) {
     momTensor(0,0) += jet.Px()*jet.Px(); momTensor(0,1) += jet.Px()*jet.Py(); momTensor(0,2) += jet.Px()*jet.Pz();
@@ -255,5 +254,17 @@ float AnalysisClass::aplanarity(const AnalysisObjects& jets) {
   }
   momTensor *= 1./norm;
   momTensor.EigenVectors(eigenValues);
+  return eigenValues;
+}
+
+float AnalysisClass::aplanarity(const AnalysisObjects& jets) {
+  if (jets.size()<2) return 0;
+  TVectorD eigenValues=calcEigenValues(jets);
   return 1.5*eigenValues(2);
+}
+
+float AnalysisClass::sphericity(const AnalysisObjects& jets) {
+  if (jets.size()<2) return 0;
+  TVectorD eigenValues=calcEigenValues(jets);
+  return 1.5*(eigenValues(1)+eigenValues(2));
 }

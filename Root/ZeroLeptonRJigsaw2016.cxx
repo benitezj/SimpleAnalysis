@@ -1,20 +1,16 @@
 #include "SimpleAnalysis/AnalysisClass.h"
 #ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 
-DefineAnalysis(ZeroLepton2016)
+DefineAnalysis(ZeroLeptonRJigsaw2016)
 
-void ZeroLepton2016::Init()
+void ZeroLeptonRJigsaw2016::Init()
 {
-  // Meff based SR's
-  addRegions({"SR_Meff_2j_1200","SR_Meff_2j_1600","SR_Meff_2j_2000","SR_Meff_2j_2400","SR_Meff_2j_2800","SR_Meff_2j_3600","SR_Meff_2j_2100","SR_Meff_3j_1300"});
-  addRegions({"SR_Meff_4j_1000","SR_Meff_4j_1400","SR_Meff_4j_1800","SR_Meff_4j_2200","SR_Meff_4j_2600","SR_Meff_4j_3000","SR_Meff_5j_1700"});
-  addRegions({"SR_Meff_5j_1600","SR_Meff_5j_2000","SR_Meff_5j_2600","SR_Meff_6j_1200","SR_Meff_6j_1800","SR_Meff_6j_2200","SR_Meff_6j_2600"});
-  addRegions({"SR_Meff_2jB_1600","SR_Meff_2jB_2400"});
 
   // RJR based SR's
   addRegions({"SR_RJR_S1a","SR_RJR_S1b","SR_RJR_S2a","SR_RJR_S2b","SR_RJR_S3a","SR_RJR_S3b","SR_RJR_S4"});
   addRegions({"SR_RJR_G1a","SR_RJR_G1b","SR_RJR_G2a","SR_RJR_G2b","SR_RJR_G3a","SR_RJR_G3b","SR_RJR_G4"});
   addRegions({"SR_RJR_C1","SR_RJR_C2","SR_RJR_C3","SR_RJR_C4","SR_RJR_C5"});
+
 
   //
   // Set up RestFrames trees through m_RF_Helper (RestFramesHelper class)
@@ -182,7 +178,7 @@ void ZeroLepton2016::Init()
   LAB_ISR->InitializeAnalysis();
 }
 
-void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
+void ZeroLeptonRJigsaw2016::ProcessEvent(AnalysisEvent *event)
 {
   auto electrons  = event->getElectrons(7, 2.47, ELooseLH);
   auto muons      = event->getMuons(7, 2.7, MuMedium);
@@ -223,117 +219,6 @@ void ZeroLepton2016::ProcessEvent(AnalysisEvent *event)
   if(meffIncl < 800) return;
 
   int Njets = jets.size();
-
-  // Meff based analysis regions and selections
-  float meff[7];
-  for(int nJet=2; nJet<=6; nJet++)
-    meff[nJet] = sumObjectsPt(jets, nJet) + met;
-  float metSig      = met/sqrt(meffIncl - met);
-  float dphiMin3    = minDphi(metVec, jets, 3);
-  float dphiMinRest = minDphi(metVec, jets);
-  float Ap          = aplanarity(jets);
-
-  // Meff-2j SR's
-  if(Njets >= 2){
-    if(met > 250. && jets[0].Pt() > 250. && jets[1].Pt() > 250. && fabs(jets[0].Eta()) < 0.8 && fabs(jets[1].Eta()) < 0.8 &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 14 && meffIncl > 1200)
-      accept("SR_Meff_2j_1200");
-    if(met > 250. && jets[0].Pt() > 300. && jets[1].Pt() > 300. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 1600)
-      accept("SR_Meff_2j_1600");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2000)
-      accept("SR_Meff_2j_2000");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
-      accept("SR_Meff_2j_2400");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
-      accept("SR_Meff_2j_2800");
-    if(met > 250. && jets[0].Pt() > 350. && jets[1].Pt() > 350. &&
-       dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 && meffIncl > 2400)
-      accept("SR_Meff_2j_3600");
-    if(met > 250. && jets[0].Pt() > 600. && jets[1].Pt() > 50. &&
-       dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 26 && meffIncl > 2400)
-      accept("SR_Meff_2j_2100");
-  }
-  // Meff-3j SR's
-  if(Njets >= 3){
-    if(met > 250. && jets[0].Pt() > 700. && jets[1].Pt() > 50. && jets[2].Pt() > 50. &&
-       dphiMin3 > 0.4 && dphiMinRest > 0.2 && metSig > 16 && meffIncl > 1300)
-      accept("SR_Meff_3j_1300");
-  }
-  // Meff-4j SR's
-  if(Njets >= 4){
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 1.2 && fabs(jets[1].Eta()) < 1.2 &&
-       fabs(jets[2].Eta()) < 1.2 && fabs(jets[3].Eta()) < 1.2 && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.3 &&
-       Ap > 0.04 && meffIncl > 1000)
-      accept("SR_Meff_4j_1000");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 &&
-       Ap > 0.04 && meffIncl > 1400)
-      accept("SR_Meff_4j_1400");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 &&
-       Ap > 0.04 && meffIncl > 1800)
-      accept("SR_Meff_4j_1800");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.25 &&
-       Ap > 0.04 && meffIncl > 2200)
-      accept("SR_Meff_4j_2200");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 &&
-       Ap > 0.04 && meffIncl > 2600)
-      accept("SR_Meff_4j_2600");
-    if(met > 250. && jets[0].Pt() > 200. && jets[3].Pt() > 150. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. &&
-       fabs(jets[2].Eta()) < 2. && fabs(jets[3].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && met/meff[4] > 0.2 &&
-       Ap > 0.04 && meffIncl > 3000)
-      accept("SR_Meff_4j_3000");
-  }
-  // Meff-5j SR's
-  if(Njets >= 5){
-    if(met > 250. && jets[0].Pt() > 700. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.3 &&
-       meffIncl > 1700)
-      accept("SR_Meff_5j_1700");
-    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.2 && met/meff[5] > 0.15 &&
-       Ap > 0.08 && meffIncl > 1600)
-      accept("SR_Meff_5j_1600");
-    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.4 && dphiMinRest > 0.4 && metSig > 15 &&
-       meffIncl > 2000)
-      accept("SR_Meff_5j_2000");
-    if(met > 250. && jets[0].Pt() > 200. && jets[4].Pt() > 50. && dphiMin3 > 0.8 && dphiMinRest > 0.4 && metSig > 18 &&
-       meffIncl > 2600)
-      accept("SR_Meff_5j_2600");
-  }
-  // Meff-6j SR's
-  if(Njets >= 6){
-    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 50. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && fabs(jets[2].Eta()) < 2. &&
-       fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
-       met/meff[6] > 0.25 && meffIncl > 1200)
-      accept("SR_Meff_6j_1200");
-    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && fabs(jets[0].Eta()) < 2. && fabs(jets[1].Eta()) < 2. && fabs(jets[2].Eta()) < 2. &&
-       fabs(jets[3].Eta()) < 2. && fabs(jets[4].Eta()) < 2. && fabs(jets[5].Eta()) < 2. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
-       met/meff[6] > 0.2 && Ap > 0.04 && meffIncl > 1800)
-      accept("SR_Meff_6j_1800");
-    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
-       met/meff[6] > 0.2 && Ap > 0.08 && meffIncl > 2200)
-      accept("SR_Meff_6j_2200");
-    if(met > 250. && jets[0].Pt() > 200. && jets[5].Pt() > 100. && dphiMin3 > 0.4 && dphiMinRest > 0.2 &&
-       met/meff[6] > 0.15 && Ap > 0.08 && meffIncl > 2600)
-      accept("SR_Meff_6j_2600");
-  }
-  // Meff boosted boson regions
-  auto fatjets = reclusterJets(jets, 1., 50.);
-  if(fatjets.size() >= 2){
-    if(met < 250 && fatjets[0].Pt() > 200. && fatjets[1].Pt() > 200. && fatjets[0].M() > 60. && fatjets[0].M() < 110. &&
-       fatjets[1].M() > 60. && fatjets[1].M() < 110. && dphiMin3 > 0.6 && dphiMinRest > 0.4 && metSig > 20.){
-      if(meffIncl > 1600.)
-	accept("SR_Meff_2jB_1600");
-      if(meffIncl > 1400.)
-	accept("SR_Meff_2jB_2400");
-    }
-  }
-
 
   // RestFrames analysis for different RJR SR's and event trees:
 

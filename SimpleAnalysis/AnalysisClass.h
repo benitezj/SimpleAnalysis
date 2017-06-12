@@ -8,6 +8,9 @@
 #include <functional>
 #include <RootCore/Packages.h>
 
+#include "SimpleAnalysis/BDT.h"
+
+
 #ifdef ROOTCORE_PACKAGE_Ext_RestFrames
 #include "SimpleAnalysis/RestFramesHelper.h"
 #endif
@@ -236,8 +239,12 @@ class AnalysisClass
   static float calcAMT2(const AnalysisObject &o1, const AnalysisObject &o2, const AnalysisObject &met, float m1, float m2);
 
   static float aplanarity(const AnalysisObjects& jets);
+  static float sphericity(const AnalysisObjects& jets);
 
   static AnalysisObjects reclusterJets(const AnalysisObjects &jets, float radius, float ptmin, float rclus=-1, float ptfrac=-1);
+
+  std::vector<BDT::BDTReader*> m_BDTReaders;
+
 
 #ifdef ROOTCORE_PACKAGE_Ext_RestFrames
   RestFramesHelper m_RF_helper;
