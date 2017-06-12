@@ -102,7 +102,7 @@ AnalysisObjects AnalysisClass::lowMassRemoval(const AnalysisObjects & cand, std:
         //Check if the object is already rejected
         if (!Good.at(obj)) continue;
         const AnalysisObject& Object = *(begin_cand + obj);
-        for (unsigned int obj1 = 0; obj1 != obj; ++obj) {
+        for (unsigned int obj1 = 0; obj1 != obj; ++obj1) {
             if (!Good.at(obj1)) continue;
             //Remove the pair
             const AnalysisObject& Object1 = *(begin_cand + obj1);
@@ -283,7 +283,7 @@ std::pair<float, float> AnalysisClass::DiZSelection(const AnalysisObjects& elect
     AnalysisObjects::const_iterator Lep_begin = Leptons.begin();
     AnalysisObjects::const_iterator Lep_end = Leptons.end();
     unsigned int NumLep = Leptons.size();
-
+    if (NumLep < 2)  return  ZMasses;
     for (AnalysisObjects::const_iterator L = Lep_begin + 1; L != Lep_end; ++L) {
         for (AnalysisObjects::const_iterator L1 = Lep_begin; L1 != L; ++L1) {
             //Loop over the first two leptons
@@ -330,6 +330,7 @@ bool AnalysisClass::PassZVeto(const AnalysisObjects& electrons, const AnalysisOb
     auto Leptons = electrons + muons;
     AnalysisObjects::const_iterator Lep_begin = Leptons.begin();
     AnalysisObjects::const_iterator Lep_end = Leptons.end();
+    if (Leptons.size() < 2) return true;
     for (AnalysisObjects::const_iterator L = Lep_begin + 1; L != Lep_end; ++L) {
         for (AnalysisObjects::const_iterator L1 = Lep_begin; L1 != L; ++L1) {
             //Loop over the first two leptons

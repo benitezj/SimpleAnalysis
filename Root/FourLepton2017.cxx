@@ -23,7 +23,10 @@ void FourLepton2017::ProcessEvent(AnalysisEvent *event) {
     if (countObjects(preJets, 20, 4.5, NOT(LooseBadJet)) != 0) return;
     auto baselineTaus = overlapRemoval(softTaus, softElectrons, 0.2);
     // Impose the pt<50 GeV and not combined muon at some point
-    baselineTaus = overlapRemoval(baselineTaus, softMuons, 0.2);
+    baselineTaus = overlapRemoval(baselineTaus, softMuons,[](const AnalysisObject &t, const AnalysisObject & m){
+       if (t.Pt() > 50 && ( m.pass(MuCaloTaggedOnly) || fabs(m.Eta()) > 2.5) )return 1.e5;
+        return t.DeltaR(m);
+    },0.2);
     auto baselineMuons = overlapRemoval(softMuons, softElectrons, 0.01, MuCaloTaggedOnly);
     auto baselineElectrons = overlapRemoval(softElectrons, baselineMuons, 0.01);
     auto baselineJets = overlapRemoval(preJets, baselineElectrons, 0.2);
@@ -44,7 +47,6 @@ void FourLepton2017::ProcessEvent(AnalysisEvent *event) {
     auto signalJets = filterObjects(baselineJets, 20., 2.8, JVT50Jet);
     auto signalElectrons = filterObjects(passLMR_electrons, 7, 2.47, EMediumLH | ED0Sigma5 | EZ05mm | EIsoGradientLoose);
     auto signalMuons = filterObjects(passLMR_muons, 5, 2.7, MuD0Sigma3 | MuZ05mm | MuIsoGradientLoose);
-
     //Count the number of signal leptons
     unsigned int N_SignalEle = signalElectrons.size();
     unsigned int N_SignalMuo = signalMuons.size();
@@ -56,7 +58,7 @@ void FourLepton2017::ProcessEvent(AnalysisEvent *event) {
     bool ZVeto = PassZVeto(signalElectrons, signalMuons);
     std::pair<float, float> DiZ = DiZSelection(signalElectrons, signalMuons);
     if (N_SignalLep >= 4 && N_SignalTau == 0) {
-        if (ZVeto && Meff > 600) accept("SROA");
+        if (ZVeto && Meff > 600) accept("SR0A");
         if (ZVeto && Meff > 1100) accept("SR0B");
         if (fabs(DiZ.first - Z_Mass) < 10. && 61.2 < DiZ.second && DiZ.second < 101.2) {
             if (met > 50) accept("SR0C");
