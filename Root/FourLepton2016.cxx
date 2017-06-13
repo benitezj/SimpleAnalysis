@@ -1,17 +1,17 @@
 #include "SimpleAnalysis/AnalysisClass.h"
 #include <string>
 
-DefineAnalysis(FourLepton2017)
+DefineAnalysis(FourLepton2016)
 
 const float Z_Mass = 91.2;
 
 
-void FourLepton2017::Init() {
+void FourLepton2016::Init() {
     addRegions( { "SR0A", "SR0B", "SR0C", "SR0D", "SR1", "SR2" });
 
 }
 
-void FourLepton2017::ProcessEvent(AnalysisEvent *event) {
+void FourLepton2016::ProcessEvent(AnalysisEvent *event) {
     auto softElectrons = event->getElectrons(7, 2.47, EVeryLooseLH);
     auto softMuons = event->getMuons(5, 2.5, MuMedium);
     auto softTaus = event->getTaus(20, 2.47, TauOneProng | TauThreeProng);
