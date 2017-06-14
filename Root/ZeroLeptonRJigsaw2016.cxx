@@ -414,29 +414,29 @@ void ZeroLeptonRJigsaw2016::ProcessEvent(AnalysisEvent *event)
   // squark SR's
   // SR-S1
   if(R_H2PP_H3PP > 0.55 && R_H2PP_H3PP < 0.9 && R_pTj2_HT3PP > 0.16 && eta12 < 0.8 && deltaQCD > 0.1 && RPT_HT3PP < 0.08){
-    if(HT3PP > 1000.)
+    if(HT3PP >= 1000. && H2PP >= 800.)
       accept("SR_RJR_S1a");
-    if(HT3PP > 1200.)
+    if(HT3PP >= 1200. && H2PP >= 1000.)
       accept("SR_RJR_S1b");
   }
   // SR-S2
 
   if(R_H2PP_H3PP > 0.5 && R_H2PP_H3PP < 0.95 && R_pTj2_HT3PP > 0.14 && eta12 < 1.1 && deltaQCD > 0.05 && RPT_HT3PP < 0.08){
-    if(HT3PP > 1400.)
+    if(HT3PP >= 1400. && H2PP >= 1200.)
       accept("SR_RJR_S2a");
-    if(HT3PP > 1600.)
+    if(HT3PP >= 1600. && H2PP >= 1400.)
       accept("SR_RJR_S2b");
   }
   // SR-S3
   if(R_H2PP_H3PP > 0.45 && R_H2PP_H3PP < 0.98 && R_pTj2_HT3PP > 0.13 && eta12 < 1.4 && deltaQCD > 0.025 && RPT_HT3PP < 0.08){
-    if(HT3PP > 1800.)
+    if(HT3PP >= 1800. && H2PP >= 1700.)
       accept("SR_RJR_S3a");
-    if(HT3PP > 2100.)
+    if(HT3PP >= 2100. && H2PP >= 1900.)
       accept("SR_RJR_S3b");
   }
   // SR-S4
   if(R_pTj2_HT3PP > 0.13 && deltaQCD > 0. && RPT_HT3PP < 0.08){
-    if(HT3PP > 2400.)
+    if(HT3PP >= 2400. && H2PP >= 2100.)
       accept("SR_RJR_S4");
   }
 

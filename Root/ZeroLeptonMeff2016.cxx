@@ -152,13 +152,15 @@ void ZeroLeptonMeff2016::ProcessEvent(AnalysisEvent *event)
       accept("SR_Meff_6j_2600");
   }
   // Meff boosted boson regions
+
   auto fatjets = reclusterJets(jets, 1., 50.);
-  if(fatjets.size() >= 2){
-    if(met < 250 && fatjets[0].Pt() > 200. && fatjets[1].Pt() > 200. && fatjets[0].M() > 60. && fatjets[0].M() < 110. &&
-       fatjets[1].M() > 60. && fatjets[1].M() < 110. && dphiMin3 > 0.6 && dphiMinRest > 0.4 && metSig > 20.){
+  if(Njets >=2 && fatjets.size() >= 2){
+    if(met > 250 && fatjets[0].Pt() > 200. && fatjets[1].Pt() > 200. && fatjets[0].M() > 60. && fatjets[0].M() < 110. &&
+       fatjets[1].M() > 60. && fatjets[1].M() < 110. && dphiMin3 > 0.6 && dphiMinRest > 0.4 && metSig > 20. && 
+       jets[0].Pt() > 200. && jets[1].Pt() > 50. ){
       if(meffIncl > 1600.)
 	accept("SR_Meff_2jB_1600");
-      if(meffIncl > 1400.)
+      if(meffIncl > 2400.)
 	accept("SR_Meff_2jB_2400");
     }
   }
