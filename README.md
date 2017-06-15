@@ -51,6 +51,11 @@ lsetup panda
 rc clean
 prun --exec 'simpleAnalysis -a ZeroLepton2015,ThreeBjets2015 %IN' --outputs='*.txt,*.root' --useRootCore --inDS <inputDS> --outDS user.<userName>.simple.v1
 ```
+For submitting multiple datasets listed in a file in one go try:
+```
+lsetup panda
+SimpleAnalysis/scripts/gridSubmit.py <listFile>
+```
 
 ## Slimming:
 For running over large input files more than once, it can be advantageous to
