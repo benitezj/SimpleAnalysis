@@ -4,7 +4,11 @@ DefineAnalysis(OneLeptonMultiJets2016)
 
 void OneLeptonMultiJets2016::Init()
 {
-	addRegions({"preSelection","8j80_0b","8j80_3b","10j60_3b","10j80_3b"});
+	addRegions({"preSelection",
+		"8j40_0b","8j40_3b","9j40_0b","9j40_3b","10j40_0b","10j40_3b","11j40_0b","11j40_3b","12j40_0b","12j40_3b",
+		"8j60_0b","8j60_3b","9j60_0b","9j60_3b","10j60_0b","10j60_3b",
+		"8j80_0b","8j80_3b","9j80_0b","9j80_3b","10j80_0b","10j80_3b",
+		});
 }
 
 void OneLeptonMultiJets2016::ProcessEvent(AnalysisEvent *event)
@@ -39,15 +43,43 @@ void OneLeptonMultiJets2016::ProcessEvent(AnalysisEvent *event)
 	// Signal regions
 	if ( signalLeptons.size()>=1 && signalJets40.size()>=5 ) {
 	  accept("preSelection");
-	  if ( bjets60.size()>=3 ) {
-	    if ( signalJets60.size()>=10 ) accept("10j60_3b");}
-	  if ( bjets80.size()>=3 ) {
-	    if ( signalJets80.size()>=8 )  accept("8j80_3b");
+		// 40 GeV jets
+	  if ( bjets40.size()==0 ) {
+	    if ( signalJets40.size()>=8  ) accept("8j40_0b");
+	    if ( signalJets40.size()>=9  ) accept("9j40_0b");
+	    if ( signalJets40.size()>=10 ) accept("10j40_0b");
+	    if ( signalJets40.size()>=11 ) accept("11j40_0b");
+	    if ( signalJets40.size()>=12 ) accept("12j40_0b");
+		}
+	  else if ( bjets40.size()>=3 ) {
+	    if ( signalJets40.size()>=8  ) accept("8j40_3b");
+	    if ( signalJets40.size()>=9  ) accept("9j40_3b");
+	    if ( signalJets40.size()>=10 ) accept("10j40_3b");
+	    if ( signalJets40.size()>=11 ) accept("11j40_3b");
+	    if ( signalJets40.size()>=12 ) accept("12j40_3b");
+		}
+		// 60 GeV jets
+	  if ( bjets60.size()==0 ) {
+	    if ( signalJets60.size()>=8  ) accept("8j60_0b");
+	    if ( signalJets60.size()>=9  ) accept("9j60_0b");
+	    if ( signalJets60.size()>=10 ) accept("10j60_0b");
+		}
+	  else if ( bjets60.size()>=3 ) {
+	    if ( signalJets60.size()>=8  ) accept("8j60_3b");
+	    if ( signalJets60.size()>=9  ) accept("9j60_3b");
+	    if ( signalJets60.size()>=10 ) accept("10j60_3b");
+		}
+		// 80 GeV jets
+	  if ( bjets80.size()==0 ) {
+	    if ( signalJets80.size()>=8  ) accept("8j80_0b");
+	    if ( signalJets80.size()>=9  ) accept("9j80_0b");
+	    if ( signalJets80.size()>=10 ) accept("10j80_0b");
+		}
+	  else if ( bjets80.size()>=3 ) {
+	    if ( signalJets80.size()>=8  ) accept("8j80_3b");
+	    if ( signalJets80.size()>=9  ) accept("9j80_3b");
 	    if ( signalJets80.size()>=10 ) accept("10j80_3b");
-	  }
-	  else if ( bjets80.size()==0 ) {
-	    if ( signalJets80.size()>=8 )  accept("8j80_0b");
-	  }
+		}
 	}
 	return;
 }
