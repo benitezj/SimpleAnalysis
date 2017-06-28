@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
     std::cerr<<std::endl;
     return 1;
   }
-
+  
   std::sort(analysisList.begin(), analysisList.end(), [](AnalysisClass* a, AnalysisClass* b) {
       return b->name() > a->name();   
     });

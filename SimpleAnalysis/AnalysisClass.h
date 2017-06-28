@@ -222,7 +222,7 @@ class AnalysisClass
   virtual void addHistogram(const std::string &label,int bins,float *edges) { _output->addHistogram(label, bins, edges); }
   virtual void addHistogram(const std::string &label,std::vector<float> &edges) { _output->addHistogram(label, edges); }
   virtual void addHistogram(const std::string &label, int binsX, float minX, float maxX,
-			    int binsY,float minY,float maxY) { _output->addHistogram(label, binsX, minX, maxX, binsY, minY, maxY); };
+  			    int binsY,float minY,float maxY) { _output->addHistogram(label, binsX, minX, maxX, binsY, minY, maxY); };
   virtual void accept(const std::string &name,double weight=1) { _output->pass(name, weight); };
   virtual void fill(const std::string &name,double x) { _output->fillHistogram(name, x); };
   virtual void fill(const std::string &name,double x,double y) { _output->fillHistogram(name, x, y); };
