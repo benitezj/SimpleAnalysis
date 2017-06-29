@@ -32,12 +32,12 @@ void tH2017::Init()
   addHistogram("fwdJet4Eta_SRB3", 25,0,4.); 
   addHistogram("fwdJet4Eta_SRB4", 25,0,4.);
 
-  // //the most forward bjets for each signal region
-  // addHistogram("1stfwdBJetEta0", 25,0,4.); 
-  // addHistogram("1stfwdBJetEta1", 25,0,4.); 
-  // addHistogram("1stfwdBJetEta2", 25,0,4.); 
-  // addHistogram("1stfwdBJetEta3", 25,0,4.); 
-  // addHistogram("1stfwdBJetEta4", 25,0,4.);
+  //the most forward bjets for each signal region
+  addHistogram("fwdBJet1Eta_SRB0", 25,0,4.); 
+  addHistogram("fwdBJet1Eta_SRB1", 25,0,4.); 
+  addHistogram("fwdBJet1Eta_SRB2", 25,0,4.); 
+  addHistogram("fwdBJet1Eta_SRB3", 25,0,4.); 
+  addHistogram("fwdBJet1Eta_SRB4", 25,0,4.);
 
   // addHistogram("2ndfwdBJetEta0", 25,0,4.); 
   // addHistogram("2ndfwdBJetEta1", 25,0,4.); 
@@ -57,14 +57,13 @@ void tH2017::Init()
   // addHistogram("4thfwdBJetEta3", 25,0,4.); 
   // addHistogram("4thfwdBJetEta4", 25,0,4.);
 
-
   addHistogram("NLep_nocuts",10,-0.5,9.5);
-  addHistogram("MET_nocuts",100,0,1000);
+  addHistogram("MET_nocuts",100,0,500);
   addHistogram("Njets_nocuts",10,-0.5,9.5);
   
-  addHistogram("MET",100,0,1000);
-  addHistogram("Njets",10,-0.5,9.5);
-  addHistogram("Nbjets",6,-0.5,5.5);
+  addHistogram("MET",100,0,500);
+  addHistogram("Njets",10,0,10);
+  addHistogram("Nbjets",6,0,6);
   addHistogram("pTL",100,0,500);
   addHistogram("fwdBJet1Eta", 25,0,4.); 
 }
@@ -112,10 +111,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("Njets",numSignalJets);
   fill("Nbjets",nBjets);
   fill("pTL",leptons.at(0).Pt());
-
-
   
-  // Find 1st,2nd,3rd most forward jets
+  // Find 1st,2nd,3rd most forward jets per event
   double fwd_eta[4]; for(int j=0;j<4;j++) fwd_eta[j]=-999; 
   int fwdJet_idx[4]; for(int j=0;j<4;j++) fwdJet_idx[j]=-1;
   for(int iJet=0;iJet<numSignalJets;iJet++){ 
@@ -155,19 +152,34 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   }
   fill("fwdBJet1Eta", fwd_bjet_eta); 
 
+  //Find 2 jets whose combined mass is closest to the Higgs
+  // double mHiggs=125; 
+  // int jet1=-1;
+  // int jet2=-1;
+  // double mCombined=-1; 
+  // if(numSignalJets>1){
+  //   for(int iJet=0;iJet<numSignalJets;iJet++){
+      
+  //   }
+  // }
+  
+
   // b-Tag signal regions
   if (nBjets==0){
     fill("fwdJet1Eta_SRB0", fwd_eta[0]);
     fill("fwdJet2Eta_SRB0", fwd_eta[1]);
     fill("fwdJet3Eta_SRB0", fwd_eta[2]);
     fill("fwdJet4Eta_SRB0", fwd_eta[3]);
+
+    fill("fwdBJet1Eta_SRB0", fwd_bjet_eta); 
   }
   if (nBjets==1){
     fill("fwdJet1Eta_SRB1", fwd_eta[0]);
     fill("fwdJet2Eta_SRB1", fwd_eta[1]);
     fill("fwdJet3Eta_SRB1", fwd_eta[2]);
     fill("fwdJet4Eta_SRB1", fwd_eta[3]);
-
+    
+    fill("fwdBJet1Eta_SRB1", fwd_bjet_eta); 
   }
   if (nBjets==2){
     fill("fwdJet1Eta_SRB2", fwd_eta[0]);
@@ -175,6 +187,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("fwdJet3Eta_SRB2", fwd_eta[2]);
     fill("fwdJet4Eta_SRB2", fwd_eta[3]);
 
+    fill("fwdBJet1Eta_SRB2", fwd_bjet_eta); 
   }
   if (nBjets==3){
     fill("fwdJet1Eta_SRB3", fwd_eta[0]);
@@ -182,6 +195,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("fwdJet3Eta_SRB3", fwd_eta[2]);
     fill("fwdJet4Eta_SRB3", fwd_eta[3]);
       
+    fill("fwdBJet1Eta_SRB3", fwd_bjet_eta); 
   }
   if (nBjets==4){
     fill("fwdJet1Eta_SRB4", fwd_eta[0]);
@@ -189,6 +203,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("fwdJet3Eta_SRB4", fwd_eta[2]);
     fill("fwdJet4Eta_SRB4", fwd_eta[3]);
 
+    fill("fwdBJet1Eta_SRB4", fwd_bjet_eta); 
   }
 
 
