@@ -7,7 +7,7 @@ void tH2017::Init()
 {
   //addRegions({"SR1lep0b","SR1lep1b","SR1lep2b","SR1lep3b","SR1lep4b"});
   
-  //the most forward jets for each signal region
+  //the most forward jet per event for each signal region
   addHistogram("fwdJet1Eta_SRB0", 25,0,4.); 
   addHistogram("fwdJet1Eta_SRB1", 25,0,4.); 
   addHistogram("fwdJet1Eta_SRB2", 25,0,4.); 
@@ -66,6 +66,7 @@ void tH2017::Init()
   addHistogram("Njets",10,-0.5,9.5);
   addHistogram("Nbjets",6,-0.5,5.5);
   addHistogram("pTL",100,0,500);
+  addHistogram("fwdBJet1Eta", 25,0,4.); 
 }
 
 void tH2017::ProcessEvent(AnalysisEvent *event)
@@ -145,6 +146,14 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     }
   }
 
+  //Find most forward bjet per event
+  double fwd_bjet_eta=-999;
+  for(int iJet=0;iJet<nBjets;iJet++){ 
+    if(fabs(bjets[iJet].Eta())>fwd_bjet_eta){
+      fwd_bjet_eta=fabs(bjets[iJet].Eta());
+    }
+  }
+  fill("fwdBJet1Eta", fwd_bjet_eta); 
 
   // b-Tag signal regions
   if (nBjets==0){
