@@ -7,7 +7,7 @@ void tH2017::Init()
 {
   //addRegions({"SR1lep0b","SR1lep1b","SR1lep2b","SR1lep3b","SR1lep4b"});
 
-  addHistogram("events",10,0,10);
+  addHistogram("events",10,-0.5,9.5);
   
   //btagged regions
   for(int i=0;i<5;i++){
@@ -54,6 +54,14 @@ void tH2017::Init()
 
 void tH2017::ProcessEvent(AnalysisEvent *event)
 {
+  _output->setEventWeight(1);
+  fill("events",0); //Number of processed events
+
+  double eventweight=event->getMCWeights()[0];
+  _output->setEventWeight(eventweight); //all histograms after this point get filled with this weight
+  fill("events",1); //Sum of initial weights
+
+
   auto electrons  = event->getElectrons(25., 2.47,ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
   auto muons      = event->getMuons(25., 2.7, MuLoose && MuIsoGradient);//add vertex (MuD0Sigma3|MuZ05mm ?)
   auto jets   = event->getJets(25., 3.8, JVT50Jet); // what about NOT(LooseBadJet)
@@ -85,7 +93,6 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   if(leptons.size()>0) fill("lep_pt_nocuts",leptons.at(0).Pt());
   fill("MET_nocuts",met);
   fill("Njets_nocuts",numSignalJets);
-  fill("events",0); 
   for(int iJet=0;iJet<numSignalJets;iJet++) fill("jet_pt_nocuts", jets.at(iJet).Pt()); 
   
 
@@ -172,19 +179,18 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   int jet2=-1;
   double mDiff=1000; 
   for(int J1=0;J1<numSignalJets;J1++){
-    double mJet1=jets.at(J1).M();
     for(int J2=0;J2<numSignalJets;J2++){
       if(J2==J1) continue; 
-      double mJet2=jets.at(J2).M();
-      if(fabs(mJet1+mJet2-mHiggs)<mDiff){
-  	mDiff=fabs(mJet1+mJet2-mHiggs);
+      double mH=(jets.at(J1)+jets.at(J2)).M();
+      if(fabs(mH-mHiggs)<mDiff){
+  	mDiff=fabs(mH-mHiggs);
   	jet1=J1;
   	jet2=J2;
       }
     }
   }
   double mCombined=-1;
-  if(jet1!=-1&&jet2!=-1) mCombined=jets.at(jet1).M()+jets.at(jet2).M();
+  if(jet1!=-1&&jet2!=-1) mCombined=(jets.at(jet1)+jets.at(jet2)).M();
   fill("Hbjets_m",mCombined);
   
 
