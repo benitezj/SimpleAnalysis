@@ -12,7 +12,7 @@ void tH2017::Init()
   //btagged regions
   for(int i=0;i<5;i++){
     std::string SR=std::to_string(i); 
-    for(int j=0;j<5;j++){ //1st,2nd,3rd,4th most forward jets
+    for(int j=0;j<4;j++){ //1st,2nd,3rd,4th most forward jets
       std::string jet=std::to_string(j);
       std::string etaHist="fwdJet"+jet+"Eta_SRB"+SR;
       std::string ptHist="fwdJet"+jet+"Pt_SRB"+SR;
@@ -23,7 +23,7 @@ void tH2017::Init()
     addHistogram("fwdBJet1Pt_SRB"+SR,100,0,500);
     
     addHistogram("lep_pt_SRB"+SR,100,0,500); 
-    addHistogram("lep_eta_SRB"+SR,100,0,500); 
+    addHistogram("lep_eta_SRB"+SR,25,0,4); 
     
     addHistogram("leadJetPt_SRB"+SR,100,0,500); 
     addHistogram("leadJetEta_SRB"+SR,25,0,4); 
@@ -62,6 +62,10 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("events",1); //Sum of initial weights
 
 
+  auto electrons_noPtCut = event->getElectrons(0., 2.47, ELooseBLLH && EIsoGradient);
+  auto muons_noPtCut = event->getMuons(0., 2.7, MuLoose && MuIsoGradient);
+  auto jets_noPtCut = event->getJets(0., 3.8); 
+
   auto electrons  = event->getElectrons(25., 2.47,ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
   auto muons      = event->getMuons(25., 2.7, MuLoose && MuIsoGradient);//add vertex (MuD0Sigma3|MuZ05mm ?)
   auto jets   = event->getJets(25., 3.8, JVT50Jet); // what about NOT(LooseBadJet)
@@ -76,8 +80,16 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   jets   = overlapRemoval(jets, muons, 0.4, LessThan3Tracks); //check this cut (b-jets?)
   muons      = overlapRemoval(muons, jets, 0.4);   
 
+  electrons_noPtCut  = overlapRemoval(electrons_noPtCut, muons_noPtCut, 0.01);
+  jets_noPtCut   = overlapRemoval(jets_noPtCut, electrons_noPtCut, 0.2, NOT(BTag85MV2c20));//check this cut
+  electrons_noPtCut  = overlapRemoval(electrons_noPtCut, jets_noPtCut, 0.4);
+  jets_noPtCut   = overlapRemoval(jets_noPtCut, muons_noPtCut, 0.4, LessThan3Tracks); //check this cut (b-jets?)
+  muons_noPtCut      = overlapRemoval(muons_noPtCut, jets_noPtCut, 0.4);   
+
+
   // Lists of objects can be merged by simple addition
   auto leptons   = electrons + muons;
+  auto leptons_noPtCut = electrons_noPtCut + muons_noPtCut; 
 
   //
   auto bjets = filterObjects(jets, 25., 3.8, BTag85MV2c20);
@@ -86,14 +98,16 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   // Object counting
   int numSignalLeptons = leptons.size();  // Object lists are essentially std::vectors so .size() works
   int numSignalJets    = jets.size();
+  int numPreJets       = jets_noPtCut.size(); 
+  int numPreLeptons    = leptons_noPtCut.size();
   int nBjets = bjets.size();
   
   // Fill in histograms without cuts
   fill("NLep_nocuts",numSignalLeptons);
-  if(leptons.size()>0) fill("lep_pt_nocuts",leptons.at(0).Pt());
+  if(leptons_noPtCut.size()>0) fill("lep_pt_nocuts",leptons_noPtCut.at(0).Pt());
   fill("MET_nocuts",met);
   fill("Njets_nocuts",numSignalJets);
-  for(int iJet=0;iJet<numSignalJets;iJet++) fill("jet_pt_nocuts", jets.at(iJet).Pt()); 
+  for(int iJet=0;iJet<numPreJets;iJet++) fill("jet_pt_nocuts", jets_noPtCut.at(iJet).Pt()); 
   
 
   // Preselection
