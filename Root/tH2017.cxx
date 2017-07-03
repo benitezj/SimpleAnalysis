@@ -5,7 +5,7 @@ double dR_fn (float eta1, float eta2, float phi1, float phi2){
   double deta= fabs(eta1 - eta2);      double dphi= fabs(phi1 - phi2);
   if (dphi > 3.14 ) dphi = 2*3.14 - dphi;
   return sqrt((dphi*dphi)+(deta*deta));
-};
+}
 
 DefineAnalysis(tH2017)
 
@@ -145,7 +145,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("MET_nocuts",met);
   fill("Njets_nocuts",numSignalJets);
   for(int iJet=0;iJet<numSignalJets;iJet++) fill("jet_pt_nocuts", jets.at(iJet).Pt()); 
-  for(int iJet=0;iJet<jets_noPtCut.size();iJet++) fill("jet_pt_noPtCut", jets_noPtCut.at(iJet).Pt()); 
+  for(unsigned int iJet=0;iJet<jets_noPtCut.size();iJet++) fill("jet_pt_noPtCut", jets_noPtCut.at(iJet).Pt()); 
   
 
   // Preselection
