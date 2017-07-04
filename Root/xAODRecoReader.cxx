@@ -406,6 +406,8 @@ bool xAODRecoReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore */*store*
 
     int id=0;
 
+    std::cout << "Spyros ... xAODRecoReader jet stuf...\n";
+
     _JetVertexTaggerTool->updateJvt(*calibJet);
     if (_JetJvtEfficiencyTool->passesJvtCut(*calibJet)) id |= JVT50Jet;
     if (calibJet->pt()<20000 || (!(id&JVT50Jet))|| !_JetCleaningLooseTool->accept(*calibJet))  id |= LooseBadJet;
