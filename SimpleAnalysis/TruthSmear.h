@@ -24,6 +24,7 @@ class TruthSmear
   bool smearJets;
   bool smearMET;
   bool addPileupJets;
+  bool useHGTD0;
   UpgradePerformanceFunctions *m_upgrade;
   TRandom3 m_random;
 };
