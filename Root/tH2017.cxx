@@ -59,7 +59,7 @@ void tH2017::Init()
   //no pt cut on jets/leptons
   addHistogram("jet_pt_noPtCut",100,0,500); 
   addHistogram("lep_pt_noPtCut",100,0,500); 
-
+  
   //after preselection
   addHistogram("MET",100,0,500);
   addHistogram("Njets",10,-0.5,9.5);
@@ -73,10 +73,12 @@ void tH2017::Init()
   addHistogram("fwdJet1Pt",100,0,500);
   addHistogram("fwdBJet1Eta",25,0,4);
   addHistogram("fwdBJet1Pt",100,0,500);						
+  
   addHistogram("leadJetPt",100,0,500); 
   addHistogram("leadJetEta",25,0,4); 
   addHistogram("leadBJetPt",100,0,500); 
   addHistogram("leadBJetEta",25,0,4); 
+  
   addHistogram("deltaEta_fwdJets",100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
   addHistogram("deltaEta_leadJets",100,0,8); //|eta(leadjet)-eta(leadbjet)|
   addHistogram("dR_leadBJets",100,0,3);//dR(leading bjet, subleading bjet)
@@ -117,17 +119,17 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   
 
   // Overlap removal - including with object Pt-dependent radius calculation
-  electrons  = overlapRemoval(electrons, muons, 0.01);
-  jets   = overlapRemoval(jets, electrons, 0.2, NOT(BTag85MV2c20));//check this cut
-  electrons  = overlapRemoval(electrons, jets, 0.4);
-  jets   = overlapRemoval(jets, muons, 0.4, LessThan3Tracks); //check this cut (b-jets?)
-  muons      = overlapRemoval(muons, jets, 0.4);   
-
   electrons_noPtCut  = overlapRemoval(electrons_noPtCut, muons_noPtCut, 0.01);
   jets_noPtCut   = overlapRemoval(jets_noPtCut, electrons_noPtCut, 0.2, NOT(BTag85MV2c20));//check this cut
   electrons_noPtCut  = overlapRemoval(electrons_noPtCut, jets_noPtCut, 0.4);
   jets_noPtCut   = overlapRemoval(jets_noPtCut, muons_noPtCut, 0.4, LessThan3Tracks); //check this cut (b-jets?)
   muons_noPtCut      = overlapRemoval(muons_noPtCut, jets_noPtCut, 0.4);   
+
+  electrons  = overlapRemoval(electrons, muons, 0.01);
+  jets   = overlapRemoval(jets, electrons, 0.2, NOT(BTag85MV2c20));//check this cut
+  electrons  = overlapRemoval(electrons, jets, 0.4);
+  jets   = overlapRemoval(jets, muons, 0.4, LessThan3Tracks); //check this cut (b-jets?)
+  muons      = overlapRemoval(muons, jets, 0.4);   
 
 
   // Lists of objects can be merged by simple addition
@@ -136,6 +138,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
   //
   auto bjets = filterObjects(jets, 25., 3.8, BTag85MV2c20);
+  auto antiBjets = filterObjects(jets, 25., 3.8, NOT(BTag85MV2c20));
 
 
   // Object counting
@@ -152,7 +155,6 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   for(int iJet=0;iJet<numSignalJets;iJet++) fill("jet_pt_nocuts", jets.at(iJet).Pt()); 
   for(unsigned int iJet=0;iJet<jets_noPtCut.size();iJet++) fill("jet_pt_noPtCut", jets_noPtCut.at(iJet).Pt()); 
   
-
   // Preselection
   if (numSignalLeptons != 1) return;
   if (numSignalJets < 2) return; 
@@ -201,9 +203,23 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   if(highPtBJet_idx[0]!=-1){
     fill("leadBJetPt", bjets.at(highPtBJet_idx[0]).Pt());
     fill("leadBJetEta", fabs(bjets.at(highPtBJet_idx[0]).Eta()));
-    fill("deltaEta_leadJets", fabs(bjets.at(highPtBJet_idx[0]).Eta()-jets.at(highPtJet_idx).Eta()));
   }
-  if(nBjets>1) fill("dR_leadBJets", dR_fn(bjets.at(highPtBJet_idx[0]).Eta(), bjets.at(highPtBJet_idx[1]).Eta(), bjets.at(highPtBJet_idx[0]).Phi(),  bjets.at(highPtBJet_idx[1]).Phi())); 
+
+  //Delta R between 2 leading bjets
+  if(nBjets>1) fill("dR_leadBJets", dR_fn(bjets.at(highPtBJet_idx[0]).Eta(), bjets.at(highPtBJet_idx[1]).Eta(), bjets.at(highPtBJet_idx[0]).Phi(),  bjets.at(highPtBJet_idx[1]).Phi()));
+  
+  //Find deltaEta btwn leading bjet and leading antibjet
+  int anti_idx=-1;
+  double highPt_anti=-1; 
+  for(int iJet=0;iJet<antiBjets.size();iJet++){
+    if(antiBjets.at(iJet).Pt()>highPt_anti){
+      highPt_anti = antiBjets.at(iJet).Pt();
+      anti_idx=iJet; 
+    }
+  }
+  if(anti_idx!=-1&&highPtBJet_idx[0]!=-1) fill("deltaEta_leadJets", fabs(bjets.at(highPtBJet_idx[0]).Eta()-antiBjets.at(anti_idx).Eta()));
+
+   
 
   // Find 1st,2nd,3rd most forward jets per event
   double fwd_eta[4]; for(int j=0;j<4;j++) fwd_eta[j]=-999; 
