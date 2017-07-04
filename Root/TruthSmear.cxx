@@ -11,7 +11,8 @@ TruthSmear::TruthSmear(std::vector<std::string>&
 options
 #endif
 ) :
-smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false), useHGTD0(false) {
+smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false), useHGTD0(false),
+useTrackConfirm(true) {
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
 
   std::string mu="None";
@@ -30,14 +31,15 @@ smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), sme
       std::cout<<"                 Only mu=200 is allowed for now"<<std::endl;
       std::cout<<" seed=<value>  - set seed value (default: "<<seed<<std::endl;
     }
-    if (option=="noElectrons") smearElectrons=false;
-    if (option=="noMuon")      smearMuons=false;
-    if (option=="noTaus")      smearTaus=false;
-    if (option=="noPhotons")   smearPhotons=false;
-    if (option=="noJets")      smearJets=false;
-    if (option=="noMET")       smearMET=false;
-    if (option=="addPileupJets") addPileupJets=true;
-    if (option=="useHGTD0") useHGTD0=true;
+    if (option=="noElectrons")    smearElectrons=false;
+    if (option=="noMuon")         smearMuons=false;
+    if (option=="noTaus")         smearTaus=false;
+    if (option=="noPhotons")      smearPhotons=false;
+    if (option=="noJets")         smearJets=false;
+    if (option=="noMET")          smearMET=false;
+    if (option=="addPileupJets")  addPileupJets=true;
+    if (option=="useHGTD0")       useHGTD0=true;
+    if (option=="noTrackConfirm") useTrackConfirm=false;
     if (option.find("mu=")==0) {
       mu=option.substr(3);
     }
@@ -60,7 +62,7 @@ smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), sme
   m_upgrade->setMETRandomSeed(seed);
   m_upgrade->loadMETHistograms("UpgradePerformanceFunctions/sumetPU_mu200_ttbar_gold.root");
   m_upgrade->setPileupRandomSeed(seed);
-  m_upgrade->setPileupUseTrackConf(true);
+  if (useTrackConfirm) m_upgrade->setPileupUseTrackConf(true);
   m_upgrade->setPileupJetPtThresholdMeV(30000.);
   m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::PU);
   m_upgrade->setPileupEff(0.02);
