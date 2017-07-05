@@ -139,54 +139,6 @@ void tH2017::Init()
   //addRegions({"SR1lep0b","SR1lep1b","SR1lep2b","SR1lep3b","SR1lep4b"});
 
   addHistogram("events",10,-0.5,9.5);
-  
-  //btagged regions
-  for(int i=0;i<5;i++){
-    std::string SR=std::to_string(i); 
-    for(int j=0;j<4;j++){ //1st,2nd,3rd,4th most forward jets
-      std::string jet=std::to_string(j+1);
-      addHistogram("fwdJet"+jet+"Eta_SRB"+SR,25,0,4);
-      addHistogram("fwdJet"+jet+"Pt_SRB"+SR,100,0,500);
-    }
-
-    addHistogram("fwdJetEtaH1_SRMbb_SRB"+SR,25,0,4);
-    addHistogram("fwdJetPtH1_SRMbb_SRB"+SR,100,0,500);
-    addHistogram("fwdJetEtaH2_SRMbb_SRB"+SR,25,0,4);
-    addHistogram("fwdJetPtH2_SRMbb_SRB"+SR,100,0,500);
-    addHistogram("fwdJetEtaH3_SRMbb_SRB"+SR,25,0,4);
-    addHistogram("fwdJetPtH3_SRMbb_SRB"+SR,100,0,500);
-
-
-    addHistogram("fwdBJet1Eta_SRB"+SR,25,0,4);
-    addHistogram("fwdBJet1Pt_SRB"+SR,100,0,500);
-    addHistogram("leadJetPt_SRB"+SR,100,0,500); 
-    addHistogram("leadJetEta_SRB"+SR,25,0,4); 
-    addHistogram("leadBJetPt_SRB"+SR,100,0,500); 
-    addHistogram("leadBJetEta_SRB"+SR,25,0,4); 
-    addHistogram("deltaEta_fwdJets_SRB"+SR,50,0,2.5); //|eta(fwdjet)-eta(fwdbjet)|
-    addHistogram("deltaEta_leadJets_SRB"+SR,50,0,2.5); //|eta(leadjet)-eta(leadbjet)|
-    addHistogram("dR_leadBJets_SRB"+SR,100,0,3);//dR(leading bjet, subleading bjet)
-
-    addHistogram("MET_SRB"+SR,100,0,500);
-    addHistogram("Njets_SRB"+SR,10,-0.5,9.5);
-    addHistogram("NAntiBjets_SRB"+SR,10,-0.5,9.5);
-    addHistogram("sumAllPt_SRB"+SR,100,0,2000); 
-
-    addHistogram("lep_pt_SRB"+SR,100,0,500); 
-    addHistogram("lep_eta_SRB"+SR,25,0,4); 
-
-    addHistogram("top_m_SRB"+SR,100,0,500); //reco mass of top quark
-    addHistogram("top_pt_SRB"+SR,100,0,500); 
-    addHistogram("top_eta_SRB"+SR,25,0,4); 
-    
-    for(int j=0;j<3;j++){ //higgs reconstruction using 3 different methods
-      std::string h_idx = std::to_string(j+1); 
-      addHistogram("Higgs_m"+h_idx+"_SRB"+SR,100,0,500);
-      addHistogram("Higgs_pt"+h_idx+"_SRB"+SR,100,0,500);
-      addHistogram("Higgs_eta"+h_idx+"_SRB"+SR,25,0,4);
-      addHistogram("deltaEta_Higgs"+h_idx+"FwdJet_SRB"+SR,100,0,8);//|eta(higgs)-eta(forwardJet)|
-    }
-   }
 
   //no cuts
   addHistogram("NLep_nocuts",10,-0.5,9.5);
@@ -209,19 +161,24 @@ void tH2017::Init()
   addHistogram("lep_pt",100,0,500);
   addHistogram("lep_eta",25,0,4);   
 
-  addHistogram("fwdJet1Eta",25,0,4);
-  addHistogram("fwdJet1Pt",100,0,500);
-  addHistogram("fwdBJet1Eta",25,0,4);
-  addHistogram("fwdBJet1Pt",100,0,500);						
+  addHistogram("fwdJetEta",25,0,4);
+  addHistogram("fwdJetPt",100,0,500);
+  addHistogram("fwdBJetEta",25,0,4);
+  addHistogram("fwdBJetPt",100,0,500);
+  addHistogram("fwdAntiBJetEta",25,0,4);
+  addHistogram("fwdAntiBJetPt",100,0,500);
   
   addHistogram("leadJetPt",100,0,500); 
   addHistogram("leadJetEta",25,0,4); 
   addHistogram("leadBJetPt",100,0,500); 
   addHistogram("leadBJetEta",25,0,4); 
+  addHistogram("leadAntiBJetPt",100,0,500); 
+  addHistogram("leadAntiBJetEta",25,0,4); 
   
-  addHistogram("deltaEta_fwdJets",100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
-  addHistogram("deltaEta_leadJets",100,0,8); //|eta(leadjet)-eta(leadbjet)|
-  addHistogram("dR_leadBJets",100,0,3);//dR(leading bjet, subleading bjet)
+  addHistogram("deltaEta_jfwd_bfwd",100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
+  addHistogram("deltaEta_jfwd_b1",100,0,8);
+  addHistogram("deltaEta_j1_b1",100,0,8); //|eta(leadjet)-eta(leadbjet)|
+  addHistogram("dR_b1_b2",100,0,3);//dR(leading bjet, subleading bjet)
 
   addHistogram("top_m",100,0,500); //reco mass of top quark
   addHistogram("top_pt",100,0,500); 
@@ -234,7 +191,58 @@ void tH2017::Init()
     addHistogram("Higgs_eta"+h_idx,25,0,4);
     addHistogram("deltaEta_Higgs"+h_idx+"FwdJet",100,0,8);//|eta(higgs)-eta(forwardJet)|
   }
- 
+
+  //btagged regions
+  for(int i=2;i<5;i++){
+
+    std::string SR=std::to_string(i); 
+   
+    addHistogram("fwdJetEtaH1_SRMbb_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPtH1_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH2_SRMbb_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPtH2_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH3_SRMbb_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPtH3_SRMbb_SRB"+SR,100,0,500);
+
+    addHistogram("fwdJetEta_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPt_SRB"+SR,100,0,500);
+    addHistogram("fwdBJetEta_SRB"+SR,25,0,4);
+    addHistogram("fwdBJetPt_SRB"+SR,100,0,500);
+    addHistogram("fwdAntiBJetEta_SRB"+SR,25,0,4);
+    addHistogram("fwdAntiBJetPt_SRB"+SR,100,0,500);
+    
+    addHistogram("leadJetPt_SRB"+SR,100,0,500); 
+    addHistogram("leadJetEta_SRB"+SR,25,0,4); 
+    addHistogram("leadBJetPt_SRB"+SR,100,0,500); 
+    addHistogram("leadBJetEta_SRB"+SR,25,0,4); 
+    addHistogram("leadAntiBJetPt_SRB"+SR,100,0,500); 
+    addHistogram("leadAntiBJetEta_SRB"+SR,25,0,4); 
+    
+    addHistogram("deltaEta_jfwd_bfwd_SRB"+SR,100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
+    addHistogram("deltaEta_j1_b1_SRB"+SR,100,0,8); //|eta(leadjet)-eta(leadbjet)|
+    addHistogram("deltaEta_jfwd_b1_SRB"+SR,100,0,8);
+    addHistogram("dR_b1_b2_SRB"+SR,100,0,3);//dR(leading bjet, subleading bjet)
+
+    addHistogram("MET_SRB"+SR,100,0,500);
+    addHistogram("Njets_SRB"+SR,10,-0.5,9.5);
+    addHistogram("NAntiBjets_SRB"+SR,10,-0.5,9.5);
+    addHistogram("sumAllPt_SRB"+SR,100,0,2000); 
+
+    addHistogram("lep_pt_SRB"+SR,100,0,500); 
+    addHistogram("lep_eta_SRB"+SR,25,0,4); 
+
+    addHistogram("top_m_SRB"+SR,100,0,500); //reco mass of top quark
+    addHistogram("top_pt_SRB"+SR,100,0,500); 
+    addHistogram("top_eta_SRB"+SR,25,0,4); 
+    
+    for(int j=0;j<3;j++){ //higgs reconstruction using 3 different methods
+      std::string h_idx = std::to_string(j+1); 
+      addHistogram("Higgs_m"+h_idx+"_SRB"+SR,100,0,500);
+      addHistogram("Higgs_pt"+h_idx+"_SRB"+SR,100,0,500);
+      addHistogram("Higgs_eta"+h_idx+"_SRB"+SR,25,0,4);
+      addHistogram("deltaEta_Higgs"+h_idx+"FwdJet_SRB"+SR,100,0,8);//|eta(higgs)-eta(forwardJet)|
+    }
+  }
 }
 
 void tH2017::ProcessEvent(AnalysisEvent *event)
@@ -321,34 +329,39 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
    
   fill("leadJetPt", leadingJets.at(0).Pt());
   fill("leadJetEta", fabs(leadingJets.at(0).Eta()));
-  fill("fwdJet1Eta", fabs(forwardJets.at(0).Eta()));
-  fill("fwdJet1Pt", forwardJets.at(0).Pt());
+  fill("fwdJetPt", forwardJets.at(0).Pt());
+  fill("fwdJetEta", fabs(forwardJets.at(0).Eta()));
   
-
-  //______________Fill histos corresponding to b-Tag signal regions____________
+  ////______________bjet cut__________________________
   if( nBjets<2 || nBjets>4 || antiBjets.size()==0)
     return;   
   std::string SR=std::to_string(nBjets); 
   
-
   ///Sum pT of all objects 
   double pTSum=leptons.at(0).Pt();
   for(int i=0;i<numSignalJets;i++) pTSum+=jets.at(i).Pt();
   fill("sumAllPt",pTSum); //(for >b-tags inclusive)
 
-
   ///lead b-jet
-  fill("leadBJetPt", leadingBjets.at(0).Pt());
+  fill("fwdBJetPt",   forwardBjets.at(0).Pt()); 
+  fill("fwdBJetEta",  fabs(forwardBjets.at(0).Eta())); 
+  fill("leadBJetPt",  leadingBjets.at(0).Pt());
   fill("leadBJetEta", fabs(leadingBjets.at(0).Eta()));
-  fill("fwdBJet1Eta", fabs(forwardBjets.at(0).Eta())); 
-  fill("fwdBJet1Pt", forwardBjets.at(0).Pt()); 
+
+  ///lead anti b-jet
+  fill("fwdAntiBJetPt",   forwardAntiBjets.at(0).Pt()); 
+  fill("fwdAntiBJetEta",  fabs(forwardAntiBjets.at(0).Eta())); 
+  fill("leadAntiBJetPt",  leadingAntiBjets.at(0).Pt());
+  fill("leadAntiBJetEta", fabs(leadingAntiBjets.at(0).Eta()));
 
   //Delta R between 2 leading bjets
-  fill("dR_leadBJets", dR_fn(leadingBjets.at(0).Eta(), leadingBjets.at(1).Eta(), leadingBjets.at(0).Phi(), leadingBjets.at(1).Phi()));
+  fill("dR_b1_b2", dR_fn(leadingBjets.at(0).Eta(), leadingBjets.at(1).Eta(), leadingBjets.at(0).Phi(), leadingBjets.at(1).Phi()));
   
-  //DeltaEta between leading bjet and leading antibjet
-  fill("deltaEta_leadJets", fabs(leadingBjets.at(0).Eta()-leadingAntiBjets.at(0).Eta()));
-  
+  //DeltaEta 
+  fill("deltaEta_jfwd_bfwd", fabs(forwardAntiBjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
+  fill("deltaEta_j1_b1",     fabs(leadingAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_b1",   fabs(forwardAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+
   //Reconstructing Higgs
   TLorentzVector higgs1=findHiggs_method1(bjets); 
   TLorentzVector higgs2=findHiggs_method2(bjets,leadingBjets);
@@ -374,49 +387,52 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   TLorentzVector top=findTop(bjets,leptons,metVec); 
   fill("top_m", top.M()); 
   fill("top_pt", top.Pt());
-  fill("top_eta", top.Eta()); 
-  
-
-  //first 4 forward jets   
-  for(unsigned int i=0;i<forwardJets.size();i++){
-    fill("fwdJet"+std::to_string(i+1)+"Pt_SRB"+SR, forwardJets.at(i).Pt());
-    fill("fwdJet"+std::to_string(i+1)+"Eta_SRB"+SR, fabs(forwardJets.at(i).Eta()));  
-  }
+  fill("top_eta", top.Eta());   
 
 
-  //////////////
-  fill("fwdBJet1Eta_SRB"+SR,forwardBjets.at(0).Eta()); 
-  fill("fwdBJet1Pt_SRB"+SR, forwardBjets.at(0).Pt()); 
-
+  ///////////////______________Fill histos corresponding to b-Tag signal regions____________
   fill("MET_SRB"+SR,met);
-  fill("sumAllPt_SRB"+SR,pTSum); 
+  fill("Njets_SRB"+SR,numSignalJets);
+  fill("NAntiBjets_SRB"+SR,antiBjets.size());  
   fill("lep_pt_SRB"+SR,leptons.at(0).Pt());
   fill("lep_eta_SRB"+SR,fabs(leptons.at(0).Eta())); 
 
-  fill("NAntiBjets_SRB"+SR,antiBjets.size());  
-  fill("Njets_SRB"+SR,numSignalJets);
-  fill("leadJetPt_SRB"+SR, leadingJets.at(0).Pt());  
-  fill("leadJetEta_SRB"+SR, leadingJets.at(0).Eta());
-  
-  fill("leadBJetPt_SRB"+SR, leadingBjets.at(0).Pt());
-  fill("leadBJetEta_SRB"+SR, fabs(leadingBjets.at(0).Eta()));
-  fill("deltaEta_fwdJets_SRB"+SR,fabs(forwardBjets.at(0).Eta()-forwardJets.at(0).Eta())); 
-  fill("deltaEta_leadJets_SRB"+SR, fabs(leadingBjets.at(0).Eta()-leadingJets.at(0).Eta()));   
+  fill("sumAllPt_SRB"+SR,pTSum); 
 
-  fill("top_m_SRB"+SR,top.M()); 
-  fill("top_pt_SRB"+SR, top.Pt()); 
-  fill("top_eta_SRB"+SR, fabs(top.Eta())); 
+  fill("fwdJetPt_SRB"+SR,        forwardJets.at(0).Pt());
+  fill("fwdJetEta_SRB"+SR,       fabs(forwardJets.at(0).Eta())); 
+  fill("leadJetPt_SRB"+SR,       leadingJets.at(0).Pt());  
+  fill("leadJetEta_SRB"+SR,      fabs(leadingJets.at(0).Eta()));
   
+  fill("fwdBJetPt_SRB"+SR,       forwardBjets.at(0).Pt()); 
+  fill("fwdBJetEta_SRB"+SR,      fabs(forwardBjets.at(0).Eta()));   			     
+  fill("leadBJetPt_SRB"+SR,      leadingBjets.at(0).Pt());
+  fill("leadBJetEta_SRB"+SR,     fabs(leadingBjets.at(0).Eta()));
+  
+  fill("fwdAntiBJetPt_SRB"+SR,   forwardAntiBjets.at(0).Pt());
+  fill("fwdAntiBJetEta_SRB"+SR,  fabs(forwardAntiBjets.at(0).Eta())); 
+  fill("leadAntiBJetPt_SRB"+SR,  leadingAntiBjets.at(0).Pt());
+  fill("leadAntiBJetEta_SRB"+SR, fabs(leadingAntiBjets.at(0).Eta()));
 
-  fill("Higgs_m1_SRB"+SR,higgs1.M()); 
-  fill("Higgs_pt1_SRB"+SR,higgs1.Pt()); 
-  fill("Higgs_eta1_SRB"+SR,fabs(higgs1.Eta())); 
-  fill("Higgs_m2_SRB"+SR,higgs2.M()); 
-  fill("Higgs_pt2_SRB"+SR,higgs2.Pt()); 
-  fill("Higgs_eta2_SRB"+SR,fabs(higgs2.Eta())); 
-  fill("Higgs_m3_SRB"+SR,higgs3.M()); 
-  fill("Higgs_pt3_SRB"+SR,higgs3.Pt()); 
-  fill("Higgs_eta3_SRB"+SR,fabs(higgs3.Eta())); 
+  fill("dR_b1_b2_SRB"+SR, dR_fn(leadingBjets.at(0).Eta(), leadingBjets.at(1).Eta(), leadingBjets.at(0).Phi(), leadingBjets.at(1).Phi()));
+
+  fill("deltaEta_jfwd_bfwd_SRB"+SR, fabs(forwardAntiBjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
+  fill("deltaEta_j1_b1_SRB"+SR,     fabs(leadingAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_b1_SRB"+SR,   fabs(forwardAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+
+  fill("top_m_SRB"+SR,      top.M()); 
+  fill("top_pt_SRB"+SR,     top.Pt()); 
+  fill("top_eta_SRB"+SR,    fabs(top.Eta()));   
+
+  fill("Higgs_m1_SRB"+SR,   higgs1.M()); 
+  fill("Higgs_pt1_SRB"+SR,  higgs1.Pt()); 
+  fill("Higgs_eta1_SRB"+SR, fabs(higgs1.Eta())); 
+  fill("Higgs_m2_SRB"+SR,   higgs2.M()); 
+  fill("Higgs_pt2_SRB"+SR,  higgs2.Pt()); 
+  fill("Higgs_eta2_SRB"+SR, fabs(higgs2.Eta())); 
+  fill("Higgs_m3_SRB"+SR,   higgs3.M()); 
+  fill("Higgs_pt3_SRB"+SR,  higgs3.Pt()); 
+  fill("Higgs_eta3_SRB"+SR, fabs(higgs3.Eta())); 
 
 
   ////Higgs mass signal regions
