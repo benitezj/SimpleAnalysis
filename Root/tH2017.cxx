@@ -154,26 +154,25 @@ void tH2017::Init()
   //after preselection
   addHistogram("MET",100,0,500);
   addHistogram("Njets",10,-0.5,9.5);
-  addHistogram("NAntiBjets",10,-0.5,9.5);
+  addHistogram("NLightjets",10,-0.5,9.5);
   addHistogram("Nbjets",6,-0.5,5.5);
   addHistogram("sumAllPt",100,0,2000); 
  
   addHistogram("lep_pt",100,0,500);
   addHistogram("lep_eta",25,0,4);   
 
-  addHistogram("fwdJetEta",25,0,4);
+  addHistogram("leadJetPt_allJets",100,0,500);
+  addHistogram("leadJetEta_allJets",25,0,4); 
+
   addHistogram("fwdJetPt",100,0,500);
-  addHistogram("fwdBJetEta",25,0,4);
-  addHistogram("fwdBJetPt",100,0,500);
-  addHistogram("fwdAntiBJetEta",25,0,4);
-  addHistogram("fwdAntiBJetPt",100,0,500);
-  
+  addHistogram("fwdJetEta",25,0,4);
   addHistogram("leadJetPt",100,0,500); 
   addHistogram("leadJetEta",25,0,4); 
+
+  addHistogram("fwdBJetPt",100,0,500);
+  addHistogram("fwdBJetEta",25,0,4);
   addHistogram("leadBJetPt",100,0,500); 
   addHistogram("leadBJetEta",25,0,4); 
-  addHistogram("leadAntiBJetPt",100,0,500); 
-  addHistogram("leadAntiBJetEta",25,0,4); 
   
   addHistogram("deltaEta_jfwd_bfwd",100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
   addHistogram("deltaEta_jfwd_b1",100,0,8);
@@ -196,40 +195,39 @@ void tH2017::Init()
   for(int i=2;i<5;i++){
 
     std::string SR=std::to_string(i); 
-   
-    addHistogram("fwdJetEtaH1_SRMbb_SRB"+SR,25,0,4);
-    addHistogram("fwdJetPtH1_SRMbb_SRB"+SR,100,0,500);
-    addHistogram("fwdJetEtaH2_SRMbb_SRB"+SR,25,0,4);
-    addHistogram("fwdJetPtH2_SRMbb_SRB"+SR,100,0,500);
-    addHistogram("fwdJetEtaH3_SRMbb_SRB"+SR,25,0,4);
-    addHistogram("fwdJetPtH3_SRMbb_SRB"+SR,100,0,500);
 
-    addHistogram("fwdJetEta_SRB"+SR,25,0,4);
+    addHistogram("MET_SRB"+SR,100,0,500);
+    addHistogram("Njets_SRB"+SR,10,-0.5,9.5);
+    addHistogram("NLightjets_SRB"+SR,10,-0.5,9.5);
+    addHistogram("sumAllPt_SRB"+SR,100,0,2000); 
+
+    addHistogram("lep_pt_SRB"+SR,100,0,500); 
+    addHistogram("lep_eta_SRB"+SR,25,0,4); 
+
+    addHistogram("leadJetPt_allJets_SRB"+SR,100,0,500); 
+    addHistogram("leadJetEta_allJets_SRB"+SR,25,0,4);
+
     addHistogram("fwdJetPt_SRB"+SR,100,0,500);
-    addHistogram("fwdBJetEta_SRB"+SR,25,0,4);
-    addHistogram("fwdBJetPt_SRB"+SR,100,0,500);
-    addHistogram("fwdAntiBJetEta_SRB"+SR,25,0,4);
-    addHistogram("fwdAntiBJetPt_SRB"+SR,100,0,500);
-    
+    addHistogram("fwdJetEta_SRB"+SR,25,0,4);
     addHistogram("leadJetPt_SRB"+SR,100,0,500); 
-    addHistogram("leadJetEta_SRB"+SR,25,0,4); 
+    addHistogram("leadJetEta_SRB"+SR,25,0,4);
+    
+    addHistogram("fwdJetPtH1_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH1_SRMbb_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPtH2_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH2_SRMbb_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPtH3_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH3_SRMbb_SRB"+SR,25,0,4);
+
+    addHistogram("fwdBJetPt_SRB"+SR,100,0,500);
+    addHistogram("fwdBJetEta_SRB"+SR,25,0,4);     
     addHistogram("leadBJetPt_SRB"+SR,100,0,500); 
-    addHistogram("leadBJetEta_SRB"+SR,25,0,4); 
-    addHistogram("leadAntiBJetPt_SRB"+SR,100,0,500); 
-    addHistogram("leadAntiBJetEta_SRB"+SR,25,0,4); 
+    addHistogram("leadBJetEta_SRB"+SR,25,0,4);  
     
     addHistogram("deltaEta_jfwd_bfwd_SRB"+SR,100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
     addHistogram("deltaEta_j1_b1_SRB"+SR,100,0,8); //|eta(leadjet)-eta(leadbjet)|
     addHistogram("deltaEta_jfwd_b1_SRB"+SR,100,0,8);
     addHistogram("dR_b1_b2_SRB"+SR,100,0,3);//dR(leading bjet, subleading bjet)
-
-    addHistogram("MET_SRB"+SR,100,0,500);
-    addHistogram("Njets_SRB"+SR,10,-0.5,9.5);
-    addHistogram("NAntiBjets_SRB"+SR,10,-0.5,9.5);
-    addHistogram("sumAllPt_SRB"+SR,100,0,2000); 
-
-    addHistogram("lep_pt_SRB"+SR,100,0,500); 
-    addHistogram("lep_eta_SRB"+SR,25,0,4); 
 
     addHistogram("top_m_SRB"+SR,100,0,500); //reco mass of top quark
     addHistogram("top_pt_SRB"+SR,100,0,500); 
@@ -313,24 +311,21 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   // Fill histogram after cuts
   fill("MET",met);
   fill("Njets",numSignalJets);
-  fill("NAntiBjets",antiBjets.size()); 
+  fill("NLightjets",antiBjets.size()); 
   fill("Nbjets",nBjets);
   fill("lep_pt",leptons.at(0).Pt());
-  fill("lep_eta",fabs(leptons.at(0).Eta()));
-  
+  fill("lep_eta",fabs(leptons.at(0).Eta()));  
 
   //Leading/forward jets and bjets
   std::vector<TLorentzVector> leadingJets=findLeadingJets(jets); 
   std::vector<TLorentzVector> forwardJets=findForwardJets(jets);
   std::vector<TLorentzVector> leadingBjets=findLeadingJets(bjets); 
   std::vector<TLorentzVector> forwardBjets=findForwardJets(bjets); 
-  std::vector<TLorentzVector> leadingAntiBjets=findLeadingJets(antiBjets); 
-  std::vector<TLorentzVector> forwardAntiBjets=findForwardJets(antiBjets); 
+  std::vector<TLorentzVector> leadingLightjets=findLeadingJets(antiBjets); 
+  std::vector<TLorentzVector> forwardLightjets=findForwardJets(antiBjets); 
    
-  fill("leadJetPt", leadingJets.at(0).Pt());
-  fill("leadJetEta", fabs(leadingJets.at(0).Eta()));
-  fill("fwdJetPt", forwardJets.at(0).Pt());
-  fill("fwdJetEta", fabs(forwardJets.at(0).Eta()));
+  fill("leadJetPt_allJets", leadingJets.at(0).Pt());
+  fill("leadJetEta_allJets", fabs(leadingJets.at(0).Eta()));
   
   ////______________bjet cut__________________________
   if( nBjets<2 || nBjets>4 || antiBjets.size()==0)
@@ -342,25 +337,25 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   for(int i=0;i<numSignalJets;i++) pTSum+=jets.at(i).Pt();
   fill("sumAllPt",pTSum); //(for >b-tags inclusive)
 
+  ///lead anti b-jet
+  fill("fwdJetPt",   forwardLightjets.at(0).Pt()); 
+  fill("fwdJetEta",  fabs(forwardLightjets.at(0).Eta())); 
+  fill("leadJetPt",  leadingLightjets.at(0).Pt());
+  fill("leadJetEta", fabs(leadingLightjets.at(0).Eta()));
+
   ///lead b-jet
   fill("fwdBJetPt",   forwardBjets.at(0).Pt()); 
   fill("fwdBJetEta",  fabs(forwardBjets.at(0).Eta())); 
   fill("leadBJetPt",  leadingBjets.at(0).Pt());
   fill("leadBJetEta", fabs(leadingBjets.at(0).Eta()));
 
-  ///lead anti b-jet
-  fill("fwdAntiBJetPt",   forwardAntiBjets.at(0).Pt()); 
-  fill("fwdAntiBJetEta",  fabs(forwardAntiBjets.at(0).Eta())); 
-  fill("leadAntiBJetPt",  leadingAntiBjets.at(0).Pt());
-  fill("leadAntiBJetEta", fabs(leadingAntiBjets.at(0).Eta()));
-
   //Delta R between 2 leading bjets
   fill("dR_b1_b2", dR_fn(leadingBjets.at(0).Eta(), leadingBjets.at(1).Eta(), leadingBjets.at(0).Phi(), leadingBjets.at(1).Phi()));
   
   //DeltaEta 
-  fill("deltaEta_jfwd_bfwd", fabs(forwardAntiBjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
-  fill("deltaEta_j1_b1",     fabs(leadingAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
-  fill("deltaEta_jfwd_b1",   fabs(forwardAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_bfwd", fabs(forwardLightjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
+  fill("deltaEta_j1_b1",     fabs(leadingLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_b1",   fabs(forwardLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
 
   //Reconstructing Higgs
   TLorentzVector higgs1=findHiggs_method1(bjets); 
@@ -379,9 +374,9 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("Higgs_eta2",fabs(higgs2.Eta()));
   fill("Higgs_eta3",fabs(higgs3.Eta()));
 
-  fill("deltaEta_Higgs1FwdJet",fabs(higgs1.Eta()-forwardAntiBjets.at(0).Eta())); 
-  fill("deltaEta_Higgs2FwdJet",fabs(higgs2.Eta()-forwardAntiBjets.at(0).Eta()));
-  fill("deltaEta_Higgs3FwdJet",fabs(higgs3.Eta()-forwardAntiBjets.at(0).Eta()));
+  fill("deltaEta_Higgs1FwdJet",fabs(higgs1.Eta()-forwardLightjets.at(0).Eta())); 
+  fill("deltaEta_Higgs2FwdJet",fabs(higgs2.Eta()-forwardLightjets.at(0).Eta()));
+  fill("deltaEta_Higgs3FwdJet",fabs(higgs3.Eta()-forwardLightjets.at(0).Eta()));
   
   //Reconstructed top quark
   TLorentzVector top=findTop(bjets,leptons,metVec); 
@@ -393,32 +388,30 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   ///////////////______________Fill histos corresponding to b-Tag signal regions____________
   fill("MET_SRB"+SR,met);
   fill("Njets_SRB"+SR,numSignalJets);
-  fill("NAntiBjets_SRB"+SR,antiBjets.size());  
+  fill("NLightjets_SRB"+SR,antiBjets.size());  
+  fill("sumAllPt_SRB"+SR,pTSum); 
+
   fill("lep_pt_SRB"+SR,leptons.at(0).Pt());
   fill("lep_eta_SRB"+SR,fabs(leptons.at(0).Eta())); 
 
-  fill("sumAllPt_SRB"+SR,pTSum); 
+  fill("leadJetPt_allJets_SRB"+SR, leadingJets.at(0).Pt());
+  fill("leadJetEta_allJets_SRB"+SR, fabs(leadingJets.at(0).Eta()));
 
-  fill("fwdJetPt_SRB"+SR,        forwardJets.at(0).Pt());
-  fill("fwdJetEta_SRB"+SR,       fabs(forwardJets.at(0).Eta())); 
-  fill("leadJetPt_SRB"+SR,       leadingJets.at(0).Pt());  
-  fill("leadJetEta_SRB"+SR,      fabs(leadingJets.at(0).Eta()));
-  
-  fill("fwdBJetPt_SRB"+SR,       forwardBjets.at(0).Pt()); 
-  fill("fwdBJetEta_SRB"+SR,      fabs(forwardBjets.at(0).Eta()));   			     
-  fill("leadBJetPt_SRB"+SR,      leadingBjets.at(0).Pt());
-  fill("leadBJetEta_SRB"+SR,     fabs(leadingBjets.at(0).Eta()));
-  
-  fill("fwdAntiBJetPt_SRB"+SR,   forwardAntiBjets.at(0).Pt());
-  fill("fwdAntiBJetEta_SRB"+SR,  fabs(forwardAntiBjets.at(0).Eta())); 
-  fill("leadAntiBJetPt_SRB"+SR,  leadingAntiBjets.at(0).Pt());
-  fill("leadAntiBJetEta_SRB"+SR, fabs(leadingAntiBjets.at(0).Eta()));
+  fill("fwdJetPt_SRB"+SR,    forwardLightjets.at(0).Pt());
+  fill("fwdJetEta_SRB"+SR,   fabs(forwardLightjets.at(0).Eta())); 
+  fill("leadJetPt_SRB"+SR,   leadingLightjets.at(0).Pt());
+  fill("leadJetEta_SRB"+SR,  fabs(leadingLightjets.at(0).Eta()));  
 
+  fill("fwdBJetPt_SRB"+SR,   forwardBjets.at(0).Pt()); 
+  fill("fwdBJetEta_SRB"+SR,  fabs(forwardBjets.at(0).Eta()));   			     
+  fill("leadBJetPt_SRB"+SR,  leadingBjets.at(0).Pt());
+  fill("leadBJetEta_SRB"+SR, fabs(leadingBjets.at(0).Eta()));
+  
   fill("dR_b1_b2_SRB"+SR, dR_fn(leadingBjets.at(0).Eta(), leadingBjets.at(1).Eta(), leadingBjets.at(0).Phi(), leadingBjets.at(1).Phi()));
 
-  fill("deltaEta_jfwd_bfwd_SRB"+SR, fabs(forwardAntiBjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
-  fill("deltaEta_j1_b1_SRB"+SR,     fabs(leadingAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
-  fill("deltaEta_jfwd_b1_SRB"+SR,   fabs(forwardAntiBjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_bfwd_SRB"+SR, fabs(forwardLightjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
+  fill("deltaEta_j1_b1_SRB"+SR,     fabs(leadingLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_b1_SRB"+SR,   fabs(forwardLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
 
   fill("top_m_SRB"+SR,      top.M()); 
   fill("top_pt_SRB"+SR,     top.Pt()); 
@@ -437,19 +430,19 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
   ////Higgs mass signal regions
   if(80<higgs1.M()&&higgs1.M()<130){
-    fill("fwdJetPtH1_SRMbb_SRB"+SR, forwardAntiBjets.at(0).Pt());
-    fill("fwdJetEtaH1_SRMbb_SRB"+SR, forwardAntiBjets.at(0).Eta());
-    fill("deltaEta_Higgs1FwdJet_SRB"+SR,fabs(higgs1.Eta()-forwardAntiBjets.at(0).Eta())); 
+    fill("fwdJetPtH1_SRMbb_SRB"+SR, forwardLightjets.at(0).Pt());
+    fill("fwdJetEtaH1_SRMbb_SRB"+SR, forwardLightjets.at(0).Eta());
+    fill("deltaEta_Higgs1FwdJet_SRB"+SR,fabs(higgs1.Eta()-forwardLightjets.at(0).Eta())); 
   }
   if(80<higgs2.M()&&higgs2.M()<130){
-    fill("fwdJetPtH2_SRMbb_SRB"+SR, forwardAntiBjets.at(0).Pt());
-    fill("fwdJetEtaH2_SRMbb_SRB"+SR, forwardAntiBjets.at(0).Eta());
-    fill("deltaEta_Higgs2FwdJet_SRB"+SR,fabs(higgs2.Eta()-forwardAntiBjets.at(0).Eta()));
+    fill("fwdJetPtH2_SRMbb_SRB"+SR, forwardLightjets.at(0).Pt());
+    fill("fwdJetEtaH2_SRMbb_SRB"+SR, forwardLightjets.at(0).Eta());
+    fill("deltaEta_Higgs2FwdJet_SRB"+SR,fabs(higgs2.Eta()-forwardLightjets.at(0).Eta()));
   }
   if(80<higgs3.M()&&higgs3.M()<130){
-    fill("fwdJetPtH3_SRMbb_SRB"+SR, forwardAntiBjets.at(0).Pt());
-    fill("fwdJetEtaH3_SRMbb_SRB"+SR, forwardAntiBjets.at(0).Eta());
-    fill("deltaEta_Higgs3FwdJet_SRB"+SR,fabs(higgs3.Eta()-forwardAntiBjets.at(0).Eta()));
+    fill("fwdJetPtH3_SRMbb_SRB"+SR, forwardLightjets.at(0).Pt());
+    fill("fwdJetEtaH3_SRMbb_SRB"+SR, forwardLightjets.at(0).Eta());
+    fill("deltaEta_Higgs3FwdJet_SRB"+SR,fabs(higgs3.Eta()-forwardLightjets.at(0).Eta()));
   }
 
   return;
