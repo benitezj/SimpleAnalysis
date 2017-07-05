@@ -7,6 +7,131 @@ double dR_fn (float eta1, float eta2, float phi1, float phi2){
   return sqrt((dphi*dphi)+(deta*deta));
 }
 
+std::vector<TLorentzVector> findForwardJets(AnalysisObjects jetVec){
+  std::vector<TLorentzVector> forwardJets; 
+  double fwd_eta[4]; for(int j=0;j<4;j++) fwd_eta[j]=-999; 
+  int fwdJet_idx[4]; for(int j=0;j<4;j++) fwdJet_idx[j]=-1;
+  int numSignalJets=jetVec.size(); 
+  for(int iJet=0;iJet<numSignalJets;iJet++){ 
+    if(fabs(jetVec.at(iJet).Eta())>fwd_eta[0]){
+      fwdJet_idx[0]=iJet;
+      fwd_eta[0]=fabs(jetVec.at(iJet).Eta());
+    }
+  }
+  for(int iJet=0;iJet<numSignalJets;iJet++){ 
+    if(iJet==fwdJet_idx[0]) continue; 
+    if(fabs(jetVec.at(iJet).Eta())>fwd_eta[1]){
+      fwdJet_idx[1]=iJet;
+      fwd_eta[1]=fabs(jetVec.at(iJet).Eta());
+    }
+  }
+  for(int iJet=0;iJet<numSignalJets;iJet++){ 
+    if(iJet==fwdJet_idx[0]||iJet==fwdJet_idx[1]) continue; 
+    if(fabs(jetVec.at(iJet).Eta())>fwd_eta[2]){
+      fwdJet_idx[2]=iJet;
+      fwd_eta[2]=fabs(jetVec.at(iJet).Eta());
+    }
+  }
+  for(int iJet=0;iJet<numSignalJets;iJet++){ 
+    if(iJet==fwdJet_idx[0]||iJet==fwdJet_idx[1]||iJet==fwdJet_idx[2]) continue; 
+    if(fabs(jetVec.at(iJet).Eta())>fwd_eta[3]){
+      fwdJet_idx[3]=iJet;
+      fwd_eta[3]=fabs(jetVec.at(iJet).Eta());
+    }
+  }
+  for(int i=0;i<4;i++) if(fwdJet_idx[i]!=-1) forwardJets.push_back(jetVec.at(fwdJet_idx[i]));
+  return forwardJets; 
+}
+
+std::vector<TLorentzVector> findLeadingJets(AnalysisObjects jetVec){
+  std::vector<TLorentzVector> leadingJets;
+  double highPt[2]={-1,-1}; 
+  double highPtJet_idx[2]={-1,-1}; 
+  for(unsigned int iJet=0;iJet<jetVec.size();iJet++){
+    if(jetVec.at(iJet).Pt()>highPt[0]){ 
+      highPt[0]=jetVec.at(iJet).Pt();
+      highPtJet_idx[0]=iJet;
+    }
+  }
+  for(unsigned int iJet=0;iJet<jetVec.size();iJet++){
+    if(iJet==highPtJet_idx[0]) continue; 
+    if(jetVec.at(iJet).Pt()>highPt[1]){ 
+      highPt[1]=jetVec.at(iJet).Pt();
+      highPtJet_idx[1]=iJet;
+    }
+  }
+  if(highPtJet_idx[0]!=-1) leadingJets.push_back(jetVec.at(highPtJet_idx[0]));
+  if(highPtJet_idx[1]!=-1) leadingJets.push_back(jetVec.at(highPtJet_idx[1]));
+  return leadingJets; 
+}
+
+TLorentzVector findHiggs_method1(AnalysisObjects bjets){
+  TLorentzVector higgs1;
+  double mHiggs=125; 
+  int nBjets = bjets.size();
+  int bjet1=-1;
+  int bjet2=-1;
+  double mDiff=1000; 
+  for(int J1=0;J1<nBjets;J1++){
+    for(int J2=0;J2<nBjets;J2++){
+      if(J2==J1) continue; 
+      double mH=(bjets.at(J1)+bjets.at(J2)).M();
+      if(fabs(mH-mHiggs)<mDiff){
+  	mDiff=fabs(mH-mHiggs);
+  	bjet1=J1;
+  	bjet2=J2;
+      }
+    }
+  } 
+  if(bjet1!=-1) higgs1 = bjets.at(bjet1)+bjets.at(bjet2);
+  return higgs1; 
+}
+
+TLorentzVector findHiggs_method2(AnalysisObjects bjets, std::vector<TLorentzVector> leadingBjets){
+  TLorentzVector higgs2;
+  if(bjets.size()>1) higgs2=leadingBjets.at(0)+leadingBjets.at(1); 
+  return higgs2; 
+}
+
+TLorentzVector findHiggs_method3(AnalysisObjects bjets){
+  TLorentzVector higgs3; 
+  double smallDR=100; 
+  int nBjets = bjets.size();
+  int bjet1=-1;
+  int bjet2=-1;
+  for(int J1=0;J1<nBjets;J1++){
+    for(int J2=0;J2<nBjets;J2++){
+      if(J2==J1) continue; 
+      double DR_bjets=dR_fn(bjets.at(J1).Eta(),bjets.at(J2).Eta(),bjets.at(J1).Phi(),bjets.at(J2).Phi());
+      if(smallDR>DR_bjets){
+	smallDR=DR_bjets;
+  	bjet1=J1;
+  	bjet2=J2;
+      }
+    }
+  }
+  if(nBjets>1) higgs3 = bjets.at(bjet1)+bjets.at(bjet2);
+  return higgs3;
+}
+
+TLorentzVector findTop(AnalysisObjects bjets, AnalysisObjects leptons, AnalysisObject metVec){
+  TLorentzVector top;
+  double DR=100; 
+  int nBjets=bjets.size(); 
+  int top_bjet_idx=-1; 
+  for(int iJet=0;iJet<nBjets;iJet++){
+    double DR_bjetLep=dR_fn(bjets.at(iJet).Eta(),leptons.at(0).Eta(),bjets.at(iJet).Phi(),leptons.at(0).Phi());
+    if(DR>DR_bjetLep){
+      DR=DR_bjetLep;
+      top_bjet_idx=iJet; 
+    }
+  }
+  if(top_bjet_idx!=-1) top=bjets.at(top_bjet_idx)+leptons.at(0)+metVec; 
+  return top; 
+}
+
+
+
 DefineAnalysis(tH2017)
 
 void tH2017::Init()
@@ -14,40 +139,6 @@ void tH2017::Init()
   //addRegions({"SR1lep0b","SR1lep1b","SR1lep2b","SR1lep3b","SR1lep4b"});
 
   addHistogram("events",10,-0.5,9.5);
-  
-  //btagged regions
-  for(int i=0;i<5;i++){
-    std::string SR=std::to_string(i); 
-    for(int j=0;j<4;j++){ //1st,2nd,3rd,4th most forward jets
-      std::string jet=std::to_string(j+1);
-      addHistogram("fwdJet"+jet+"Eta_SRB"+SR,25,0,4);
-      addHistogram("fwdJet"+jet+"Pt_SRB"+SR,100,0,500);
-    }
-    addHistogram("fwdBJet1Eta_SRB"+SR,25,0,4);
-    addHistogram("fwdBJet1Pt_SRB"+SR,100,0,500);
-    addHistogram("leadJetPt_SRB"+SR,100,0,500); 
-    addHistogram("leadJetEta_SRB"+SR,25,0,4); 
-    addHistogram("leadBJetPt_SRB"+SR,100,0,500); 
-    addHistogram("leadBJetEta_SRB"+SR,25,0,4); 
-    addHistogram("deltaEta_fwdJets_SRB"+SR,50,0,2.5); //|eta(fwdjet)-eta(fwdbjet)|
-    addHistogram("deltaEta_leadJets_SRB"+SR,50,0,2.5); //|eta(leadjet)-eta(leadbjet)|
-    addHistogram("dR_leadBJets_SRB"+SR,100,0,3);//dR(leading bjet, subleading bjet)
-    addHistogram("deltaEta_Higgs_fwdJet_SRB"+SR,100,0,8);//|eta(higgs)-eta(forwardJet)|
-
-    addHistogram("lep_pt_SRB"+SR,100,0,500); 
-    addHistogram("lep_eta_SRB"+SR,25,0,4); 
-
-    addHistogram("top_m_SRB"+SR,100,0,500); //reco mass of top quark
-    addHistogram("top_pt_SRB"+SR,100,0,500); 
-    addHistogram("top_eta_SRB"+SR,25,0,4); 
-    
-    for(int j=0;j<3;j++){ //higgs reconstruction using 3 different methods
-      std::string h_idx = std::to_string(j+1); 
-      addHistogram("Higgs_m"+h_idx+"_SRB"+SR,100,0,500);
-      addHistogram("Higgs_pt"+h_idx+"_SRB"+SR,100,0,500);
-      addHistogram("Higgs_eta"+h_idx+"_SRB"+SR,25,0,4);
-    }
-   }
 
   //no cuts
   addHistogram("NLep_nocuts",10,-0.5,9.5);
@@ -66,26 +157,30 @@ void tH2017::Init()
   //after preselection
   addHistogram("MET",100,0,500);
   addHistogram("Njets",10,-0.5,9.5);
+  addHistogram("NLightjets",10,-0.5,9.5);
   addHistogram("Nbjets",6,-0.5,5.5);
   addHistogram("sumAllPt",100,0,2000); 
  
   addHistogram("lep_pt",100,0,500);
   addHistogram("lep_eta",25,0,4);   
 
-  addHistogram("fwdJet1Eta",25,0,4);
-  addHistogram("fwdJet1Pt",100,0,500);
-  addHistogram("fwdBJet1Eta",25,0,4);
-  addHistogram("fwdBJet1Pt",100,0,500);						
-  
+  addHistogram("leadJetPt_allJets",100,0,500);
+  addHistogram("leadJetEta_allJets",25,0,4); 
+
+  addHistogram("fwdJetPt",100,0,500);
+  addHistogram("fwdJetEta",25,0,4);
   addHistogram("leadJetPt",100,0,500); 
   addHistogram("leadJetEta",25,0,4); 
+
+  addHistogram("fwdBJetPt",100,0,500);
+  addHistogram("fwdBJetEta",25,0,4);
   addHistogram("leadBJetPt",100,0,500); 
   addHistogram("leadBJetEta",25,0,4); 
   
-  addHistogram("deltaEta_fwdJets",100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
-  addHistogram("deltaEta_leadJets",100,0,8); //|eta(leadjet)-eta(leadbjet)|
-  addHistogram("dR_leadBJets",100,0,3);//dR(leading bjet, subleading bjet)
-  addHistogram("deltaEta_Higgs_fwdJet",100,0,8);//|eta(higgs)-eta(forwardJet)|
+  addHistogram("deltaEta_jfwd_bfwd",100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
+  addHistogram("deltaEta_jfwd_b1",100,0,8);
+  addHistogram("deltaEta_j1_b1",100,0,8); //|eta(leadjet)-eta(leadbjet)|
+  addHistogram("dR_b1_b2",100,0,3);//dR(leading bjet, subleading bjet)
 
   addHistogram("top_m",100,0,500); //reco mass of top quark
   addHistogram("top_pt",100,0,500); 
@@ -96,8 +191,59 @@ void tH2017::Init()
     addHistogram("Higgs_m"+h_idx,100,0,500); 
     addHistogram("Higgs_pt"+h_idx,100,0,500);
     addHistogram("Higgs_eta"+h_idx,25,0,4);
+    addHistogram("deltaEta_Higgs"+h_idx+"FwdJet",100,0,8);//|eta(higgs)-eta(forwardJet)|
   }
- 
+
+  //btagged regions
+  for(int i=2;i<5;i++){
+
+    std::string SR=std::to_string(i); 
+
+    addHistogram("MET_SRB"+SR,100,0,500);
+    addHistogram("Njets_SRB"+SR,10,-0.5,9.5);
+    addHistogram("NLightjets_SRB"+SR,10,-0.5,9.5);
+    addHistogram("sumAllPt_SRB"+SR,100,0,2000); 
+
+    addHistogram("lep_pt_SRB"+SR,100,0,500); 
+    addHistogram("lep_eta_SRB"+SR,25,0,4); 
+
+    addHistogram("leadJetPt_allJets_SRB"+SR,100,0,500); 
+    addHistogram("leadJetEta_allJets_SRB"+SR,25,0,4);
+
+    addHistogram("fwdJetPt_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEta_SRB"+SR,25,0,4);
+    addHistogram("leadJetPt_SRB"+SR,100,0,500); 
+    addHistogram("leadJetEta_SRB"+SR,25,0,4);
+    
+    addHistogram("fwdJetPtH1_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH1_SRMbb_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPtH2_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH2_SRMbb_SRB"+SR,25,0,4);
+    addHistogram("fwdJetPtH3_SRMbb_SRB"+SR,100,0,500);
+    addHistogram("fwdJetEtaH3_SRMbb_SRB"+SR,25,0,4);
+
+    addHistogram("fwdBJetPt_SRB"+SR,100,0,500);
+    addHistogram("fwdBJetEta_SRB"+SR,25,0,4);     
+    addHistogram("leadBJetPt_SRB"+SR,100,0,500); 
+    addHistogram("leadBJetEta_SRB"+SR,25,0,4);  
+    
+    addHistogram("deltaEta_jfwd_bfwd_SRB"+SR,100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
+    addHistogram("deltaEta_j1_b1_SRB"+SR,100,0,8); //|eta(leadjet)-eta(leadbjet)|
+    addHistogram("deltaEta_jfwd_b1_SRB"+SR,100,0,8);
+    addHistogram("dR_b1_b2_SRB"+SR,100,0,3);//dR(leading bjet, subleading bjet)
+
+    addHistogram("top_m_SRB"+SR,100,0,500); //reco mass of top quark
+    addHistogram("top_pt_SRB"+SR,100,0,500); 
+    addHistogram("top_eta_SRB"+SR,25,0,4); 
+    
+    for(int j=0;j<3;j++){ //higgs reconstruction using 3 different methods
+      std::string h_idx = std::to_string(j+1); 
+      addHistogram("Higgs_m"+h_idx+"_SRB"+SR,100,0,500);
+      addHistogram("Higgs_pt"+h_idx+"_SRB"+SR,100,0,500);
+      addHistogram("Higgs_eta"+h_idx+"_SRB"+SR,25,0,4);
+      addHistogram("deltaEta_Higgs"+h_idx+"FwdJet_SRB"+SR,100,0,8);//|eta(higgs)-eta(forwardJet)|
+    }
+  }
 }
 
 void tH2017::ProcessEvent(AnalysisEvent *event)
@@ -160,10 +306,12 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   
   // Fill in histograms without cuts
   fill("NLep_nocuts",numSignalLeptons);
-  if(numSignalLeptons>0) fill("lep_pt_nocuts", leptons.at(0).Pt()); 
-  if(leptons_noPtCut.size()>0) fill("lep_pt_noPtCut",leptons_noPtCut.at(0).Pt());
   fill("MET_nocuts",met);
   fill("Njets_nocuts",numSignalJets);
+
+  if(numSignalLeptons>0) fill("lep_pt_nocuts", leptons.at(0).Pt()); 
+  if(leptons_noPtCut.size()>0) fill("lep_pt_noPtCut",leptons_noPtCut.at(0).Pt());
+  
   for(int iJet=0;iJet<numSignalJets;iJet++) fill("jet_pt_nocuts", jets.at(iJet).Pt()); 
   for(unsigned int iJet=0;iJet<jets_noPtCut.size();iJet++) fill("jet_pt_noPtCut", jets_noPtCut.at(iJet).Pt()); 
   
@@ -175,287 +323,140 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   // Fill histogram after cuts
   fill("MET",met);
   fill("Njets",numSignalJets);
+  fill("NLightjets",antiBjets.size()); 
   fill("Nbjets",nBjets);
   fill("lep_pt",leptons.at(0).Pt());
-  fill("lep_eta",fabs(leptons.at(0).Eta()));
-  
-  //Sum pT of all objects
-  double pTSum=leptons.at(0).Pt();
-  for(int i=0;i<numSignalJets;i++) pTSum+=jets.at(i).Pt();
-  fill("sumAllPt",pTSum); 
+  fill("lep_eta",fabs(leptons.at(0).Eta()));  
 
-  //Find leading pT jet
-  double highPt=-1; 
-  double highPtJet_idx=-1; 
-  for(int iJet=0;iJet<numSignalJets;iJet++){
-    if(jets.at(iJet).Pt()>highPt){ 
-      highPt=jets.at(iJet).Pt();
-      highPtJet_idx=iJet;
-    }
-  }
-  fill("leadJetPt", jets.at(highPtJet_idx).Pt());
-  fill("leadJetEta", fabs(jets.at(highPtJet_idx).Eta()));
-
-  //Find 1st/2nd leading bjets 
-  double highPtB[2]={-1,-1};
-  double highPtBJet_idx[2]={-1,-1};
-  for(int iJet=0;iJet<nBjets;iJet++){
-    if(bjets.at(iJet).Pt()>highPtB[0]){ 
-      highPtB[0]=bjets.at(iJet).Pt();
-      highPtBJet_idx[0]=iJet;
-    }
-  }
-  for(int iJet=0;iJet<nBjets;iJet++){
-    if(iJet==highPtBJet_idx[0]) continue; 
-    if(bjets.at(iJet).Pt()>highPtB[1]){ 
-      highPtB[1]=bjets.at(iJet).Pt();
-      highPtBJet_idx[1]=iJet;
-    }
-  }
-  if(highPtBJet_idx[0]!=-1){
-    fill("leadBJetPt", bjets.at(highPtBJet_idx[0]).Pt());
-    fill("leadBJetEta", fabs(bjets.at(highPtBJet_idx[0]).Eta()));
-  }
-
-  //Delta R between 2 leading bjets
-  if(nBjets>1) fill("dR_leadBJets", dR_fn(bjets.at(highPtBJet_idx[0]).Eta(), bjets.at(highPtBJet_idx[1]).Eta(), bjets.at(highPtBJet_idx[0]).Phi(),  bjets.at(highPtBJet_idx[1]).Phi()));
-  
-  //Find deltaEta btwn leading bjet and leading antibjet
-  int anti_idx=-1;
-  double highPt_anti=-1; 
-  for(int iJet=0;iJet<antiBjets.size();iJet++){
-    if(antiBjets.at(iJet).Pt()>highPt_anti){
-      highPt_anti = antiBjets.at(iJet).Pt();
-      anti_idx=iJet; 
-    }
-  }
-  if(anti_idx!=-1&&highPtBJet_idx[0]!=-1) fill("deltaEta_leadJets", fabs(bjets.at(highPtBJet_idx[0]).Eta()-antiBjets.at(anti_idx).Eta()));
-
+  //Leading/forward jets and bjets
+  std::vector<TLorentzVector> leadingJets=findLeadingJets(jets); 
+  std::vector<TLorentzVector> forwardJets=findForwardJets(jets);
+  std::vector<TLorentzVector> leadingBjets=findLeadingJets(bjets); 
+  std::vector<TLorentzVector> forwardBjets=findForwardJets(bjets); 
+  std::vector<TLorentzVector> leadingLightjets=findLeadingJets(antiBjets); 
+  std::vector<TLorentzVector> forwardLightjets=findForwardJets(antiBjets); 
    
-
-  // Find 1st,2nd,3rd most forward jets per event
-  double fwd_eta[4]; for(int j=0;j<4;j++) fwd_eta[j]=-999; 
-  int fwdJet_idx[4]; for(int j=0;j<4;j++) fwdJet_idx[j]=-1;
-  for(int iJet=0;iJet<numSignalJets;iJet++){ 
-    if(fabs(jets.at(iJet).Eta())>fwd_eta[0]){
-      fwdJet_idx[0]=iJet;
-      fwd_eta[0]=fabs(jets.at(iJet).Eta());
-    }
-  }
-  for(int iJet=0;iJet<numSignalJets;iJet++){ 
-    if(iJet==fwdJet_idx[0]) continue; 
-    if(fabs(jets.at(iJet).Eta())>fwd_eta[1]){
-      fwdJet_idx[1]=iJet;
-      fwd_eta[1]=fabs(jets.at(iJet).Eta());
-    }
-  }
-  for(int iJet=0;iJet<numSignalJets;iJet++){ 
-    if(iJet==fwdJet_idx[0]||iJet==fwdJet_idx[1]) continue; 
-    if(fabs(jets.at(iJet).Eta())>fwd_eta[2]){
-      fwdJet_idx[2]=iJet;
-      fwd_eta[2]=fabs(jets.at(iJet).Eta());
-    }
-  }
-  for(int iJet=0;iJet<numSignalJets;iJet++){ 
-    if(iJet==fwdJet_idx[0]||iJet==fwdJet_idx[1]||iJet==fwdJet_idx[2]) continue; 
-    if(fabs(jets.at(iJet).Eta())>fwd_eta[3]){
-      fwdJet_idx[3]=iJet;
-      fwd_eta[3]=fabs(jets.at(iJet).Eta());
-    }
-  }
-  fill("fwdJet1Eta", fabs(jets.at(fwdJet_idx[0]).Eta()));
-  fill("fwdJet1Pt", jets.at(fwdJet_idx[0]).Pt()); 
-
-  //Find most forward bjet per event
-  double fwdBJet_eta=-999;
-  int fwdBJet_idx=-1;
-  for(int iJet=0;iJet<nBjets;iJet++){ 
-    if(fabs(bjets.at(iJet).Eta())>fwdBJet_eta){
-      fwdBJet_eta=fabs(bjets.at(iJet).Eta());
-      fwdBJet_idx=iJet;
-    }
-  }
-  if(fwdBJet_idx!=-1){
-    fill("fwdBJet1Eta",fabs(bjets.at(fwdBJet_idx).Eta()));
-    fill("fwdBJet1Pt",fabs(bjets.at(fwdBJet_idx).Pt()));
-    fill("deltaEta_fwdJets",fabs(bjets.at(fwdBJet_idx).Eta()-jets.at(fwdJet_idx[0]).Eta())); 
-  }
-
-  /////--------Reconstructing Higgs---------------------------------
-
-  //First method of building Higgs candidate --find 2 jets whose combined mass is closest to the Higgs
-  double mHiggs=125; 
-  int BJET1=-1;
-  int BJET2=-1;
-  double mDiff=1000; 
-  for(int J1=0;J1<nBjets;J1++){
-    for(int J2=0;J2<nBjets;J2++){
-      if(J2==J1) continue; 
-      double mH=(bjets.at(J1)+bjets.at(J2)).M();
-      if(fabs(mH-mHiggs)<mDiff){
-  	mDiff=fabs(mH-mHiggs);
-  	BJET1=J1;
-  	BJET2=J2;
-      }
-    }
-  }
-
-  double higgs_m1=-1;
-  double higgs_pt1=-1;
-  double higgs_eta1=-999;
-
-  if(nBjets>1&&BJET1!=-1){ 
-    higgs_m1=(bjets.at(BJET1)+bjets.at(BJET2)).M();
-    higgs_pt1=(bjets.at(BJET1)+bjets.at(BJET2)).Pt();
-    higgs_eta1=(bjets.at(BJET1)+bjets.at(BJET2)).Eta();
-  }
-  fill("Higgs_m1",higgs_m1);
-  fill("Higgs_pt1",higgs_pt1); 
-  fill("Higgs_eta1",fabs(higgs_eta1)); 
+  fill("leadJetPt_allJets", leadingJets.at(0).Pt());
+  fill("leadJetEta_allJets", fabs(leadingJets.at(0).Eta()));
   
-  //Second method of building Higgs candidate-- use leading bjets
-  double higgs_m2=-1;
-  double higgs_pt2=-1;
-  double higgs_eta2=-999;
-  if(nBjets>1){
-    higgs_m2=(bjets.at(highPtBJet_idx[0])+bjets.at(highPtBJet_idx[1])).M();
-    higgs_pt2=(bjets.at(highPtBJet_idx[0])+bjets.at(highPtBJet_idx[1])).Pt();
-    higgs_eta2=(bjets.at(highPtBJet_idx[0])+bjets.at(highPtBJet_idx[1])).Eta();
-  }
-  fill("Higgs_m2",higgs_m2);
-  fill("Higgs_pt2",higgs_pt2);
-  fill("Higgs_eta2",fabs(higgs_eta2)); 
-
-  //Third method of building Higgs candidate --use 2 bjets with smallest dR
-  double higgs_m3=-1;
-  double higgs_pt3=-1;
-  double higgs_eta3=-999;  
-  double smallDR=100; 
-  int bjet1=-1;
-  int bjet2=-1;
-  for(int J1=0;J1<nBjets;J1++){
-    for(int J2=0;J2<nBjets;J2++){
-      if(J2==J1) continue; 
-      double DR_bjets=dR_fn(bjets.at(J1).Eta(),bjets.at(J2).Eta(),bjets.at(J1).Phi(),bjets.at(J2).Phi());
-      if(smallDR>DR_bjets){
-	smallDR=DR_bjets;
-  	bjet1=J1;
-  	bjet2=J2;
-      }
-    }
-  }
- 
-  if(nBjets>1){
-    higgs_m3=(bjets.at(bjet1)+bjets.at(bjet2)).M();
-    higgs_pt3=(bjets.at(bjet1)+bjets.at(bjet2)).Pt();
-    higgs_eta3=(bjets.at(bjet1)+bjets.at(bjet2)).Eta();
-  }
-  
-  fill("Higgs_m3",higgs_m3);
-  fill("Higgs_pt3",higgs_pt3);
-  fill("Higgs_eta3",fabs(higgs_eta3)); 
-
-  //find mass of reconstructed top quark
-  //----->first find bjet closest to lepton
-  double DR=100; 
-  int top_bjet_idx=-1; 
-  for(int iJet=0;iJet<nBjets;iJet++){
-    double DR_bjetLep=dR_fn(bjets.at(iJet).Eta(),leptons.at(0).Eta(),bjets.at(iJet).Phi(),leptons.at(0).Phi());
-    if(DR>DR_bjetLep){
-      DR=DR_bjetLep;
-      top_bjet_idx=iJet; 
-    }
-  }
-  double topM=-1;
-  double topPt=-1;
-  double topEta=-999;
-  if(top_bjet_idx!=-1){
-    topM=(bjets.at(top_bjet_idx)+leptons.at(0)+metVec).M();
-    topPt=(bjets.at(top_bjet_idx)+leptons.at(0)+metVec).Pt();
-    topEta=(bjets.at(top_bjet_idx)+leptons.at(0)+metVec).Eta();
-    fill("top_m",topM);
-    fill("top_pt",topPt); 
-    fill("top_eta",fabs(topEta)); 
-  }
-
-  //fill histos corresponding to b-Tag signal regions
-  if(nBjets>4) return; 
+  ////______________bjet cut__________________________
+  if( nBjets<2 || nBjets>4 || antiBjets.size()==0)
+    return;   
   std::string SR=std::to_string(nBjets); 
   
-  for(int i=0;i<4;i++){//first 4 forward jets
-    std::string jetPosition=std::to_string(i+1);
-    if(fwdJet_idx[i]!=-1){
-      fill("fwdJet"+jetPosition+"Pt_SRB"+SR, jets.at(fwdJet_idx[i]).Pt());
-      fill("fwdJet"+jetPosition+"Eta_SRB"+SR, fabs(jets.at(fwdJet_idx[i]).Eta()));
-    }
-  }
-  fill("fwdBJet1Eta_SRB"+SR, fwdBJet_eta); 
-  if(fwdBJet_idx!=-1) fill("fwdBJet1Pt_SRB"+SR, bjets.at(fwdBJet_idx).Pt()); 
+  ///Sum pT of all objects 
+  double pTSum=leptons.at(0).Pt();
+  for(int i=0;i<numSignalJets;i++) pTSum+=jets.at(i).Pt();
+  fill("sumAllPt",pTSum); //(for >b-tags inclusive)
+
+  ///lead anti b-jet
+  fill("fwdJetPt",   forwardLightjets.at(0).Pt()); 
+  fill("fwdJetEta",  fabs(forwardLightjets.at(0).Eta())); 
+  fill("leadJetPt",  leadingLightjets.at(0).Pt());
+  fill("leadJetEta", fabs(leadingLightjets.at(0).Eta()));
+
+  ///lead b-jet
+  fill("fwdBJetPt",   forwardBjets.at(0).Pt()); 
+  fill("fwdBJetEta",  fabs(forwardBjets.at(0).Eta())); 
+  fill("leadBJetPt",  leadingBjets.at(0).Pt());
+  fill("leadBJetEta", fabs(leadingBjets.at(0).Eta()));
+
+  //Delta R between 2 leading bjets
+  fill("dR_b1_b2", dR_fn(leadingBjets.at(0).Eta(), leadingBjets.at(1).Eta(), leadingBjets.at(0).Phi(), leadingBjets.at(1).Phi()));
   
+  //DeltaEta 
+  fill("deltaEta_jfwd_bfwd", fabs(forwardLightjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
+  fill("deltaEta_j1_b1",     fabs(leadingLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_b1",   fabs(forwardLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+
+  //Reconstructing Higgs
+  TLorentzVector higgs1=findHiggs_method1(bjets); 
+  TLorentzVector higgs2=findHiggs_method2(bjets,leadingBjets);
+  TLorentzVector higgs3=findHiggs_method3(bjets);
+
+  fill("Higgs_m1",higgs1.M());
+  fill("Higgs_m2",higgs2.M());
+  fill("Higgs_m3",higgs3.M());
+
+  fill("Higgs_pt1",higgs1.Pt()); 
+  fill("Higgs_pt2",higgs2.Pt());
+  fill("Higgs_pt3",higgs3.Pt());
+    
+  fill("Higgs_eta1",fabs(higgs1.Eta())); 
+  fill("Higgs_eta2",fabs(higgs2.Eta()));
+  fill("Higgs_eta3",fabs(higgs3.Eta()));
+
+  fill("deltaEta_Higgs1FwdJet",fabs(higgs1.Eta()-forwardLightjets.at(0).Eta())); 
+  fill("deltaEta_Higgs2FwdJet",fabs(higgs2.Eta()-forwardLightjets.at(0).Eta()));
+  fill("deltaEta_Higgs3FwdJet",fabs(higgs3.Eta()-forwardLightjets.at(0).Eta()));
+  
+  //Reconstructed top quark
+  TLorentzVector top=findTop(bjets,leptons,metVec); 
+  fill("top_m", top.M()); 
+  fill("top_pt", top.Pt());
+  fill("top_eta", top.Eta());   
+
+
+  ///////////////______________Fill histos corresponding to b-Tag signal regions____________
+  fill("MET_SRB"+SR,met);
+  fill("Njets_SRB"+SR,numSignalJets);
+  fill("NLightjets_SRB"+SR,antiBjets.size());  
+  fill("sumAllPt_SRB"+SR,pTSum); 
+
   fill("lep_pt_SRB"+SR,leptons.at(0).Pt());
   fill("lep_eta_SRB"+SR,fabs(leptons.at(0).Eta())); 
-  fill("leadJetPt_SRB"+SR, jets.at(highPtJet_idx).Pt());  
-  fill("leadJetEta_SRB"+SR, fabs(jets.at(highPtJet_idx).Eta()));
-  fill("Higgs_m1_SRB"+SR,higgs_m1); 
-  fill("Higgs_pt1_SRB"+SR,higgs_pt1); 
-  fill("Higgs_eta1_SRB"+SR,fabs(higgs_eta1)); 
-    
-  if(nBjets>0){
-    fill("leadBJetPt_SRB"+SR, bjets.at(highPtBJet_idx[0]).Pt());
-    fill("leadBJetEta_SRB"+SR, fabs(bjets.at(highPtBJet_idx[0]).Eta()));
-    fill("deltaEta_fwdJets_SRB"+SR,fabs(bjets.at(fwdBJet_idx).Eta()-jets.at(fwdJet_idx[0]).Eta())); 
-    fill("deltaEta_leadJets_SRB"+SR, fabs(bjets.at(highPtBJet_idx[0]).Eta()-jets.at(highPtJet_idx).Eta()));
-    fill("Higgs_m2_SRB"+SR,higgs_m2); 
-    fill("Higgs_pt2_SRB"+SR,higgs_pt2); 
-    fill("Higgs_eta2_SRB"+SR,fabs(higgs_eta2)); 
-    fill("Higgs_m3_SRB"+SR,higgs_m3); 
-    fill("Higgs_pt3_SRB"+SR,higgs_pt3); 
-    fill("Higgs_eta3_SRB"+SR,fabs(higgs_eta3)); 
 
-    fill("top_m_SRB"+SR,topM); 
-    fill("top_pt_SRB"+SR, topPt); 
-    fill("top_eta_SRB"+SR, fabs(topEta)); 
+  fill("leadJetPt_allJets_SRB"+SR, leadingJets.at(0).Pt());
+  fill("leadJetEta_allJets_SRB"+SR, fabs(leadingJets.at(0).Eta()));
+
+  fill("fwdJetPt_SRB"+SR,    forwardLightjets.at(0).Pt());
+  fill("fwdJetEta_SRB"+SR,   fabs(forwardLightjets.at(0).Eta())); 
+  fill("leadJetPt_SRB"+SR,   leadingLightjets.at(0).Pt());
+  fill("leadJetEta_SRB"+SR,  fabs(leadingLightjets.at(0).Eta()));  
+
+  fill("fwdBJetPt_SRB"+SR,   forwardBjets.at(0).Pt()); 
+  fill("fwdBJetEta_SRB"+SR,  fabs(forwardBjets.at(0).Eta()));   			     
+  fill("leadBJetPt_SRB"+SR,  leadingBjets.at(0).Pt());
+  fill("leadBJetEta_SRB"+SR, fabs(leadingBjets.at(0).Eta()));
+  
+  fill("dR_b1_b2_SRB"+SR, dR_fn(leadingBjets.at(0).Eta(), leadingBjets.at(1).Eta(), leadingBjets.at(0).Phi(), leadingBjets.at(1).Phi()));
+
+  fill("deltaEta_jfwd_bfwd_SRB"+SR, fabs(forwardLightjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
+  fill("deltaEta_j1_b1_SRB"+SR,     fabs(leadingLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+  fill("deltaEta_jfwd_b1_SRB"+SR,   fabs(forwardLightjets.at(0).Eta()-leadingBjets.at(0).Eta())); 
+
+  fill("top_m_SRB"+SR,      top.M()); 
+  fill("top_pt_SRB"+SR,     top.Pt()); 
+  fill("top_eta_SRB"+SR,    fabs(top.Eta()));   
+
+  fill("Higgs_m1_SRB"+SR,   higgs1.M()); 
+  fill("Higgs_pt1_SRB"+SR,  higgs1.Pt()); 
+  fill("Higgs_eta1_SRB"+SR, fabs(higgs1.Eta())); 
+  fill("Higgs_m2_SRB"+SR,   higgs2.M()); 
+  fill("Higgs_pt2_SRB"+SR,  higgs2.Pt()); 
+  fill("Higgs_eta2_SRB"+SR, fabs(higgs2.Eta())); 
+  fill("Higgs_m3_SRB"+SR,   higgs3.M()); 
+  fill("Higgs_pt3_SRB"+SR,  higgs3.Pt()); 
+  fill("Higgs_eta3_SRB"+SR, fabs(higgs3.Eta())); 
+
+
+  ////Higgs mass signal regions
+  if(80<higgs1.M()&&higgs1.M()<130){
+    fill("fwdJetPtH1_SRMbb_SRB"+SR, forwardLightjets.at(0).Pt());
+    fill("fwdJetEtaH1_SRMbb_SRB"+SR, forwardLightjets.at(0).Eta());
+    fill("deltaEta_Higgs1FwdJet_SRB"+SR,fabs(higgs1.Eta()-forwardLightjets.at(0).Eta())); 
+  }
+  if(80<higgs2.M()&&higgs2.M()<130){
+    fill("fwdJetPtH2_SRMbb_SRB"+SR, forwardLightjets.at(0).Pt());
+    fill("fwdJetEtaH2_SRMbb_SRB"+SR, forwardLightjets.at(0).Eta());
+    fill("deltaEta_Higgs2FwdJet_SRB"+SR,fabs(higgs2.Eta()-forwardLightjets.at(0).Eta()));
+  }
+  if(80<higgs3.M()&&higgs3.M()<130){
+    fill("fwdJetPtH3_SRMbb_SRB"+SR, forwardLightjets.at(0).Pt());
+    fill("fwdJetEtaH3_SRMbb_SRB"+SR, forwardLightjets.at(0).Eta());
+    fill("deltaEta_Higgs3FwdJet_SRB"+SR,fabs(higgs3.Eta()-forwardLightjets.at(0).Eta()));
   }
 
   return;
 }
 
-
-
-
-  // //Find 1st,2nd,3rd most forward bjets
-  // double fwdBJet_eta[4]; for(int j=0;j<4;j++) fwdBJet_eta[j]=-999;  
-  // int fwdBJet_idx[4]; for(int j=0;j<4;j++) fwdBJet_idx[j]=-1;
-  // for(int iJet=0;iJet<nBjets;iJet++){ 
-  //   if(fabs(bjets.at(iJet).Eta())>fwdBJet_eta[0]){
-  //     fwdBJet_idx[0]=iJet;
-  //     fwdBJet_eta[0]=fabs(bjets.at(iJet).Eta());
-  //   }
-  // }
-  // for(int iJet=0;iJet<nBjets;iJet++){ 
-  //   if(iJet==fwdBJet_idx[0]) continue; 
-  //   if(fabs(bjets.at(iJet).Eta())>fwdBJet_eta[1]){
-  //     fwdBJet_idx[1]=iJet;
-  //     fwdBJet_eta[1]=fabs(bjets.at(iJet).Eta());
-  //   }
-  // }
-  // for(int iJet=0;iJet<nBjets;iJet++){ 
-  //   if(iJet==fwdBJet_idx[0]||iJet==fwdBJet_idx[1]) continue; 
-  //   if(fabs(bjets.at(iJet).Eta())>fwdBJet_eta[2]){
-  //     fwdBJet_idx[2]=iJet;
-  //     fwdBJet_eta[2]=fabs(bjets.at(iJet).Eta());
-  //   }
-  // }
-
- 
-   // fill("1stfwdBJetEta4", fwdBJet_eta[0]);
-    // fill("2ndfwdBJetEta4", fwdBJet_eta[1]);
-    // fill("3rdfwdBJetEta4", fwdBJet_eta[2]);
-
-  //Fill in optional ntuple variables
-  // ntupVar("met",met);    
-  // ntupVar("nBjets",nBjets); 
-  // ntupVar("ele", signalElectrons);
-  // ntupVar("jet", jets); 
-  // ntupVar("bjet", bjets); 
-  // if(fwd_eta[0]!=0) ntupVar("fwdJet", fwdJet); 
