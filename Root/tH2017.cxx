@@ -360,9 +360,9 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   
   ////______________bjet cut_____: 
   // Note some quantities below are not defined without this cut.
-  if( nBjets<2 ) return;   
+  ///Note if the histogram is not defined the code will crash and not write the output
+  if( nBjets<2 || nBjets>4 ) return;   
   std::string SR=std::to_string(nBjets); 
-
   
   ///fwd b-jet
   fill("fwdBJetPt",   forwardBjets.at(0).Pt()); 
