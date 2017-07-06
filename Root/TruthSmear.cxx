@@ -63,6 +63,7 @@ useTrackConfirm(true) {
   m_upgrade->loadMETHistograms("UpgradePerformanceFunctions/sumetPU_mu200_ttbar_gold.root");
   m_upgrade->setPileupRandomSeed(seed);
   if (useTrackConfirm) m_upgrade->setPileupUseTrackConf(true);
+  else m_upgrade->setPileupUseTrackConf(false);
   m_upgrade->setPileupJetPtThresholdMeV(30000.);
   m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::PU);
   m_upgrade->setPileupEff(0.02);

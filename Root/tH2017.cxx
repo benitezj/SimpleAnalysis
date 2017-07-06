@@ -148,6 +148,9 @@ void tH2017::Init()
   addHistogram("jet_pt_nocuts",100,0,500);
   addHistogram("lep_pt_nocuts",100,0,500); 
   
+  addHistogram("Njets_HGTD_nocuts",10,-0.5,9.5); 
+  addHistogram("Nbjets_HGTD_nocuts",6,-0.5,5.5); 
+  
   //no pt cut on jets/leptons
   addHistogram("jet_pt_noPtCut",100,0,500); 
   addHistogram("lep_pt_noPtCut",100,0,500); 
@@ -266,7 +269,6 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   _output->setEventWeight(eventweight); //all histograms after this point get filled with this weight
   fill("events",1); //Sum of initial weights
 
-
   auto electrons_noPtCut = event->getElectrons(0., 2.47, ELooseBLLH && EIsoGradient);
   auto muons_noPtCut = event->getMuons(0., 2.7, MuLoose && MuIsoGradient);
   auto jets_noPtCut = event->getJets(0., 3.8); 
@@ -277,6 +279,16 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   auto metVec     = event->getMET();
   double met = metVec.Et();
   
+  // Jets in HGTD acceptance
+  int njets_hgtd(0), nbjets_hgtd(0);
+  for (auto j : jets) {
+    if ( fabs(j.Eta()) >= 2.4 && fabs(j.Eta()) <= 4.3) {
+      ++njets_hgtd;
+      if (j.pass(GoodBJet)) ++nbjets_hgtd;
+    }
+  }
+  fill("Njets_HGTD_nocuts", njets_hgtd);
+  fill("Nbjets_HGTD_nocuts", nbjets_hgtd);
 
   // Overlap removal - including with object Pt-dependent radius calculation
   electrons_noPtCut  = overlapRemoval(electrons_noPtCut, muons_noPtCut, 0.01);
