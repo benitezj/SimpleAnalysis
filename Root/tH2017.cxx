@@ -479,25 +479,39 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("dEta_lep_H3_SRMbbH3_SRB"+SR,     fabs(leptons.at(0).Eta()-higgs3.Eta()));
     fill("dEta_lep_b1_SRMbbH3_SRB"+SR,     fabs(leptons.at(0).Eta()-bjets.at(0).Eta()));
 
+    fill("dR_R1_H3_SRMbbH3_SRB"+SR,        R1.DeltaR(higgs3));
+    fill("dR_R2_H3_SRMbbH3_SRB"+SR,        R2.DeltaR(higgs3));
+    fill("dEta_R1_H3_SRMbbH3_SRB"+SR,      fabs(R1.Eta()-higgs3.Eta()));
+    fill("dEta_R2_H3_SRMbbH3_SRB"+SR,      fabs(R2.Eta()-higgs3.Eta()));          
+
     if(bjets_notH.size()>0){
       fill("dR_lep_b1NotH_SRMbbH3_SRB"+SR,   leptons.at(0).DeltaR(bjets_notH.at(0)));
       fill("dR_H3_b1NotH_SRMbbH3_SRB"+SR,    higgs3.DeltaR(bjets_notH.at(0)));
-      fill("dR_R1_H3_SRMbbH3_SRB"+SR,        R1.DeltaR(higgs3));
-      fill("dR_R2_H3_SRMbbH3_SRB"+SR,        R2.DeltaR(higgs3));
       fill("dEta_lep_b1NotH_SRMbbH3_SRB"+SR, fabs(leptons.at(0).Eta()-bjets_notH.at(0).Eta()));
       fill("dEta_H3_b1NotH_SRMbbH3_SRB"+SR,  fabs(higgs3.Eta()-bjets_notH.at(0).Eta()));
-      fill("dEta_R1_H3_SRMbbH3_SRB"+SR,      fabs(R1.Eta()-higgs3.Eta()));
-      fill("dEta_R2_H3_SRMbbH3_SRB"+SR,      fabs(R2.Eta()-higgs3.Eta()));          
     }          
 
-
-
+    
     ///fill ntuple
+    ntupVar("Nbjets",nBjets);
     ntupVar("met",met);
     ntupVar("top_m",top.M()); 
     ntupVar("h_pt",higgs3.Pt());
     ntupVar("lep_pt",leptons.at(0).Pt());
     ntupVar("b1_pt",bjets.at(0).Pt());
+    ntupVar("dR_R1_H3",R1.DeltaR(higgs3));
+    ntupVar("dR_R2_H3",R2.DeltaR(higgs3));
+    ntupVar("dEta_R1_H3",fabs(R1.Eta()-higgs3.Eta()));
+    ntupVar("dEta_R2_H3",fabs(R2.Eta()-higgs3.Eta()));
+
+    if(bjets_notH.size()>0){
+      ntupVar("dR_lep_b1NotH",leptons.at(0).DeltaR(bjets_notH.at(0)));
+      ntupVar("dR_H3_b1NotH",higgs3.DeltaR(bjets_notH.at(0)));
+      ntupVar("dEta_lep_b1NotH",fabs(leptons.at(0).Eta()-bjets_notH.at(0).Eta()));
+      ntupVar("dEta_H3_b1NotH",fabs(higgs3.Eta()-bjets_notH.at(0).Eta()));
+    }
+
+
   }                  
                     
   return;            
