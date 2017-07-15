@@ -33,6 +33,16 @@ void sortPairsClosestdR(std::vector<std::pair<AnalysisObject,AnalysisObject>>& c
   std::sort(cands.begin(), cands.end(), dR_sort());
 }
 
+float minmaxdEta(const AnalysisObjects& ljets, const AnalysisObjects& bjets, const bool min) {
+  std::vector<float> dist;
+  for (auto ljet : ljets) {
+    for (auto bjet : bjets) {
+      dist.push_back(fabs(ljet.Eta()-bjet.Eta()));
+    }
+  }
+  if (min) return *std::min_element(dist.begin(), dist.end());
+  else return *std::max_element(dist.begin(), dist.end());
+}
 
 void findHiggs(const AnalysisObjects& bjets, TLorentzVector& h2, TLorentzVector &h3){
   // Make vector of b-jet pairs
@@ -160,6 +170,8 @@ void tH2017::Init()
   addHistogram("dEta_jfwd_b1",100,0,8);
   addHistogram("dEta_j1_b1",100,0,8); //|eta(leadjet)-eta(leadbjet)|
   addHistogram("dR_b1_b2",100,0,8);//dR(leading bjet, subleading bjet)
+  addHistogram("mindEta_ljets_bjets",100,0,8);
+  addHistogram("maxdEta_ljets_bjets",100,0,8);
 
   addHistogram("top_m",100,0,500); //reco mass of top quark
   addHistogram("top_pt",100,0,500); 
@@ -319,7 +331,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   // Object counting
   int numSignalLeptons = leptons.size();  // Object lists are essentially std::vectors so .size() works
   int numSignalJets    = jets.size();
-  int nBjets =           bjets.size();
+  int nBjets           = bjets.size();
   
   // Fill in histograms without cuts
   fill("NLep_nocuts",numSignalLeptons);
@@ -334,9 +346,9 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   
   // Preselection
   if (numSignalLeptons != 1) return;
-  if (numSignalJets < 2) return; 
-  if (met < 20 || met>100) return; 
-  if (antiBjets.size()==0 || antiBjets.size()>2) return;
+  if (numSignalJets < 4 || numSignalJets > 5) return; 
+  if (antiBjets.size() < 1 || antiBjets.size() > 3) return;
+  if (nBjets < 2 ) return;
 
   // Fill histogram after cuts
   fill("MET",met);
@@ -368,7 +380,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   ////______________bjet cut_____: 
   // Note some quantities below are not defined without this cut.
   ///Note if the histogram is not defined the code will crash and not write the output
-  if( nBjets<2 || nBjets>4 ) return;   
+  //if( nBjets>4 ) return; // this might be unnecessary now
   std::string SR=std::to_string(nBjets); 
   
   ///fwd b-jet
@@ -386,7 +398,9 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("dEta_jfwd_bfwd", fabs(forwardLightjets.at(0).Eta()-forwardBjets.at(0).Eta())); 
   fill("dEta_j1_b1",     fabs(antiBjets.at(0).Eta()-bjets.at(0).Eta())); 
   fill("dEta_jfwd_b1",   fabs(forwardLightjets.at(0).Eta()-bjets.at(0).Eta())); 
-
+  fill("mindEta_ljets_bjets", minmaxdEta(antiBjets, bjets, true)); 
+  fill("maxdEta_ljets_bjets", minmaxdEta(antiBjets, bjets, false)); 
+  
   //Reconstructed Higgs
   TLorentzVector higgs2, higgs3;
   findHiggs(bjets, higgs2, higgs3); 
