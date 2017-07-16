@@ -17,15 +17,17 @@ class TruthSmear
   TruthEvent *smearEvent(AnalysisEvent*);
 
  private:
-  bool smearElectrons;
-  bool smearMuons;
-  bool smearTaus;
-  bool smearPhotons;
-  bool smearJets;
-  bool smearMET;
-  bool addPileupJets;
-  bool useHGTD0;
-  bool useTrackConfirm;
+  bool        smearElectrons;
+  bool        smearMuons;
+  bool        smearTaus;
+  bool        smearPhotons;
+  bool        smearJets;
+  bool        smearMET;
+  bool        addPileupJets;
+  bool        useHGTD0;
+  bool        useTrackConfirm;
+  std::string puEffScheme;
+  float        puEff;
   UpgradePerformanceFunctions *m_upgrade;
   TRandom3 m_random;
 };

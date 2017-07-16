@@ -12,7 +12,7 @@ options
 #endif
 ) :
 smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false), useHGTD0(false),
-useTrackConfirm(true) {
+useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
 
   std::string mu="None";
@@ -40,6 +40,13 @@ useTrackConfirm(true) {
     if (option=="addPileupJets")  addPileupJets=true;
     if (option=="useHGTD0")       useHGTD0=true;
     if (option=="noTrackConfirm") useTrackConfirm=false;
+    if (option.find("PUeff=")==0) {
+      puEff=std::stof(option.substr(6));
+    }
+    if (option.find("HSeff=")==0) {
+      puEffScheme="HS";
+      puEff=std::stof(option.substr(6));
+    }
     if (option.find("mu=")==0) {
       mu=option.substr(3);
     }
@@ -65,8 +72,9 @@ useTrackConfirm(true) {
   if (useTrackConfirm) m_upgrade->setPileupUseTrackConf(true);
   else m_upgrade->setPileupUseTrackConf(false);
   m_upgrade->setPileupJetPtThresholdMeV(30000.);
-  m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::PU);
-  m_upgrade->setPileupEff(0.02);
+  if     (puEffScheme == "PU") m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::PU);
+  else if (puEffScheme == "HS") m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::HS);
+  m_upgrade->setPileupEff(puEff);
   if (useHGTD0) m_upgrade->setUseHGTD0(true);
   m_upgrade->setPileupTemplatesPath("/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/UpgradePerformanceFunctions/");
   m_upgrade->initPhotonFakeHistograms("UpgradePerformanceFunctions/PhotonFakes.root");
