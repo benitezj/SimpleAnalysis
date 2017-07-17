@@ -44,7 +44,7 @@ float minmaxdEta(const AnalysisObjects& ljets, const AnalysisObjects& bjets, con
   else return *std::max_element(dist.begin(), dist.end());
 }
 
-void findHiggs(const AnalysisObjects& bjets, TLorentzVector& h2, TLorentzVector &h3){
+void findHiggs(const AnalysisObjects& bjets, TLorentzVector& h2, TLorentzVector &h3, AnalysisObjects & hbjets){
   // Make vector of b-jet pairs
   std::vector<std::pair<AnalysisObject, AnalysisObject>> bPairs;
   for (unsigned int i=0; i < bjets.size(); ++i) {
@@ -57,19 +57,21 @@ void findHiggs(const AnalysisObjects& bjets, TLorentzVector& h2, TLorentzVector 
   //sortPairsClosestToHiggs(bPairs);
   //h1 = bPairs.at(0).first+bPairs.at(0).second;
   
-  // Metohd 2 - leading b-jets
+  // Method 2 - leading b-jets
   h2 = bjets.at(0) + bjets.at(1);
   
   // Method 3 - closest dR
   sortPairsClosestdR(bPairs);
   h3 = bPairs.at(0).first+bPairs.at(0).second;
+  hbjets.push_back(bPairs.at(0).first); 
+  hbjets.push_back(bPairs.at(0).second); 
   
 }
 
-TLorentzVector findTop(const AnalysisObjects& bjets, const AnalysisObjects& leptons, const AnalysisObject& metVec){
-  TLorentzVector top;
+void findTop(const AnalysisObjects& bjets, const AnalysisObjects& leptons, const AnalysisObject& metVec, AnalysisObject& top1, AnalysisObject &top2){
   double DR=100; 
   int nBjets=bjets.size(); 
+  if(nBjets==0) return; 
   int top_bjet_idx=-1; 
   for(int iJet=0;iJet<nBjets;iJet++){
     double DR_bjetLep=bjets.at(iJet).DeltaR(leptons.at(0));
@@ -78,46 +80,43 @@ TLorentzVector findTop(const AnalysisObjects& bjets, const AnalysisObjects& lept
       top_bjet_idx=iJet; 
     }
   }
-  if(top_bjet_idx!=-1) top=bjets.at(top_bjet_idx)+leptons.at(0)+metVec; 
-  return top; 
+  //Method 1 - closest bjet to lepton
+  if(top_bjet_idx!=-1) top1=bjets.at(top_bjet_idx)+leptons.at(0)+metVec; 
+  //Method 2 - leading bjet
+  top2=bjets.at(0)+leptons.at(0)+metVec; 
 }
 
 
-std::vector<TLorentzVector> findbjets_notH(AnalysisObjects bjets){
-  std::vector<TLorentzVector> bjets_notH; 
-  double smallDR=100; 
-  int nBjets = bjets.size();
-  if(nBjets<2) return bjets_notH; 
-  int bjet1=-1;
-  int bjet2=-1;
-  for(int J1=0;J1<nBjets;J1++){
-    for(int J2=0;J2<nBjets;J2++){
-      if(J2==J1) continue; 
-      double DR_bjets=bjets.at(J1).DeltaR(bjets.at(J2));
-      if(smallDR>DR_bjets){
-	smallDR=DR_bjets;
-  	bjet1=J1;
-  	bjet2=J2;
-      }
-    }
-  }
-  for(int i=0;i<nBjets;i++) if(i!=bjet1&&i!=bjet2) bjets_notH.push_back(bjets.at(i)); 
-  return bjets_notH; 
-}
+// void findbjets_notH(AnalysisObjects bjets){
+//   AnalysisObjects bjets_notH(0.,0.,0.,0.,0,0,JET,0); 
+//   double smallDR=100; 
+//   int nBjets = bjets.size();
+//   if(nBjets<2) return bjets_notH; 
+//   int bjet1=-1;
+//   int bjet2=-1;
+//   for(int J1=0;J1<nBjets;J1++){
+//     for(int J2=0;J2<nBjets;J2++){
+//       if(J2==J1) continue; 
+//       double DR_bjets=bjets.at(J1).DeltaR(bjets.at(J2));
+//       if(smallDR>DR_bjets){
+// 	smallDR=DR_bjets;
+//   	bjet1=J1;
+//   	bjet2=J2;
+//       }
+//     }
+//   }
+//   for(int i=0;i<nBjets;i++) if(i!=bjet1&&i!=bjet2) bjets_notH.push_back(bjets.at(i)); 
+// }
 
-std::vector<TLorentzVector> findHiggsRecoil(std::vector<TLorentzVector> bjets_notH, AnalysisObjects leptons, AnalysisObject metVec){
-  std::vector<TLorentzVector> higgsRecoil; 
-  TLorentzVector HR1;
-  TLorentzVector HR2;
-  HR1=leptons.at(0)+metVec; 
-  HR2=leptons.at(0); 
+void findHiggsRecoil(AnalysisObjects& bjets_notH, AnalysisObjects& leptons, AnalysisObject& metVec, AnalysisObjects& higgsRecoil){
+  auto HR1=leptons.at(0)+metVec; 
+  auto HR2=leptons.at(0); 
   for(unsigned int i=0;i<bjets_notH.size();i++){ 
     HR1=HR1+bjets_notH.at(i);
     HR2=HR2+bjets_notH.at(i); 
   }
   higgsRecoil.push_back(HR1); 
   higgsRecoil.push_back(HR2); 
-  return higgsRecoil;
 }
 
 
@@ -173,9 +172,21 @@ void tH2017::Init()
   addHistogram("mindEta_ljets_bjets",100,0,8);
   addHistogram("maxdEta_ljets_bjets",100,0,8);
 
-  addHistogram("top_m",100,0,500); //reco mass of top quark
-  addHistogram("top_pt",100,0,500); 
-  addHistogram("top_eta",25,0,4);
+  addHistogram("top1_m",100,0,500); //reco mass of top quark
+  addHistogram("top1_pt",100,0,500); 
+  addHistogram("top1_eta",25,0,4);
+
+  addHistogram("top2_m",100,0,500); 
+  addHistogram("top2_pt",100,0,500); 
+  addHistogram("top2_eta",25,0,4);
+
+  addHistogram("top3_m",100,0,500); 
+  addHistogram("top3_pt",100,0,500); 
+  addHistogram("top3_eta",25,0,4);
+
+  addHistogram("top4_m",100,0,500); 
+  addHistogram("top4_pt",100,0,500); 
+  addHistogram("top4_eta",25,0,4);
 
   for(int j=0;j<3;j++){ //Higgs reconstruction using 3 different methods
     std::string h_idx = std::to_string(j+1); 
@@ -217,9 +228,21 @@ void tH2017::Init()
 
     addHistogram("dR_b1_b2_SRB"+SR,100,0,8);//dR(leading bjet, subleading bjet)
 
-    addHistogram("top_m_SRB"+SR,100,0,500); //reco mass of top quark
-    addHistogram("top_pt_SRB"+SR,100,0,500); 
-    addHistogram("top_eta_SRB"+SR,25,0,4); 
+    addHistogram("top1_m_SRB"+SR,100,0,500); //reco mass of top quark
+    addHistogram("top1_pt_SRB"+SR,100,0,500); 
+    addHistogram("top1_eta_SRB"+SR,25,0,4); 
+
+    addHistogram("top2_m_SRB"+SR,100,0,500); //reco mass of top quark
+    addHistogram("top2_pt_SRB"+SR,100,0,500); 
+    addHistogram("top2_eta_SRB"+SR,25,0,4); 
+
+    addHistogram("top3_m_SRB"+SR,100,0,500); //reco mass of top quark
+    addHistogram("top3_pt_SRB"+SR,100,0,500); 
+    addHistogram("top3_eta_SRB"+SR,25,0,4); 
+
+    addHistogram("top4_m_SRB"+SR,100,0,500); //reco mass of top quark
+    addHistogram("top4_pt_SRB"+SR,100,0,500); 
+    addHistogram("top4_eta_SRB"+SR,25,0,4); 
     
     for(int j=0;j<3;j++){ //higgs reconstruction using 3 different methods
       std::string h_idx = std::to_string(j+1); 
@@ -320,7 +343,6 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   //
   auto bjets = filterObjects(jets, 25., 3.8, BTag85MV2c20);
   auto antiBjets = filterObjects(jets, 25., 3.8, NOT(BTag85MV2c20));
-  auto bjets_notH = findbjets_notH(bjets); //bjets not associated with higgs3 - we should avoid looping again here over the jets
 
   // eta-sorted jets
   auto forwardJets = jets;
@@ -400,10 +422,15 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("dEta_jfwd_b1",   fabs(forwardLightjets.at(0).Eta()-bjets.at(0).Eta())); 
   fill("mindEta_ljets_bjets", minmaxdEta(antiBjets, bjets, true)); 
   fill("maxdEta_ljets_bjets", minmaxdEta(antiBjets, bjets, false)); 
-  
+  				  
   //Reconstructed Higgs
   TLorentzVector higgs2, higgs3;
-  findHiggs(bjets, higgs2, higgs3); 
+  AnalysisObjects hbjets;
+  findHiggs(bjets, higgs2, higgs3, hbjets); 
+
+  AnalysisObjects bjets_notH; 
+  for(auto i:bjets) if(hbjets.at(0).DeltaR(i)>0.1&&hbjets.at(1).DeltaR(i)>0.1) bjets_notH.push_back(i); 
+  //bjets_notH = overlapRemoval(bjets_notH, hbjets,0.01); //bjets not associated with higgs3
 
   fill("H2_m",higgs2.M());
   fill("H3_m",higgs3.M());
@@ -418,15 +445,36 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("dEta_H3_jfwd",fabs(higgs3.Eta()-forwardLightjets.at(0).Eta()));
 
   //Higgs recoil
-  TLorentzVector R1=findHiggsRecoil(bjets_notH,leptons,metVec).at(0); //non-Higgs (H3) bjets+lepton+MET
-  TLorentzVector R2=findHiggsRecoil(bjets_notH,leptons,metVec).at(1); //non-Higgs (H3) bjets+lepton
+  AnalysisObjects higgsRecoil;//(0.,0.,0.,0.,0,0,COMBINED,0); 
+  findHiggsRecoil(bjets_notH,leptons,metVec,higgsRecoil); //non-Higgs (H3) bjets+lepton+MET
+  auto R1 = higgsRecoil.at(0); 
+  auto R2 = higgsRecoil.at(1); 
+  //TLorentzVector R2=findHiggsRecoil(bjets_notH,leptons,metVec).at(1); //non-Higgs (H3) bjets+lepton
   
   //Reconstructed top quark
-  TLorentzVector top=findTop(bjets,leptons,metVec); 
-  fill("top_m", top.M()); 
-  fill("top_pt", top.Pt());
-  fill("top_eta", top.Eta());   
+  AnalysisObject top1(0.,0.,0.,0.,0,0,COMBINED,0); 
+  AnalysisObject top2(0.,0.,0.,0.,0,0,COMBINED,0); 
+  AnalysisObject top3(0.,0.,0.,0.,0,0,COMBINED,0); 
+  AnalysisObject top4(0.,0.,0.,0.,0,0,COMBINED,0); 
+  
+  findTop(bjets,leptons,metVec,top1,top2); 
+  findTop(bjets_notH,leptons,metVec,top3,top4); 
+  
+  fill("top1_m", top1.M()); 
+  fill("top1_pt", top1.Pt());
+  fill("top1_eta", top1.Eta());   
 
+  fill("top2_m", top2.M()); 
+  fill("top2_pt", top2.Pt());
+  fill("top2_eta", top2.Eta());   
+
+  fill("top3_m", top3.M()); 
+  fill("top3_pt", top3.Pt());
+  fill("top3_eta", top3.Eta());   
+
+  fill("top4_m", top4.M()); 
+  fill("top4_pt", top4.Pt());
+  fill("top4_eta", top4.Eta());   
 
   ///////////////______________Fill histos corresponding to b-Tag signal regions____________
   fill("MET_SRB"+SR,            met);
@@ -434,9 +482,21 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("NLightjets_SRB"+SR,     antiBjets.size());  
   fill("HT_SRB"+SR,             pTSum); 
 
-  fill("top_m_SRB"+SR,          top.M()); 
-  fill("top_pt_SRB"+SR,         top.Pt()); 
-  fill("top_eta_SRB"+SR,        fabs(top.Eta()));   
+  fill("top1_m_SRB"+SR,          top1.M()); 
+  fill("top1_pt_SRB"+SR,         top1.Pt()); 
+  fill("top1_eta_SRB"+SR,        fabs(top1.Eta()));   
+
+  fill("top2_m_SRB"+SR,          top2.M()); 
+  fill("top2_pt_SRB"+SR,         top2.Pt()); 
+  fill("top2_eta_SRB"+SR,        fabs(top2.Eta()));   
+
+  fill("top3_m_SRB"+SR,          top3.M()); 
+  fill("top3_pt_SRB"+SR,         top3.Pt()); 
+  fill("top3_eta_SRB"+SR,        fabs(top3.Eta()));   
+
+  fill("top4_m_SRB"+SR,          top4.M()); 
+  fill("top4_pt_SRB"+SR,         top4.Pt()); 
+  fill("top4_eta_SRB"+SR,        fabs(top4.Eta()));   
 
   fill("lep_pt_SRB"+SR,         leptons.at(0).Pt());
   fill("lep_eta_SRB"+SR,        fabs(leptons.at(0).Eta())); 
@@ -509,7 +569,13 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     ///fill ntuple
     ntupVar("Nbjets",nBjets);
     ntupVar("met",met);
-    ntupVar("top_m",top.M()); 
+    ntupVar("top1",top1); 
+    ntupVar("top2",top2); 
+    ntupVar("top3",top3); 
+    ntupVar("top4",top4); 
+    ntupVar("bjets",bjets); 
+    ntupVar("bjets_notH",bjets_notH); 
+    ntupVar("hbjets",hbjets); 
     ntupVar("h_pt",higgs3.Pt());
     ntupVar("lep_pt",leptons.at(0).Pt());
     ntupVar("b1_pt",bjets.at(0).Pt());
@@ -517,6 +583,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     ntupVar("dR_R2_H3",R2.DeltaR(higgs3));
     ntupVar("dEta_R1_H3",fabs(R1.Eta()-higgs3.Eta()));
     ntupVar("dEta_R2_H3",fabs(R2.Eta()-higgs3.Eta()));
+    ntupVar("leptons",leptons); 
+    ntupVar("jets", jets); 
 
     if(bjets_notH.size()>0){
       ntupVar("dR_lep_b1NotH",leptons.at(0).DeltaR(bjets_notH.at(0)));
