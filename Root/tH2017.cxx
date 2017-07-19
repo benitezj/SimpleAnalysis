@@ -468,13 +468,15 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("top2_pt", top2.Pt());
   fill("top2_eta", top2.Eta());   
 
-  fill("top3_m", top3.M()); 
-  fill("top3_pt", top3.Pt());
-  fill("top3_eta", top3.Eta());   
+  if(bjets_notH.size()>1){
+    fill("top3_m", top3.M()); 
+    fill("top3_pt", top3.Pt());
+    fill("top3_eta", top3.Eta());   
 
-  fill("top4_m", top4.M()); 
-  fill("top4_pt", top4.Pt());
-  fill("top4_eta", top4.Eta());   
+    fill("top4_m", top4.M()); 
+    fill("top4_pt", top4.Pt());
+    fill("top4_eta", top4.Eta());
+  }   
 
   ///////////////______________Fill histos corresponding to b-Tag signal regions____________
   fill("MET_SRB"+SR,            met);
@@ -490,13 +492,15 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("top2_pt_SRB"+SR,         top2.Pt()); 
   fill("top2_eta_SRB"+SR,        fabs(top2.Eta()));   
 
-  fill("top3_m_SRB"+SR,          top3.M()); 
-  fill("top3_pt_SRB"+SR,         top3.Pt()); 
-  fill("top3_eta_SRB"+SR,        fabs(top3.Eta()));   
+  if(bjets_notH.size()>1){
+    fill("top3_m_SRB"+SR,          top3.M()); 
+    fill("top3_pt_SRB"+SR,         top3.Pt()); 
+    fill("top3_eta_SRB"+SR,        fabs(top3.Eta()));   
 
-  fill("top4_m_SRB"+SR,          top4.M()); 
-  fill("top4_pt_SRB"+SR,         top4.Pt()); 
-  fill("top4_eta_SRB"+SR,        fabs(top4.Eta()));   
+    fill("top4_m_SRB"+SR,          top4.M()); 
+    fill("top4_pt_SRB"+SR,         top4.Pt()); 
+    fill("top4_eta_SRB"+SR,        fabs(top4.Eta()));   
+  }
 
   fill("lep_pt_SRB"+SR,         leptons.at(0).Pt());
   fill("lep_eta_SRB"+SR,        fabs(leptons.at(0).Eta())); 
