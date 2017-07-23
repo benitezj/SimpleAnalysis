@@ -368,9 +368,13 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   
   // Preselection
   if (numSignalLeptons != 1) return;
+  fill("events",2);
   if (numSignalJets < 4 || numSignalJets > 5) return; 
+  fill("events",3);
   if (antiBjets.size() < 1 || antiBjets.size() > 3) return;
+  fill("events",4);
   if (nBjets < 2 ) return;
+  fill("events",5);
 
   // Fill histogram after cuts
   fill("MET",met);
@@ -428,9 +432,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   AnalysisObjects hbjets;
   findHiggs(bjets, higgs2, higgs3, hbjets); 
 
-  AnalysisObjects bjets_notH; 
+  AnalysisObjects bjets_notH;  //bjets not associated with higgs3
   for(auto i:bjets) if(hbjets.at(0).DeltaR(i)>0.1&&hbjets.at(1).DeltaR(i)>0.1) bjets_notH.push_back(i); 
-  //bjets_notH = overlapRemoval(bjets_notH, hbjets,0.01); //bjets not associated with higgs3
 
   fill("H2_m",higgs2.M());
   fill("H3_m",higgs3.M());
@@ -445,11 +448,10 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("dEta_H3_jfwd",fabs(higgs3.Eta()-forwardLightjets.at(0).Eta()));
 
   //Higgs recoil
-  AnalysisObjects higgsRecoil;//(0.,0.,0.,0.,0,0,COMBINED,0); 
+  AnalysisObjects higgsRecoil; 
   findHiggsRecoil(bjets_notH,leptons,metVec,higgsRecoil); //non-Higgs (H3) bjets+lepton+MET
   auto R1 = higgsRecoil.at(0); 
   auto R2 = higgsRecoil.at(1); 
-  //TLorentzVector R2=findHiggsRecoil(bjets_notH,leptons,metVec).at(1); //non-Higgs (H3) bjets+lepton
   
   //Reconstructed top quark
   AnalysisObject top1(0.,0.,0.,0.,0,0,COMBINED,0); 
@@ -479,6 +481,9 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   }   
 
   ///////////////______________Fill histos corresponding to b-Tag signal regions____________
+  if(nBjets==3) fill("events",6);
+  if(nBjets==4) fill("events",7);
+
   fill("MET_SRB"+SR,            met);
   fill("Njets_SRB"+SR,          numSignalJets);
   fill("NLightjets_SRB"+SR,     antiBjets.size());  
@@ -539,13 +544,16 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
   ////Histos with mbb cut 
   if(80<higgs2.M()&&higgs2.M()<130){
+    fill("events",8);
+    if(nBjets==3) fill("events",9);
+    if(nBjets==4) fill("events",10);
     fill("H2_pt_SRMbbH2_SRB"+SR,         higgs2.Pt());   
     fill("jfwd_pt_SRMbbH2_SRB"+SR,       forwardLightjets.at(0).Pt());
     fill("jfwd_eta_SRMbbH2_SRB"+SR,      forwardLightjets.at(0).Eta());
     fill("dEta_jfwd_b1_SRMbbH2_SRB"+SR,  fabs(forwardLightjets.at(0).Eta()-bjets.at(0).Eta())); 
     fill("dEta_H2_jfwd_SRMbbH2_SRB"+SR,  fabs(higgs2.Eta()-forwardLightjets.at(0).Eta()));
   }
-  if(80<higgs3.M()&&higgs3.M()<130){
+  if(80<higgs3.M()&&higgs3.M()<130){ 
     fill("H3_pt_SRMbbH3_SRB"+SR,         higgs3.Pt());
     fill("jfwd_pt_SRMbbH3_SRB"+SR,       forwardLightjets.at(0).Pt());
     fill("jfwd_eta_SRMbbH3_SRB"+SR,      forwardLightjets.at(0).Eta());
