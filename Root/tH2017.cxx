@@ -602,7 +602,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
 
   ////Histos with mbb cut 
-  if(80<higgs2.M()&&higgs2.M()<130){
+  if(30<higgs2.M()&&higgs2.M()<130){
     fill("events",8);
     if(nBjets==3) fill("events",9);
     if(nBjets==4) fill("events",10);
@@ -612,7 +612,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("dEta_jfwd_b1_SRMbbH2_SRB"+SR,  fabs(forwardLightjets.at(0).Eta()-bjets.at(0).Eta())); 
     fill("dEta_H2_jfwd_SRMbbH2_SRB"+SR,  fabs(higgs2.Eta()-forwardLightjets.at(0).Eta()));
   }
-  if(80<higgs3.M()&&higgs3.M()<130){ 
+  if(30<higgs3.M()&&higgs3.M()<130){ 
     fill("H3_pt_SRMbbH3_SRB"+SR,         higgs3.Pt());
     fill("jfwd_pt_SRMbbH3_SRB"+SR,       forwardLightjets.at(0).Pt());
     fill("jfwd_eta_SRMbbH3_SRB"+SR,      forwardLightjets.at(0).Eta());
