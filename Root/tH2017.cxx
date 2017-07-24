@@ -171,7 +171,7 @@ void tH2017::Init()
 {
   //addRegions({"SR1lep0b","SR1lep1b","SR1lep2b","SR1lep3b","SR1lep4b"});
 
-  addHistogram("events",10,-0.5,9.5);
+  addHistogram("events",12,-0.5,11.5);
 
   //no cuts
   addHistogram("NLep_nocuts",10,-0.5,9.5);
@@ -424,8 +424,9 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   if (antiBjets.size() < 1 || antiBjets.size() > 3) return;
   fill("events",4);
   if (nBjets < 2 ) return;
- fill("events",5);
+  fill("events",5);
   if (pTSum < 300 ) return;
+  fill("events",6);
 
   // Trigger
   if ( electrons.size() == 1 ) {
@@ -459,7 +460,6 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
   // HT
   fill("HT",pTSum);
-
 
   
   ////______________bjet cut_____: 
@@ -540,8 +540,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   }   
 
   ///////////////______________Fill histos corresponding to b-Tag signal regions____________
-  if(nBjets==3) fill("events",6);
-  if(nBjets==4) fill("events",7);
+  if(nBjets==3) fill("events",7);
+  if(nBjets==4) fill("events",8);
 
   fill("MET_SRB"+SR,            met);
   fill("Njets_SRB"+SR,          numSignalJets);
@@ -603,9 +603,9 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
   ////Histos with mbb cut 
   if(30<higgs2.M()&&higgs2.M()<130){
-    fill("events",8);
-    if(nBjets==3) fill("events",9);
-    if(nBjets==4) fill("events",10);
+    fill("events",9);
+    if(nBjets==3) fill("events",10);
+    if(nBjets==4) fill("events",11);
     fill("H2_pt_SRMbbH2_SRB"+SR,         higgs2.Pt());   
     fill("jfwd_pt_SRMbbH2_SRB"+SR,       forwardLightjets.at(0).Pt());
     fill("jfwd_eta_SRMbbH2_SRB"+SR,      forwardLightjets.at(0).Eta());
