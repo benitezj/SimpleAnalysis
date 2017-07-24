@@ -33,6 +33,51 @@ void sortPairsClosestdR(std::vector<std::pair<AnalysisObject,AnalysisObject>>& c
   std::sort(cands.begin(), cands.end(), dR_sort());
 }
 
+float getSingleElectronTriggerEfficiency(float ptMeV, float eta) {
+  float minPt = 22000.;
+  float minPtHighEta = 35000;
+  float maxEta = 4.0;
+  float eff = 0.95;
+  float effHighEta = 0.90;
+
+  // HGTD forward trigger 5 GeV improvement
+  //if (m_bUseHGTD0 || m_bUseHGTD1)
+  //  minPtHighEta = 30000.;
+
+  if ( ptMeV > 35000. && fabs(eta) < 2.5 ) return 1.0;
+  if ( ptMeV > minPt && fabs(eta) < 2.5 )
+    return eff;
+  if ( ptMeV > minPtHighEta && fabs(eta) < maxEta )
+    return effHighEta;
+  return 0.0;
+}
+
+float muonEtaTriggerEfficiency(float eta) {
+    // rpc L0 efficiency data  22 bins for 0<eta<1.1
+    const float eta_bin = 0.05;
+    const float eff_gold[22] = {0.790656, 0.930483, 0.98033, 0.992508, 0.974555, 0.981241, 0.985142, 0.947444, 0.960144, 0.98223, 0.983938, 0.984972, 0.972907, 0.982902, 0.919753, 0.899409, 0.970952, 0.960322, 0.946016, 0.868755, 0.619748,0};
+    //=======    
+    float eff = 0.98*0.98; //TGC*MDT efficiency
+    if (fabs(eta)>2.4) return 0.;
+    
+    // RPC efficiencies for gold layout
+    if (fabs(eta)<=1.05) {
+      int ibin=fabs(eta)/eta_bin;
+      eff=eff_gold[ibin]*0.98; //RPC recovery with BI RPC chambers
+    }
+    
+    return eff;
+}
+
+float getSingleMuonTriggerEfficiency(float etMeV, float eta) {
+  //single-mu trigger efficiency w.r.t. reconstruction efficiency (tight=true)
+  //using 2012 values from K. Nagano
+  float minPt=20000.;
+  if (etMeV > minPt) return muonEtaTriggerEfficiency(eta);
+  return 0.;
+}
+
+
 float minmaxdEta(const AnalysisObjects& ljets, const AnalysisObjects& bjets, const bool min) {
   std::vector<float> dist;
   for (auto ljet : ljets) {
@@ -310,17 +355,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   sortObjectsByPt(electrons);
   sortObjectsByPt(muons);
   sortObjectsByPt(jets);
-  
-  // Jets in HGTD acceptance
-  int njets_hgtd(0), nbjets_hgtd(0);
-  for (auto j : jets) {
-    if ( fabs(j.Eta()) >= 2.4 && fabs(j.Eta()) <= 4.3) {
-      ++njets_hgtd;
-      if (j.pass(GoodBJet)) ++nbjets_hgtd;
-    }
-  }
-  fill("Njets_HGTD_nocuts", njets_hgtd);
-  fill("Nbjets_HGTD_nocuts", nbjets_hgtd);
+    
 
   // Overlap removal - including with object Pt-dependent radius calculation
   electrons_noPtCut  = overlapRemoval(electrons_noPtCut, muons_noPtCut, 0.01);
@@ -334,7 +369,6 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   electrons  = overlapRemoval(electrons, jets, 0.4);
   jets   = overlapRemoval(jets, muons, 0.4, LessThan3Tracks); //check this cut (b-jets?)
   muons      = overlapRemoval(muons, jets, 0.4);   
-
 
   // Lists of objects can be merged by simple addition
   auto leptons   = electrons + muons;
@@ -354,7 +388,18 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   int numSignalLeptons = leptons.size();  // Object lists are essentially std::vectors so .size() works
   int numSignalJets    = jets.size();
   int nBjets           = bjets.size();
-  
+    
+  // Jets in HGTD acceptance
+  int njets_hgtd(0), nbjets_hgtd(0);
+  for (auto j : jets) {
+    if ( fabs(j.Eta()) >= 2.4 && fabs(j.Eta()) <= 4.3) {
+      ++njets_hgtd;
+      if (j.pass(GoodBJet)) ++nbjets_hgtd;
+    }
+  }
+  fill("Njets_HGTD_nocuts", njets_hgtd);
+  fill("Nbjets_HGTD_nocuts", nbjets_hgtd);
+
   // Fill in histograms without cuts
   fill("NLep_nocuts",numSignalLeptons);
   fill("MET_nocuts",met);
@@ -366,6 +411,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   for(int iJet=0;iJet<numSignalJets;iJet++) fill("jet_pt_nocuts", jets.at(iJet).Pt()); 
   for(unsigned int iJet=0;iJet<jets_noPtCut.size();iJet++) fill("jet_pt_noPtCut", jets_noPtCut.at(iJet).Pt()); 
   
+  ///HT
+  double pTSum=0.0;
+  if (leptons.size() > 0) pTSum+=leptons.at(0).Pt();
+  for(int i=0;i<numSignalJets;i++) pTSum+=jets.at(i).Pt();
+
   // Preselection
   if (numSignalLeptons != 1) return;
   fill("events",2);
@@ -374,7 +424,18 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   if (antiBjets.size() < 1 || antiBjets.size() > 3) return;
   fill("events",4);
   if (nBjets < 2 ) return;
-  fill("events",5);
+ fill("events",5);
+  if (pTSum < 300 ) return;
+
+  // Trigger
+  if ( electrons.size() == 1 ) {
+    float trigWeight = getSingleElectronTriggerEfficiency(electrons.at(0).Pt()*1000., electrons.at(0).Eta());
+    _output->setEventWeight(eventweight*trigWeight);
+  }
+  else if ( muons.size() == 1 ) {
+    float trigWeight = getSingleMuonTriggerEfficiency(muons.at(0).Pt()*1000., muons.at(0).Eta());
+    _output->setEventWeight(eventweight*trigWeight);
+  }
 
   // Fill histogram after cuts
   fill("MET",met);
@@ -396,9 +457,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("j1_pt",  antiBjets.at(0).Pt());
   fill("j1_eta", fabs(antiBjets.at(0).Eta()));
 
-  ///HT
-  double pTSum=leptons.at(0).Pt();
-  for(int i=0;i<numSignalJets;i++) pTSum+=jets.at(i).Pt();
+  // HT
   fill("HT",pTSum);
 
 
