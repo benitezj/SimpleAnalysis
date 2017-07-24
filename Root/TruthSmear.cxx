@@ -12,7 +12,7 @@ options
 #endif
 ) :
 smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false), useHGTD0(false),
-useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
+useHGTDbtag(false), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
 
   std::string mu="None";
@@ -39,6 +39,7 @@ useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
     if (option=="noMET")          smearMET=false;
     if (option=="addPileupJets")  addPileupJets=true;
     if (option=="useHGTD0")       useHGTD0=true;
+    if (option=="useHGTDbtag")    useHGTDbtag=true;
     if (option=="noTrackConfirm") useTrackConfirm=false;
     if (option.find("PUeff=")==0) {
       puEff=std::stof(option.substr(6));
@@ -76,6 +77,7 @@ useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
   else if (puEffScheme == "HS") m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::HS);
   m_upgrade->setPileupEff(puEff);
   if (useHGTD0) m_upgrade->setUseHGTD0(true);
+  if (useHGTDbtag) m_upgrade->setUseHGTDbtag(true);
   m_upgrade->setPileupTemplatesPath("/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/UpgradePerformanceFunctions/");
   m_upgrade->initPhotonFakeHistograms("UpgradePerformanceFunctions/PhotonFakes.root");
   m_upgrade->setFlavourTaggingCalibrationFilename("UpgradePerformanceFunctions/flavor_tags_v1.1.root");

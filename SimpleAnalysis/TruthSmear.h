@@ -25,6 +25,7 @@ class TruthSmear
   bool        smearMET;
   bool        addPileupJets;
   bool        useHGTD0;
+  bool	      useHGTDbtag;
   bool        useTrackConfirm;
   std::string puEffScheme;
   float        puEff;
