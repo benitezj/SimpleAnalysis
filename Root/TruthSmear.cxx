@@ -80,7 +80,7 @@ useHGTDbtag(false), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
   if (useHGTDbtag) m_upgrade->setUseHGTDbtag(true);
   m_upgrade->setPileupTemplatesPath("/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/UpgradePerformanceFunctions/");
   m_upgrade->initPhotonFakeHistograms("UpgradePerformanceFunctions/PhotonFakes.root");
-  m_upgrade->setFlavourTaggingCalibrationFilename("UpgradePerformanceFunctions/flavor_tags_v1.1.root");
+  m_upgrade->setFlavourTaggingCalibrationFilename("UpgradePerformanceFunctions/flavor_tags_v1.2.root");
   m_random.SetSeed(seed);
 
 #else
