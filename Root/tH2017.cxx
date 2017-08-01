@@ -131,28 +131,6 @@ void findTop(const AnalysisObjects& bjets, const AnalysisObjects& leptons, const
   top2=bjets.at(0)+leptons.at(0)+metVec; 
 }
 
-
-// void findbjets_notH(AnalysisObjects bjets){
-//   AnalysisObjects bjets_notH(0.,0.,0.,0.,0,0,JET,0); 
-//   double smallDR=100; 
-//   int nBjets = bjets.size();
-//   if(nBjets<2) return bjets_notH; 
-//   int bjet1=-1;
-//   int bjet2=-1;
-//   for(int J1=0;J1<nBjets;J1++){
-//     for(int J2=0;J2<nBjets;J2++){
-//       if(J2==J1) continue; 
-//       double DR_bjets=bjets.at(J1).DeltaR(bjets.at(J2));
-//       if(smallDR>DR_bjets){
-// 	smallDR=DR_bjets;
-//   	bjet1=J1;
-//   	bjet2=J2;
-//       }
-//     }
-//   }
-//   for(int i=0;i<nBjets;i++) if(i!=bjet1&&i!=bjet2) bjets_notH.push_back(bjets.at(i)); 
-// }
-
 void findHiggsRecoil(AnalysisObjects& bjets_notH, AnalysisObjects& leptons, AnalysisObject& metVec, AnalysisObjects& higgsRecoil){
   auto HR1=leptons.at(0)+metVec; 
   auto HR2=leptons.at(0); 
@@ -366,14 +344,15 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     
 
   // Overlap removal - including with object Pt-dependent radius calculation
+  int btagger= BTag70MV2c20; //BTag85MV2c20;
   electrons_noPtCut  = overlapRemoval(electrons_noPtCut, muons_noPtCut, 0.01);
-  jets_noPtCut   = overlapRemoval(jets_noPtCut, electrons_noPtCut, 0.2, NOT(BTag85MV2c20));//check this cut
+  jets_noPtCut   = overlapRemoval(jets_noPtCut, electrons_noPtCut, 0.2, NOT(btagger));//check this cut
   electrons_noPtCut  = overlapRemoval(electrons_noPtCut, jets_noPtCut, 0.4);
   jets_noPtCut   = overlapRemoval(jets_noPtCut, muons_noPtCut, 0.4, LessThan3Tracks); //check this cut (b-jets?)
   muons_noPtCut      = overlapRemoval(muons_noPtCut, jets_noPtCut, 0.4);   
 
   electrons  = overlapRemoval(electrons, muons, 0.01);
-  jets   = overlapRemoval(jets, electrons, 0.2, NOT(BTag85MV2c20));//check this cut
+  jets   = overlapRemoval(jets, electrons, 0.2, NOT(btagger));//check this cut
   electrons  = overlapRemoval(electrons, jets, 0.4);
   jets   = overlapRemoval(jets, muons, 0.4, LessThan3Tracks); //check this cut (b-jets?)
   muons      = overlapRemoval(muons, jets, 0.4);   
@@ -383,14 +362,14 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   auto leptons_noPtCut = electrons_noPtCut + muons_noPtCut; 
 
   //
-  auto bjets = filterObjects(jets, 25., 3.8, BTag85MV2c20);
-  auto antiBjets = filterObjects(jets, 25., 3.8, NOT(BTag85MV2c20));
+  auto bjets = filterObjects(jets, 25., 3.8, btagger);
+  auto antiBjets = filterObjects(jets, 25., 3.8, NOT(btagger));
 
   // eta-sorted jets
   auto forwardJets = jets;
   sortObjectsByEta(forwardJets);
-  auto forwardBjets = filterObjects(forwardJets, 25., 3.8, BTag85MV2c20);
-  auto forwardLightjets = filterObjects(forwardJets, 25., 3.8, NOT(BTag85MV2c20));
+  auto forwardBjets = filterObjects(forwardJets, 25., 3.8, btagger);
+  auto forwardLightjets = filterObjects(forwardJets, 25., 3.8, NOT(btagger));
 
   // Object counting
   int numSignalLeptons = leptons.size();  // Object lists are essentially std::vectors so .size() works
