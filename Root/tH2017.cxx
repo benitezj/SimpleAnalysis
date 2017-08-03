@@ -113,6 +113,30 @@ void findHiggs(const AnalysisObjects& bjets, TLorentzVector& h2, TLorentzVector 
   
 }
 
+void calculateFoxWMoments(const AnalysisObjects& jets, const AnalysisObjects& leptons, std::vector<double>& FoxWMoments){
+  AnalysisObjects allObj = jets; 
+  allObj.push_back(leptons.at(0));
+  double fw1=0;
+  double fw2=0;
+  double fw3=0;
+  double ptotal=0;
+
+  for(auto obj: allObj) ptotal += sqrt(obj.Px()*obj.Px()+obj.Py()*obj.Py()+obj.Pz()*obj.Pz());
+
+  for (unsigned int i=0; i < allObj.size(); ++i) {
+    for (unsigned int j=i+1; j < allObj.size(); ++j) {
+      double p1 = sqrt(allObj.at(i).Px()*allObj.at(i).Px()+allObj.at(i).Py()*allObj.at(i).Py()+allObj.at(i).Pz()*allObj.at(i).Pz());
+      double p2 = sqrt(allObj.at(j).Px()*allObj.at(j).Px()+allObj.at(j).Py()*allObj.at(j).Py()+allObj.at(j).Pz()*allObj.at(j).Pz());
+      double weight = fabs(p1*p2)/(ptotal*ptotal); 
+      double cosOmega = cos(allObj.at(i).Theta())*cos(allObj.at(j).Theta()) + sin(allObj.at(i).Theta())*sin(allObj.at(j).Theta())*cos(allObj.at(i).Phi()-allObj.at(j).Phi());
+      fw1 += weight*1;
+      fw2 += weight*cosOmega; 
+      fw3 += weight*0.5*(3*cosOmega*cosOmega - 1); 
+    } 
+  }
+  FoxWMoments = {fw1,fw2,fw3};
+}
+
 void findTop(const AnalysisObjects& bjets, const AnalysisObjects& leptons, const AnalysisObject& metVec, AnalysisObject& top1, AnalysisObject &top2){
   double DR=100; 
   int nBjets=bjets.size(); 
@@ -211,13 +235,20 @@ void tH2017::Init()
   addHistogram("top4_pt",100,0,500); 
   addHistogram("top4_eta",40,0,4);
 
-  for(int j=0;j<3;j++){ //Higgs reconstruction using 3 different methods
-    std::string h_idx = std::to_string(j+1); 
-    addHistogram("H"+h_idx+"_m",100,0,500); 
-    addHistogram("H"+h_idx+"_pt",100,0,500);
-    addHistogram("H"+h_idx+"_eta",40,0,4);
-    addHistogram("dEta_H"+h_idx+"_jfwd",100,0,8);//|eta(higgs)-eta(forwardJet)|
-  }
+  addHistogram("H2_m",100,0,500); 
+  addHistogram("H2_pt",100,0,500);
+  addHistogram("H2_eta",40,0,4);
+
+  addHistogram("H3_m",100,0,500); 
+  addHistogram("H3_pt",100,0,500);
+  addHistogram("H3_eta",40,0,4);
+
+  addHistogram("dEta_H2_jfwd",100,0,8);//|eta(higgs)-eta(forwardJet)|
+  addHistogram("dEta_H3_jfwd",100,0,8);//|eta(higgs)-eta(forwardJet)|
+
+  addHistogram("FoxW1",50,0,1);
+  addHistogram("FoxW2",50,0,1);
+  addHistogram("FoxW3",50,0,1);
 
   //btagged regions
   for(int i=2;i<5;i++){
@@ -283,6 +314,10 @@ void tH2017::Init()
 
       addHistogram("mindEta_ljets_bjets"+SRjfwd+"_SRB"+SR,100,0,8);
       addHistogram("maxdEta_ljets_bjets"+SRjfwd+"_SRB"+SR,100,0,8);
+
+      addHistogram("FoxW1"+SRjfwd+"_SRB"+SR,50,0,1);
+      addHistogram("FoxW2"+SRjfwd+"_SRB"+SR,50,0,1);
+      addHistogram("FoxW3"+SRjfwd+"_SRB"+SR,50,0,1);
     }
 
     ////Histograms after mbb cut
@@ -314,6 +349,10 @@ void tH2017::Init()
     addHistogram("dEta_H3_b1NotH_SRMbbH3_SRB"+SR,100,0,8);
     addHistogram("dEta_R1_H3_SRMbbH3_SRB"+SR,100,0,8);
     addHistogram("dEta_R2_H3_SRMbbH3_SRB"+SR,100,0,8);
+
+    addHistogram("FoxW1_SRMbbH3_SRB"+SR,50,0,1);
+    addHistogram("FoxW2_SRMbbH3_SRB"+SR,50,0,1);
+    addHistogram("FoxW3_SRMbbH3_SRB"+SR,50,0,1);
   }
 }
 
@@ -448,7 +487,13 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   // HT
   fill("HT",pTSum);
 
-  
+  //Shape variables
+  std::vector<double> fwMoments;
+  calculateFoxWMoments(jets, leptons, fwMoments); 
+  fill("FoxW1", fwMoments.at(0)); 
+  fill("FoxW2", fwMoments.at(1)); 
+  fill("FoxW3", fwMoments.at(2)); 
+
   ////______________bjet cut_____: 
   // Note some quantities below are not defined without this cut.
   ///Note if the histogram is not defined the code will crash and not write the output
@@ -588,6 +633,10 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("mindEta_ljets_bjets_SRB"+SR, minmaxdEta(antiBjets, bjets, true)); 
   fill("maxdEta_ljets_bjets_SRB"+SR, minmaxdEta(antiBjets, bjets, false)); 
 
+  fill("FoxW1_SRB"+SR, fwMoments.at(0)); 
+  fill("FoxW2_SRB"+SR, fwMoments.at(1)); 
+  fill("FoxW3_SRB"+SR, fwMoments.at(2)); 
+
   ////Histos with fwdJet cut  
   if(2.5<fabs(forwardLightjets.at(0).Eta())&&fabs(forwardLightjets.at(0).Eta())<3.8){
     if(nBjets==3) fill("events",12);
@@ -650,6 +699,10 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("dEta_H3_jfwd_SRjfwd_SRB"+SR,   fabs(higgs3.Eta()-forwardLightjets.at(0).Eta()));
     fill("mindEta_ljets_bjets_SRjfwd_SRB"+SR, minmaxdEta(antiBjets, bjets, true)); 
     fill("maxdEta_ljets_bjets_SRjfwd_SRB"+SR, minmaxdEta(antiBjets, bjets, false)); 
+
+    fill("FoxW1_SRjfwd_SRB"+SR, fwMoments.at(0)); 
+    fill("FoxW2_SRjfwd_SRB"+SR, fwMoments.at(1)); 
+    fill("FoxW3_SRjfwd_SRB"+SR, fwMoments.at(2)); 
   }
 
   ////Histos with mbb cut 
@@ -685,7 +738,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
       fill("dR_H3_b1NotH_SRMbbH3_SRB"+SR,    higgs3.DeltaR(bjets_notH.at(0)));
       fill("dEta_lep_b1NotH_SRMbbH3_SRB"+SR, fabs(leptons.at(0).Eta()-bjets_notH.at(0).Eta()));
       fill("dEta_H3_b1NotH_SRMbbH3_SRB"+SR,  fabs(higgs3.Eta()-bjets_notH.at(0).Eta()));
-    }          
+    }     
+    
+    fill("FoxW1_SRMbbH3_SRB"+SR, fwMoments.at(0)); 
+    fill("FoxW2_SRMbbH3_SRB"+SR, fwMoments.at(1)); 
+    fill("FoxW3_SRMbbH3_SRB"+SR, fwMoments.at(2)); 
   }
 
   ///fill ntuple
