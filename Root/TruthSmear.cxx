@@ -11,8 +11,7 @@ TruthSmear::TruthSmear(std::vector<std::string>&
 options
 #endif
 ) :
-smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false), useHGTD0(false),
-useHGTDbtag(false), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
+  smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false), useHGTD0(false), useHGTD_PUrejx2(false), useHGTDbtag(false), btagScheme(""), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
 
   std::string mu="None";
@@ -39,8 +38,15 @@ useHGTDbtag(false), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
     if (option=="noMET")          smearMET=false;
     if (option=="addPileupJets")  addPileupJets=true;
     if (option=="useHGTD0")       useHGTD0=true;
-    if (option=="useHGTDbtag")    useHGTDbtag=true;
+    if (option=="useHGTD_PUrejx2")useHGTD_PUrejx2=true;
     if (option=="noTrackConfirm") useTrackConfirm=false;
+    if (option=="useHGTDbtag"){
+      useHGTDbtag=true;
+      btagScheme="lrej";
+    }
+    if (option.find("btagScheme=")==0){
+      btagScheme=option.substr(11); 
+    }
     if (option.find("PUeff=")==0) {
       puEff=std::stof(option.substr(6));
     }
@@ -56,6 +62,7 @@ useHGTDbtag(false), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
     }
   }
   std::cout<<"Smearing with mu="<<mu<<" and seed="<<seed<<std::endl;
+  std::cout<<"btagScheme="<<btagScheme<<std::endl; 
 
   if (mu!="200") throw std::runtime_error("Unsupported pile-up level. Only mu=200 currently supported");
   m_upgrade = new UpgradePerformanceFunctions();
@@ -77,10 +84,12 @@ useHGTDbtag(false), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
   else if (puEffScheme == "HS") m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::HS);
   m_upgrade->setPileupEff(puEff);
   if (useHGTD0) m_upgrade->setUseHGTD0(true);
+  if (useHGTD_PUrejx2) m_upgrade->setUseHGTD_PUrejx2(true); 
   if (useHGTDbtag) m_upgrade->setUseHGTDbtag(true);
+  m_upgrade->setbtagScheme(btagScheme); 
   m_upgrade->setPileupTemplatesPath("/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/UpgradePerformanceFunctions/");
   m_upgrade->initPhotonFakeHistograms("UpgradePerformanceFunctions/PhotonFakes.root");
-  m_upgrade->setFlavourTaggingCalibrationFilename("UpgradePerformanceFunctions/flavor_tags_v1.3.root");
+  m_upgrade->setFlavourTaggingCalibrationFilename("UpgradePerformanceFunctions/flavor_tags_v1.4.root");
   m_random.SetSeed(seed);
 
 #else
@@ -206,10 +215,10 @@ event
       if (jet.pass(TrueCJet)) jetType = 'C';
       
       float tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 70, m_upgrade->getPileupTrackConfSetting());
-      float tagEff85 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 85, m_upgrade->getPileupTrackConfSetting());
+      //float tagEff85 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 85, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
-      if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
+      //if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
       if (tag<tagEff70) jetid = GoodBJet;
       if (jet.pass(TrueLightJet)) jetid|=TrueLightJet;
       if (jet.pass(TrueCJet))     jetid|=TrueCJet;
@@ -275,10 +284,10 @@ event
             
       if (puProb > trackEff) continue; // FIXME: should couple this to JVT flag
       float tagEff70 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 70, m_upgrade->getPileupTrackConfSetting());
-      float tagEff85 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 85, m_upgrade->getPileupTrackConfSetting());
+      //float tagEff85 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 85, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
-      if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
+      //if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
       if (tag<tagEff70) jetid=GoodBJet;
       smeared->addJet(pujet.Px()/1000., pujet.Py()/1000., pujet.Pz()/1000., pujet.E()/1000., jetid, -1);
       // Add jets faking photon

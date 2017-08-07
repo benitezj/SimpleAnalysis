@@ -26,8 +26,10 @@ class TruthSmear
   bool        addPileupJets;
   bool        useHGTD0;
   bool	      useHGTDbtag;
+  bool        useHGTD_PUrejx2;  
   bool        useTrackConfirm;
   std::string puEffScheme;
+  std::string btagScheme;
   float        puEff;
   UpgradePerformanceFunctions *m_upgrade;
   TRandom3 m_random;
