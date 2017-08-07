@@ -42,7 +42,6 @@ options
     if (option=="noTrackConfirm") useTrackConfirm=false;
     if (option=="useHGTDbtag"){
       useHGTDbtag=true;
-      btagScheme="lrej";
     }
     if (option.find("btagScheme=")==0){
       btagScheme=option.substr(11); 
