@@ -113,9 +113,11 @@ void findHiggs(const AnalysisObjects& bjets, TLorentzVector& h2, TLorentzVector 
   
 }
 
-void calculateFoxWMoments(const AnalysisObjects& jets, const AnalysisObjects& leptons, std::vector<double>& FoxWMoments){
+std::vector<double> calculateFoxWMoments(const AnalysisObjects& jets, const AnalysisObjects& leptons){
+  std::vector<double> FoxWMoments;
   AnalysisObjects allObj = jets; 
   allObj.push_back(leptons.at(0));
+  double fw0=0;
   double fw1=0;
   double fw2=0;
   double fw3=0;
@@ -129,12 +131,14 @@ void calculateFoxWMoments(const AnalysisObjects& jets, const AnalysisObjects& le
       double p2 = sqrt(allObj.at(j).Px()*allObj.at(j).Px()+allObj.at(j).Py()*allObj.at(j).Py()+allObj.at(j).Pz()*allObj.at(j).Pz());
       double weight = fabs(p1*p2)/(ptotal*ptotal); 
       double cosOmega = cos(allObj.at(i).Theta())*cos(allObj.at(j).Theta()) + sin(allObj.at(i).Theta())*sin(allObj.at(j).Theta())*cos(allObj.at(i).Phi()-allObj.at(j).Phi());
-      fw1 += weight*1;
-      fw2 += weight*cosOmega; 
-      fw3 += weight*0.5*(3*cosOmega*cosOmega - 1); 
+      fw0 += weight*1;
+      fw1 += weight*cosOmega; 
+      fw2 += weight*0.5*(3*cosOmega*cosOmega - 1); 
+      fw3 += weight*0.5*(5*cosOmega*cosOmega*cosOmega - 3*cosOmega); 
     } 
   }
-  FoxWMoments = {fw1,fw2,fw3};
+  FoxWMoments = {fw0,fw1,fw2,fw3};
+  return FoxWMoments; 
 }
 
 void findTop(const AnalysisObjects& bjets, const AnalysisObjects& leptons, const AnalysisObject& metVec, AnalysisObject& top1, AnalysisObject &top2){
@@ -246,6 +250,7 @@ void tH2017::Init()
   addHistogram("dEta_H2_jfwd",100,0,8);//|eta(higgs)-eta(forwardJet)|
   addHistogram("dEta_H3_jfwd",100,0,8);//|eta(higgs)-eta(forwardJet)|
 
+  addHistogram("FoxW0",50,0,1);
   addHistogram("FoxW1",50,0,1);
   addHistogram("FoxW2",50,0,1);
   addHistogram("FoxW3",50,0,1);
@@ -315,6 +320,7 @@ void tH2017::Init()
       addHistogram("mindEta_ljets_bjets"+SRjfwd+"_SRB"+SR,100,0,8);
       addHistogram("maxdEta_ljets_bjets"+SRjfwd+"_SRB"+SR,100,0,8);
 
+      addHistogram("FoxW0"+SRjfwd+"_SRB"+SR,50,0,1);
       addHistogram("FoxW1"+SRjfwd+"_SRB"+SR,50,0,1);
       addHistogram("FoxW2"+SRjfwd+"_SRB"+SR,50,0,1);
       addHistogram("FoxW3"+SRjfwd+"_SRB"+SR,50,0,1);
@@ -350,6 +356,7 @@ void tH2017::Init()
     addHistogram("dEta_R1_H3_SRMbbH3_SRB"+SR,100,0,8);
     addHistogram("dEta_R2_H3_SRMbbH3_SRB"+SR,100,0,8);
 
+    addHistogram("FoxW0_SRMbbH3_SRB"+SR,50,0,1);
     addHistogram("FoxW1_SRMbbH3_SRB"+SR,50,0,1);
     addHistogram("FoxW2_SRMbbH3_SRB"+SR,50,0,1);
     addHistogram("FoxW3_SRMbbH3_SRB"+SR,50,0,1);
@@ -366,11 +373,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   _output->setEventWeight(eventweight); //all histograms after this point get filled with this weight
   fill("events",1); //Sum of initial weights
 
-  auto electrons_noPtCut = event->getElectrons(0., 2.47, ELooseBLLH && EIsoGradient);
+  auto electrons_noPtCut = event->getElectrons(0., 4.0, ELooseBLLH && EIsoGradient);
   auto muons_noPtCut     = event->getMuons(0., 2.7, MuLoose && MuIsoGradient);
   auto jets_noPtCut      = event->getJets(0., 3.8); 
 
-  auto electrons = event->getElectrons(25., 2.47,ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
+  auto electrons = event->getElectrons(25., 4.0, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
   auto muons     = event->getMuons(25., 2.7, MuLoose && MuIsoGradient);//add vertex (MuD0Sigma3|MuZ05mm ?)
   auto jets      = event->getJets(25., 3.8, JVT50Jet); // what about NOT(LooseBadJet)
   auto metVec    = event->getMET();
@@ -488,11 +495,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("HT",pTSum);
 
   //Shape variables
-  std::vector<double> fwMoments;
-  calculateFoxWMoments(jets, leptons, fwMoments); 
-  fill("FoxW1", fwMoments.at(0)); 
-  fill("FoxW2", fwMoments.at(1)); 
-  fill("FoxW3", fwMoments.at(2)); 
+  std::vector<double> fwMoments = calculateFoxWMoments(jets, leptons); 
+  fill("FoxW0", fwMoments.at(0)); 
+  fill("FoxW1", fwMoments.at(1)); 
+  fill("FoxW2", fwMoments.at(2)); 
+  fill("FoxW3", fwMoments.at(3)); 
 
   ////______________bjet cut_____: 
   // Note some quantities below are not defined without this cut.
@@ -633,9 +640,10 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("mindEta_ljets_bjets_SRB"+SR, minmaxdEta(antiBjets, bjets, true)); 
   fill("maxdEta_ljets_bjets_SRB"+SR, minmaxdEta(antiBjets, bjets, false)); 
 
-  fill("FoxW1_SRB"+SR, fwMoments.at(0)); 
-  fill("FoxW2_SRB"+SR, fwMoments.at(1)); 
-  fill("FoxW3_SRB"+SR, fwMoments.at(2)); 
+  fill("FoxW0_SRB"+SR, fwMoments.at(0)); 
+  fill("FoxW1_SRB"+SR, fwMoments.at(1)); 
+  fill("FoxW2_SRB"+SR, fwMoments.at(2)); 
+  fill("FoxW3_SRB"+SR, fwMoments.at(3)); 
 
   ////Histos with fwdJet cut  
   if(2.5<fabs(forwardLightjets.at(0).Eta())&&fabs(forwardLightjets.at(0).Eta())<3.8){
@@ -700,9 +708,10 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("mindEta_ljets_bjets_SRjfwd_SRB"+SR, minmaxdEta(antiBjets, bjets, true)); 
     fill("maxdEta_ljets_bjets_SRjfwd_SRB"+SR, minmaxdEta(antiBjets, bjets, false)); 
 
-    fill("FoxW1_SRjfwd_SRB"+SR, fwMoments.at(0)); 
-    fill("FoxW2_SRjfwd_SRB"+SR, fwMoments.at(1)); 
-    fill("FoxW3_SRjfwd_SRB"+SR, fwMoments.at(2)); 
+    fill("FoxW0_SRjfwd_SRB"+SR, fwMoments.at(0)); 
+    fill("FoxW1_SRjfwd_SRB"+SR, fwMoments.at(1)); 
+    fill("FoxW2_SRjfwd_SRB"+SR, fwMoments.at(2)); 
+    fill("FoxW3_SRjfwd_SRB"+SR, fwMoments.at(3)); 
   }
 
   ////Histos with mbb cut 
