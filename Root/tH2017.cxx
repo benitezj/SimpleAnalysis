@@ -185,7 +185,8 @@ void tH2017::Init()
   addHistogram("Njets_nocuts",10,-0.5,9.5);
   addHistogram("jet_pt_nocuts",100,0,500);
   addHistogram("lep_pt_nocuts",100,0,500); 
-  
+  addHistogram("sphericity_nocuts",50,0,1);
+
   addHistogram("Njets_HGTD_nocuts",10,-0.5,9.5); 
   addHistogram("Nbjets_HGTD_nocuts",6,-0.5,5.5); 
   
@@ -199,6 +200,7 @@ void tH2017::Init()
   addHistogram("NLightjets",10,-0.5,9.5);
   addHistogram("Nbjets",6,-0.5,5.5);
   addHistogram("HT",100,0,2000); 
+  addHistogram("sphericity",50,0,1);
  
   addHistogram("lep_pt",100,0,500);
   addHistogram("lep_eta",40,0,4);   
@@ -438,6 +440,10 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("MET_nocuts",met);
   fill("Njets_nocuts",numSignalJets);
 
+  // Sphericity 
+  float sph = sphericity(jets);
+  fill("sphericity_nocuts", sph); 
+
   if(numSignalLeptons>0) fill("lep_pt_nocuts", leptons.at(0).Pt()); 
   if(leptons_noPtCut.size()>0) fill("lep_pt_noPtCut",leptons_noPtCut.at(0).Pt());
   
@@ -500,6 +506,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("FoxW1", fwMoments.at(1)); 
   fill("FoxW2", fwMoments.at(2)); 
   fill("FoxW3", fwMoments.at(3)); 
+
+  fill("sphericity",sph); 
 
   ////______________bjet cut_____: 
   // Note some quantities below are not defined without this cut.
