@@ -121,20 +121,24 @@ std::vector<double> calculateFoxWMoments(const AnalysisObjects& jets, const Anal
   double fw1=0;
   double fw2=0;
   double fw3=0;
-  double ptotal=0;
-
-  for(auto obj: allObj) ptotal += sqrt(obj.Px()*obj.Px()+obj.Py()*obj.Py()+obj.Pz()*obj.Pz());
-
+  
+  // Build total 4-momentum of final state particles
+  AnalysisObject tot4Mom = leptons.at(0);
+  for (auto jet: jets) tot4Mom += jet;
+  
+  // Need mass squared of ptotal
+  float ptotal = pow(tot4Mom.M(),2);
+  
   for (unsigned int i=0; i < allObj.size(); ++i) {
-    for (unsigned int j=i+1; j < allObj.size(); ++j) {
-      double p1 = sqrt(allObj.at(i).Px()*allObj.at(i).Px()+allObj.at(i).Py()*allObj.at(i).Py()+allObj.at(i).Pz()*allObj.at(i).Pz());
-      double p2 = sqrt(allObj.at(j).Px()*allObj.at(j).Px()+allObj.at(j).Py()*allObj.at(j).Py()+allObj.at(j).Pz()*allObj.at(j).Pz());
-      double weight = fabs(p1*p2)/(ptotal*ptotal); 
+    for (unsigned int j=0; j < allObj.size(); ++j) {
+      double p1 = sqrt(pow(allObj.at(i).Px(),2)+pow(allObj.at(i).Py(),2)+pow(allObj.at(i).Pz(),2));
+      double p2 = sqrt(pow(allObj.at(j).Px(),2)+pow(allObj.at(j).Py(),2)+pow(allObj.at(j).Pz(),2));
+      double weight = p1*p2/ptotal; 
       double cosOmega = cos(allObj.at(i).Theta())*cos(allObj.at(j).Theta()) + sin(allObj.at(i).Theta())*sin(allObj.at(j).Theta())*cos(allObj.at(i).Phi()-allObj.at(j).Phi());
       fw0 += weight*1;
       fw1 += weight*cosOmega; 
-      fw2 += weight*0.5*(3*cosOmega*cosOmega - 1); 
-      fw3 += weight*0.5*(5*cosOmega*cosOmega*cosOmega - 3*cosOmega); 
+      fw2 += weight*0.5*(3.*pow(cosOmega,2) - 1.); 
+      fw3 += weight*0.5*(5.*pow(cosOmega,3) - 3.*cosOmega); 
     } 
   }
   FoxWMoments = {fw0,fw1,fw2,fw3};
