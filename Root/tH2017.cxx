@@ -122,25 +122,31 @@ std::vector<double> calculateFoxWMoments(const AnalysisObjects& jets, const Anal
   double fw2=0;
   double fw3=0;
   
-  // Build total 4-momentum of final state particles
-  AnalysisObject tot4Mom = leptons.at(0);
-  for (auto jet: jets) tot4Mom += jet;
-  
-  // Need mass squared of ptotal
-  float ptotal = pow(tot4Mom.M(),2);
+  // for normalization
+  double pi = 0.0;
   
   for (unsigned int i=0; i < allObj.size(); ++i) {
+    pi += sqrt(pow(allObj.at(i).Px(),2)+ pow(allObj.at(i).Py(),2) + pow(allObj.at(i).Pz(),2));
     for (unsigned int j=0; j < allObj.size(); ++j) {
-      double p1 = sqrt(pow(allObj.at(i).Px(),2)+pow(allObj.at(i).Py(),2)+pow(allObj.at(i).Pz(),2));
-      double p2 = sqrt(pow(allObj.at(j).Px(),2)+pow(allObj.at(j).Py(),2)+pow(allObj.at(j).Pz(),2));
-      double weight = p1*p2/ptotal; 
-      double cosOmega = cos(allObj.at(i).Theta())*cos(allObj.at(j).Theta()) + sin(allObj.at(i).Theta())*sin(allObj.at(j).Theta())*cos(allObj.at(i).Phi()-allObj.at(j).Phi());
+      // 3-momenta product
+      double p1       = sqrt(pow(allObj.at(i).Px(),2)+ pow(allObj.at(i).Py(),2) + pow(allObj.at(i).Pz(),2));
+      double p2       = sqrt(pow(allObj.at(j).Px(),2)+ pow(allObj.at(j).Py(),2) + pow(allObj.at(j).Pz(),2));
+      double weight   = p1*p2;
+      double cosOmega = cos(allObj.at(i).Theta())*cos(allObj.at(j).Theta()) + 
+      		       sin(allObj.at(i).Theta())*sin(allObj.at(j).Theta())*cos(allObj.at(i).Phi()-allObj.at(j).Phi());
       fw0 += weight*1;
       fw1 += weight*cosOmega; 
       fw2 += weight*0.5*(3.*pow(cosOmega,2) - 1.); 
       fw3 += weight*0.5*(5.*pow(cosOmega,3) - 3.*cosOmega); 
     } 
   }
+  
+  // Normalization
+  fw0 /= pow(pi,2);
+  fw1 /= pow(pi,2);
+  fw2 /= pow(pi,2);
+  fw3 /= pow(pi,2);
+  
   FoxWMoments = {fw0,fw1,fw2,fw3};
   return FoxWMoments; 
 }
