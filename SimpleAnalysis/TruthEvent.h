@@ -3,6 +3,7 @@
 
 #include "SimpleAnalysis/AnalysisClass.h"
 #include <cmath>
+#include "xAODTruth/TruthParticleContainer.h"
 
 class TruthEvent : public AnalysisEvent
 {
@@ -15,6 +16,9 @@ class TruthEvent : public AnalysisEvent
   virtual AnalysisObjects getJets(float ptCut,float etaCut,int btag) { return AnalysisClass::filterObjects( _baseJets, ptCut, etaCut, btag); };
   virtual AnalysisObjects getFatJets(float ptCut,float etaCut,int btag) { return AnalysisClass::filterObjects( _baseFatJets, ptCut, etaCut, btag); };
   virtual AnalysisObject  getMET() { return _met; };
+  virtual const xAOD::TruthParticleContainer * getTruthParticles(){return _truthParticles;}
+  void setTruthParticles(const xAOD::TruthParticleContainer * truthparticles){_truthParticles=truthparticles;}
+
   virtual float  getSumET() { return _sumet; };
 
   virtual float  getGenMET() { return _genmet; };
@@ -98,6 +102,7 @@ class TruthEvent : public AnalysisEvent
   AnalysisObject  _met;
   float           _genmet;
   float           _genht;
+  const xAOD::TruthParticleContainer * _truthParticles=NULL;
 
   int             _mcChannel;
   int             _susyChannel;

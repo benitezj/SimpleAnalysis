@@ -1,5 +1,13 @@
 #include "SimpleAnalysis/AnalysisClass.h"
 #include <string>
+#include "xAODTruth/TruthParticleContainer.h"
+
+float deltaR(float eta1, float phi1, float eta2, float phi2){
+  float deta= fabs(eta1 - eta2);      
+  float dphi= fabs(phi1 - phi2);
+  if (dphi > TMath::Pi() ) dphi = 2*(TMath::Pi()) - dphi;
+  return sqrt((dphi*dphi)+(deta*deta));
+}
 
 struct eta_sort {
   bool operator()(const TLorentzVector& v1, const TLorentzVector& v2) const {
@@ -180,6 +188,121 @@ void findHiggsRecoil(AnalysisObjects& bjets_notH, AnalysisObjects& leptons, Anal
   higgsRecoil.push_back(HR2); 
 }
 
+void printTruthTree(const xAOD::TruthParticleContainer* Truth, unsigned int idx){
+  if(!Truth || idx >= Truth->size()){
+    std::cout<<"printTruthTree Truth = NULL or idx> Truth size"<<std::endl;
+    return;
+  }
+  
+  std::cout<<" TRUTH TREE: "<<Truth->at(idx)->pdgId()<<" status="<<Truth->at(idx)->status()<<" nChildren="<<Truth->at(idx)->nChildren()<<std::endl;
+  for(unsigned int i=0;i< Truth->at(idx)->nChildren();i++){
+    const xAOD::TruthParticle* part1 = Truth->at(idx)->child(i);
+    if(part1==NULL){std::cout<<"printTruthTree part1 = NULL at i="<<i<<"  of nChildren="<<Truth->at(idx)->nChildren()<<std::endl; return;  }
+    ///First generation
+    std::cout<<"    id="<<part1->pdgId()<<"  status="<<part1->status()<<"  (pt,eta)="<<part1->p4().Pt()<<","<<part1->p4().Eta()<<")"<<std::endl;
+    for(unsigned int j=0;j< part1->nChildren();j++){
+      const xAOD::TruthParticle* part2 = part1->child(j);
+      if(part2==NULL){std::cout<<"printTruthTree part2 = NULL at i="<<j<<"  of nChildren="<<part1->nChildren()<<std::endl; return;  }
+      ///Second generation
+      std::cout<<"        id="<<part2->pdgId()<<"  status="<<part2->status()<<"  (pt,eta)="<<part2->p4().Pt()<<","<<part2->p4().Eta()<<")"<<std::endl;
+      for(unsigned int k=0;k< part2->nChildren();k++){
+        const xAOD::TruthParticle* part3 = part2->child(k);
+	if(part3==NULL){std::cout<<"printTruthTree part3 = NULL at i="<<j<<"  of nChildren="<<part2->nChildren()<<std::endl; return;  }
+        ///Third generation
+        std::cout<<"            id="<<part3->pdgId()<<"  status="<<part3->status()<<"  (pt,eta)="<<part3->p4().Pt()<<","<<part3->p4().Eta()<<")"<<std::endl;
+	for(unsigned int l=0;l< part3->nChildren();l++){
+	  const xAOD::TruthParticle* part4 = part3->child(l);
+	  if(part4==NULL){std::cout<<"printTruthTree part4 = NULL at i="<<l<<"  of nChildren="<<part3->nChildren()<<std::endl; return;  }
+	  ///Fourth generation
+	  std::cout<<"                id="<<part4->pdgId()<<"  status="<<part4->status()<<"  (pt,eta)="<<part4->p4().Pt()<<","<<part4->p4().Eta()<<")"<<std::endl;
+	  for(unsigned int m=0;m< part4->nChildren();m++){
+	    const xAOD::TruthParticle* part5 = part4->child(m);
+	    if(part5==NULL){std::cout<<"printTruthTree part5 = NULL at i="<<m<<"  of nChildren="<<part4->nChildren()<<std::endl; return;  }
+	    ///Fith generation
+	    std::cout<<"                    id="<<part5->pdgId()<<"  status="<<part5->status()<<"  (pt,eta)="<<part5->p4().Pt()<<","<<part5->p4().Eta()<<")"<<std::endl;
+	  }
+	}
+      }
+    }
+  }
+
+}
+
+
+bool findHbb(const xAOD::TruthParticle* parent, const xAOD::TruthParticle* &Hb, const xAOD::TruthParticle* &Hbbar){
+  if(!parent){
+    std::cout<<"findHbb parent = NULL"<<std::endl;
+    return false;
+  }
+  
+  //check if there is a b-bbar pair
+  for(unsigned int i=0;i<parent->nChildren();i++){
+    const xAOD::TruthParticle* dau = parent->child(i);
+    if(dau==NULL){std::cout<<"findHbb dau = NULL at i="<<i<<"  of nChildren="<<parent->nChildren()<<std::endl; return false;  }
+    if(dau->pdgId()==-5) Hb = dau;
+    if(dau->pdgId()==5)  Hbbar = dau;
+  }
+  if(Hb!=NULL && Hbbar!=NULL) return true; //exit the recursive loop
+
+  //continue to check the daughters
+  for(unsigned int i=0;i<parent->nChildren();i++){
+    if(findHbb(parent->child(i),Hb,Hbbar)) return true;
+  }
+
+  std::cout<<"findHbb failed to find H->bb "<<std::endl;
+  return false;
+}
+  
+bool findTopWb(const xAOD::TruthParticle* parent, const xAOD::TruthParticle* &TopW, const xAOD::TruthParticle* &TopB){
+  if(!parent){
+    std::cout<<"findTopWb parent = NULL"<<std::endl;
+    return false;
+  }
+  
+  //check if there is a b-bbar pair
+  for(unsigned int i=0;i<parent->nChildren();i++){
+    const xAOD::TruthParticle* dau = parent->child(i);
+    if(dau==NULL){std::cout<<"findTopWb dau = NULL at i="<<i<<"  of nChildren="<<parent->nChildren()<<std::endl; return false;  }
+    if(abs(dau->pdgId())==24) TopW = dau;
+    if(abs(dau->pdgId())==5)  TopB = dau;
+  }
+  if(TopW!=NULL && TopB!=NULL) return true; //exit the recursive loop
+
+  //continue to check the daughters
+  for(unsigned int i=0;i<parent->nChildren();i++){
+    if(findTopWb(parent->child(i),TopW,TopB)) return true;
+  }
+
+  std::cout<<"findTopWb failed to find Top->Wb "<<std::endl;
+  return false;
+}
+  
+
+bool findWl(const xAOD::TruthParticle* parent, const xAOD::TruthParticle* &Wl){
+  if(!parent){
+    std::cout<<"findWl parent = NULL"<<std::endl;
+    return false;
+  }
+  
+  //check if there is a b-bbar pair
+  for(unsigned int i=0;i<parent->nChildren();i++){
+    const xAOD::TruthParticle* dau = parent->child(i);
+    if(dau==NULL){std::cout<<"findWl dau = NULL at i="<<i<<"  of nChildren="<<parent->nChildren()<<std::endl; return false;  }
+    if((abs(dau->pdgId())==11 || abs(dau->pdgId())==13) && dau->status()==1 ) Wl = dau;
+  }
+  if(Wl!=NULL) return true; //exit the recursive loop
+
+  //continue to check the daughters
+  for(unsigned int i=0;i<parent->nChildren();i++){
+    if(findWl(parent->child(i),Wl)) return true;
+  }
+
+  std::cout<<"findWl failed to find W->l "<<std::endl;
+  return false;
+}
+  
+
+
 
 DefineAnalysis(tH2017)
 
@@ -336,6 +459,14 @@ void tH2017::Init()
       addHistogram("FoxW1"+SRjfwd+"_SRB"+SR,50,0,1);
       addHistogram("FoxW2"+SRjfwd+"_SRB"+SR,50,0,1);
       addHistogram("FoxW3"+SRjfwd+"_SRB"+SR,50,0,1);
+
+      
+      ///histogram for the reconstruction efficiencies
+      // tHqb;  t -> W b -> l v b;  h-> b1 b2, 
+      // bin 1 counts total events 
+      // bin 2=t, 3=H, 4=q, 5=b;   6=top_l,7=top_b;   8=H_b1, 9=H_b2 
+      addHistogram("effReco"+SRjfwd+"_SRB"+SR,9,0.5,9.5);
+      
     }
 
     ////Histograms after mbb cut
@@ -525,6 +656,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   //if( nBjets>4 ) return; // this might be unnecessary now
   std::string SR=std::to_string(nBjets); 
   
+
+
   ///fwd b-jet
   fill("bfwd_pt",   forwardBjets.at(0).Pt()); 
   fill("bfwd_eta",  fabs(forwardBjets.at(0).Eta())); 
@@ -596,9 +729,86 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("top4_eta", top4.Eta());
   }   
 
+
+
   ///////////////______________Fill histos corresponding to b-Tag signal regions____________
   if(nBjets==3) fill("events",7);
   if(nBjets==4) fill("events",8);
+
+  //////////  Reco efficiencies
+  fill("effReco_SRB"+SR,1);//count total events in this category
+  //truth particles only available in TRUTH1
+  const xAOD::TruthParticleContainer* Truth = event->getTruthParticles();
+  const xAOD::TruthParticle* truthFwdJet = Truth->at(7);
+  const xAOD::TruthParticle* truthB =      Truth->at(6);
+  const xAOD::TruthParticle* truthHiggs =  Truth->at(4);  // printTruthTree(Truth,4);
+  const xAOD::TruthParticle* truthHB = NULL;
+  const xAOD::TruthParticle* truthHBbar = NULL;
+  if(truthHiggs) findHbb(truthHiggs,truthHB,truthHBbar);  
+  const xAOD::TruthParticle* truthHB1 = NULL;
+  const xAOD::TruthParticle* truthHB2 = NULL;
+  if(truthHB && truthHBbar) {
+    if(truthHB->pt() > truthHBbar->pt()){ truthHB1 = truthHB;  truthHB2 = truthHBbar;}
+    if(truthHB->pt() < truthHBbar->pt()){ truthHB1 = truthHBbar;  truthHB2 = truthHB;}
+  }
+  const xAOD::TruthParticle* truthTop =  Truth->at(5); //printTruthTree(Truth,5);
+  const xAOD::TruthParticle* truthTopB = NULL;
+  const xAOD::TruthParticle* truthTopW = NULL;
+  if(truthTop) findTopWb(truthTop,truthTopW,truthTopB); 
+  const xAOD::TruthParticle* truthTopWL = NULL;
+  if(truthTopW) findWl(truthTopW,truthTopWL);
+
+  ///fill tuple
+  if(truthTopWL)ntupVar("truth_lep_pt",truthTopWL->pt());
+  if(truthTopWL)ntupVar("truth_lep_eta",truthTopWL->eta());
+  if(truthFwdJet)ntupVar("truth_jfwd_pt",truthFwdJet->pt());
+  if(truthFwdJet)ntupVar("truth_jfwd_eta",truthFwdJet->eta());
+  if(truthHB1)ntupVar("truth_Hb1_pt",truthHB1->pt());
+  if(truthHB1)ntupVar("truth_Hb1_eta",truthHB1->eta());
+  if(truthHB2)ntupVar("truth_Hb2_pt",truthHB2->pt());
+  if(truthHB2)ntupVar("truth_Hb2_eta",truthHB2->eta());
+  if(truthTopB)ntupVar("truth_Hb2_pt",truthTopB->pt());
+  if(truthTopB)ntupVar("truth_Hb2_eta",truthTopB->eta());
+
+
+  //////check the top
+  if(truthTopWL) 
+    if(deltaR(truthTopWL->eta(),truthTopWL->phi(),leptons.at(0).Eta(),leptons.at(0).Phi())<0.2) 
+      fill("effReco_SRB"+SR,6);
+  if(truthTopB)
+    if(deltaR(truthTopB->eta(),truthTopB->phi(),bjets.at(0).Eta(),bjets.at(0).Phi())<0.3) ///(use leading b-jet for now)
+      fill("effReco_SRB"+SR,7);
+  if(truthTopWL && truthTopB)
+    if(deltaR(truthTopWL->eta(),truthTopWL->phi(),leptons.at(0).Eta(),leptons.at(0).Phi())<0.2
+       && deltaR(truthTopB->eta(),truthTopB->phi(),bjets.at(0).Eta(),bjets.at(0).Phi())<0.3) 
+      fill("effReco_SRB"+SR,2);
+
+  //////check the H 
+  if(truthHB && truthHBbar) 
+    if(deltaR(truthHB->eta(),truthHB->phi(),hbjets.at(0).Eta(),hbjets.at(0).Phi())<0.3
+       || deltaR(truthHBbar->eta(),truthHBbar->phi(),hbjets.at(0).Eta(),hbjets.at(0).Phi())<0.3) 
+      fill("effReco_SRB"+SR,8);
+  if(truthHB && truthHBbar) 
+    if(deltaR(truthHB->eta(),truthHB->phi(),hbjets.at(1).Eta(),hbjets.at(1).Phi())<0.3
+       || deltaR(truthHBbar->eta(),truthHBbar->phi(),hbjets.at(1).Eta(),hbjets.at(1).Phi())<0.3)
+      fill("effReco_SRB"+SR,9);
+  if(truthHB && truthHBbar) 
+    if((deltaR(truthHB->eta(),truthHB->phi(),hbjets.at(0).Eta(),hbjets.at(0).Phi())<0.3
+  	&& deltaR(truthHBbar->eta(),truthHBbar->phi(),hbjets.at(1).Eta(),hbjets.at(1).Phi())<0.3)
+       ||(deltaR(truthHB->eta(),truthHB->phi(),hbjets.at(1).Eta(),hbjets.at(1).Phi())<0.3
+  	  && deltaR(truthHBbar->eta(),truthHBbar->phi(),hbjets.at(0).Eta(),hbjets.at(0).Phi())<0.3) ) 
+      fill("effReco_SRB"+SR,3);
+  
+  //check the q
+  if(truthFwdJet) 
+    if(deltaR(truthFwdJet->eta(),truthFwdJet->phi(),forwardLightjets.at(0).Eta(),forwardLightjets.at(0).Phi())<0.3) 
+      fill("effReco_SRB"+SR,4);
+  
+  //check the b
+  if(truthB) 
+    if(deltaR(truthB->eta(),truthB->phi(),bjets.at(0).Eta(),bjets.at(0).Phi())<0.3) ///(use leading b-jet for now)
+      fill("effReco_SRB"+SR,5);
+  
 
   fill("MET_SRB"+SR,            met);
   fill("Njets_SRB"+SR,          numSignalJets);

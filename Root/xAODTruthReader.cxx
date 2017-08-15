@@ -156,6 +156,7 @@ bool xAODTruthReader::processEvent(xAOD::TEvent *xaodEvent,xAOD::TStore *store) 
   
   TruthEvent* event=new TruthEvent(met->sumet()/1000.,met->mpx()/1000.,met->mpy()/1000.);
   event->setChannelInfo(mcChannel,susy_process);
+  event->setTruthParticles(truthparticles);
 
   TLorentzVector tlv(0.,0.,0.,0.);
 

@@ -9,6 +9,7 @@
 #include <RootCore/Packages.h>
 
 #include "SimpleAnalysis/BDT.h"
+#include "xAODTruth/TruthParticleContainer.h"
 
 
 #ifdef ROOTCORE_PACKAGE_Ext_RestFrames
@@ -178,6 +179,7 @@ class AnalysisEvent {
         virtual AnalysisObjects getJets(float ptCut, float etaCut, int btag = 0)=0;
         virtual AnalysisObjects getFatJets(float ptCut, float etaCut, int btag = 0)=0;
         virtual AnalysisObject getMET()=0;
+        virtual const xAOD::TruthParticleContainer * getTruthParticles()=0;
         virtual float getSumET()=0;
         virtual float getGenMET()=0;
         virtual float getGenHT()=0;
