@@ -31,6 +31,7 @@ class TruthSmear
   std::string puEffScheme;
   std::string btagScheme;
   float        puEff;
+  int          btagOP;
   UpgradePerformanceFunctions *m_upgrade;
   TRandom3 m_random;
 };

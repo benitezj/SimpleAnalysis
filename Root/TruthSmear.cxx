@@ -11,7 +11,21 @@ TruthSmear::TruthSmear(std::vector<std::string>&
 options
 #endif
 ) :
-  smearElectrons(true), smearMuons(true), smearTaus(true), smearPhotons(true), smearJets(true), smearMET(true), addPileupJets(false), useHGTD0(false), useHGTD_PUrejx2(false), useHGTDbtag(false), btagScheme(""), useTrackConfirm(true), puEffScheme("PU"), puEff(0.02) {
+  smearElectrons(true), 
+  smearMuons(true), 
+  smearTaus(true), 
+  smearPhotons(true), 
+  smearJets(true), 
+  smearMET(true), 
+  addPileupJets(false), 
+  useHGTD0(false), 
+  useHGTDbtag(false), 
+  useHGTD_PUrejx2(false), 
+  useTrackConfirm(true), 
+  puEffScheme("PU"), 
+  btagScheme(""), 
+  puEff(0.02), 
+  btagOP(70) {
 #ifdef ROOTCORE_PACKAGE_UpgradePerformanceFunctions
 
   std::string mu="None";
@@ -43,6 +57,9 @@ options
     if (option=="useHGTDbtag"){
       useHGTDbtag=true;
     }
+    if (option=="btagOP="){
+      btagOP=std::stoi(option.substr(7));
+    }
     if (option.find("btagScheme=")==0){
       btagScheme=option.substr(11); 
     }
@@ -62,6 +79,7 @@ options
   }
   std::cout<<"Smearing with mu="<<mu<<" and seed="<<seed<<std::endl;
   std::cout<<"btagScheme="<<btagScheme<<std::endl; 
+  std::cout<<"Operating point = " << btagOP << std::endl;
 
   if (mu!="200") throw std::runtime_error("Unsupported pile-up level. Only mu=200 currently supported");
   m_upgrade = new UpgradePerformanceFunctions();
@@ -88,7 +106,7 @@ options
   m_upgrade->setbtagScheme(btagScheme); 
   m_upgrade->setPileupTemplatesPath("/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/UpgradePerformanceFunctions/");
   m_upgrade->initPhotonFakeHistograms("UpgradePerformanceFunctions/PhotonFakes.root");
-  m_upgrade->setFlavourTaggingCalibrationFilename("UpgradePerformanceFunctions/flavor_tags_v1.4.root");
+  m_upgrade->setFlavourTaggingCalibrationFilename("UpgradePerformanceFunctions/flavor_tags_v1.5.root");
   m_random.SetSeed(seed);
 
 #else
@@ -213,7 +231,7 @@ event
       if (jet.pass(TrueBJet)) jetType = 'B';
       if (jet.pass(TrueCJet)) jetType = 'C';
       
-      float tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 70, m_upgrade->getPileupTrackConfSetting());
+      float tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
       //float tagEff85 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 85, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
@@ -282,7 +300,7 @@ event
       float puProb = m_random.Uniform(1.0);
             
       if (puProb > trackEff) continue; // FIXME: should couple this to JVT flag
-      float tagEff70 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 70, m_upgrade->getPileupTrackConfSetting());
+      float tagEff70 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
       //float tagEff85 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 85, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
