@@ -57,7 +57,7 @@ options
     if (option=="useHGTDbtag"){
       useHGTDbtag=true;
     }
-    if (option=="btagOP="){
+    if (option.find("btagOP=")==0){
       btagOP=std::stoi(option.substr(7));
     }
     if (option.find("btagScheme=")==0){
