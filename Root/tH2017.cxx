@@ -516,11 +516,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   _output->setEventWeight(eventweight); //all histograms after this point get filled with this weight
   fill("events",1); //Sum of initial weights
 
-  auto electrons_noPtCut = event->getElectrons(0., 4.0, ELooseBLLH && EIsoGradient);
+  auto electrons_noPtCut = event->getElectrons(0., 2.47, ELooseBLLH && EIsoGradient);
   auto muons_noPtCut     = event->getMuons(0., 2.7, MuLoose && MuIsoGradient);
   auto jets_noPtCut      = event->getJets(0., 3.8); 
 
-  auto electrons = event->getElectrons(25., 4.0, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
+  auto electrons = event->getElectrons(25., 2.47, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
   auto muons     = event->getMuons(25., 2.7, MuLoose && MuIsoGradient);//add vertex (MuD0Sigma3|MuZ05mm ?)
   auto jets      = event->getJets(25., 3.8, JVT50Jet); // what about NOT(LooseBadJet)
   auto metVec    = event->getMET();
@@ -737,7 +737,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
   //////////  Reco efficiencies
   fill("effReco_SRB"+SR,1);//count total events in this category
-  //truth particles only available in TRUTH1
+ /* //truth particles only available in TRUTH1
   const xAOD::TruthParticleContainer* Truth = event->getTruthParticles();
   const xAOD::TruthParticle* truthFwdJet = Truth->at(7);
   const xAOD::TruthParticle* truthB =      Truth->at(6);
@@ -809,7 +809,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     if(deltaR(truthB->eta(),truthB->phi(),bjets.at(0).Eta(),bjets.at(0).Phi())<0.3) ///(use leading b-jet for now)
       fill("effReco_SRB"+SR,5);
   
-
+  */
+  
   fill("MET_SRB"+SR,            met);
   fill("Njets_SRB"+SR,          numSignalJets);
   fill("NLightjets_SRB"+SR,     antiBjets.size());  
