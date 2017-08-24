@@ -20,7 +20,6 @@ options
   addPileupJets(false), 
   useHGTD0(false), 
   useHGTDbtag(false), 
-  useHGTD_PUrejx2(false), 
   useTrackConfirm(true), 
   puEffScheme("PU"), 
   btagScheme(""), 
@@ -52,7 +51,6 @@ options
     if (option=="noMET")          smearMET=false;
     if (option=="addPileupJets")  addPileupJets=true;
     if (option=="useHGTD0")       useHGTD0=true;
-    if (option=="useHGTD_PUrejx2")useHGTD_PUrejx2=true;
     if (option=="noTrackConfirm") useTrackConfirm=false;
     if (option=="useHGTDbtag"){
       useHGTDbtag=true;
@@ -101,7 +99,6 @@ options
   else if (puEffScheme == "HS") m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::HS);
   m_upgrade->setPileupEff(puEff);
   if (useHGTD0) m_upgrade->setUseHGTD0(true);
-  if (useHGTD_PUrejx2) m_upgrade->setUseHGTD_PUrejx2(true); 
   if (useHGTDbtag) m_upgrade->setUseHGTDbtag(true);
   m_upgrade->setbtagScheme(btagScheme); 
   m_upgrade->setPileupTemplatesPath("/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/UpgradePerformanceFunctions/");
