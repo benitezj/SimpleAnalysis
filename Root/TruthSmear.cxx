@@ -81,7 +81,7 @@ options
 
   if (mu!="200") throw std::runtime_error("Unsupported pile-up level. Only mu=200 currently supported");
   m_upgrade = new UpgradePerformanceFunctions();
-  m_upgrade->setLayout(UpgradePerformanceFunctions::gold);
+  m_upgrade->setLayout(UpgradePerformanceFunctions::Step1p6);
   m_upgrade->setAvgMu(stoi(mu));
   m_upgrade->setElectronWorkingPoint(UpgradePerformanceFunctions::looseElectron);
   m_upgrade->setElectronRandomSeed(seed);

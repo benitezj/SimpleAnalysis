@@ -49,8 +49,7 @@ float getSingleElectronTriggerEfficiency(float ptMeV, float eta) {
   float effHighEta = 0.90;
 
   // HGTD forward trigger 5 GeV improvement
-  //if (m_bUseHGTD0 || m_bUseHGTD1)
-  //  minPtHighEta = 30000.;
+  //minPtHighEta = 30000.;
 
   if ( ptMeV > 35000. && fabs(eta) < 2.5 ) return 1.0;
   if ( ptMeV > minPt && fabs(eta) < 2.5 )
@@ -568,7 +567,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   // Jets in HGTD acceptance
   int njets_hgtd(0), nbjets_hgtd(0);
   for (auto j : jets) {
-    if ( fabs(j.Eta()) >= 2.4 && fabs(j.Eta()) <= 4.3) {
+    if ( fabs(j.Eta()) >= 2.4 && fabs(j.Eta()) <= 3.8) {
       ++njets_hgtd;
       if (j.pass(GoodBJet)) ++nbjets_hgtd;
     }
