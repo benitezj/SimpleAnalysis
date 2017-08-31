@@ -248,7 +248,7 @@ bool findHbb(const xAOD::TruthParticle* parent, const xAOD::TruthParticle* &Hb, 
     if(findHbb(parent->child(i),Hb,Hbbar)) return true;
   }
 
-  std::cout<<"findHbb failed to find H->bb "<<std::endl;
+  //std::cout<<"findHbb(): failed to find H->bb "<<std::endl;
   return false;
 }
   
@@ -272,7 +272,7 @@ bool findTopWb(const xAOD::TruthParticle* parent, const xAOD::TruthParticle* &To
     if(findTopWb(parent->child(i),TopW,TopB)) return true;
   }
 
-  std::cout<<"findTopWb failed to find Top->Wb "<<std::endl;
+  //std::cout<<"findTopWb(): failed to find Top->Wb "<<std::endl;
   return false;
 }
   
@@ -283,7 +283,7 @@ bool findWl(const xAOD::TruthParticle* parent, const xAOD::TruthParticle* &Wl){
     return false;
   }
   
-  //check if there is a b-bbar pair
+  //check if there is leptonic decay
   for(unsigned int i=0;i<parent->nChildren();i++){
     const xAOD::TruthParticle* dau = parent->child(i);
     if(dau==NULL){std::cout<<"findWl dau = NULL at i="<<i<<"  of nChildren="<<parent->nChildren()<<std::endl; return false;  }
@@ -296,7 +296,7 @@ bool findWl(const xAOD::TruthParticle* parent, const xAOD::TruthParticle* &Wl){
     if(findWl(parent->child(i),Wl)) return true;
   }
 
-  std::cout<<"findWl failed to find W->l "<<std::endl;
+  //std::cout<<"findWl(): failed to find truth W->l decay "<<std::endl;
   return false;
 }
   
@@ -326,6 +326,19 @@ void tH2017::Init()
   addHistogram("jet_pt_noPtCut",100,0,500); 
   addHistogram("lep_pt_noPtCut",100,0,500); 
   
+  //lepton cut but no b-tag cuts
+  addHistogram("alljettruth_pt_noBcuts",100,0,500); 
+  addHistogram("alljettruth_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthB_pt_noBcuts",100,0,500); 
+  addHistogram("alljettruthB_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthC_pt_noBcuts",100,0,500); 
+  addHistogram("alljettruthC_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthTau_pt_noBcuts",100,0,500); 
+  addHistogram("alljettruthTau_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthL_pt_noBcuts",100,0,500); 
+  addHistogram("alljettruthL_eta_noBcuts",40,0,4);   
+
+
   //after preselection
   addHistogram("MET",100,0,500);
   addHistogram("Njets",10,-0.5,9.5);
@@ -502,6 +515,32 @@ void tH2017::Init()
     addHistogram("FoxW1_SRMbbH3_SRB"+SR,50,0,1);
     addHistogram("FoxW2_SRMbbH3_SRB"+SR,50,0,1);
     addHistogram("FoxW3_SRMbbH3_SRB"+SR,50,0,1);
+
+
+    //b-tagged jet composition 
+    addHistogram("allbjettruth_pt_SRB"+SR,100,0,500); 
+    addHistogram("allbjettruth_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthB_pt_SRB"+SR,100,0,500); 
+    addHistogram("allbjettruthB_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthC_pt_SRB"+SR,100,0,500); 
+    addHistogram("allbjettruthC_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthTau_pt_SRB"+SR,100,0,500); 
+    addHistogram("allbjettruthTau_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthL_pt_SRB"+SR,100,0,500); 
+    addHistogram("allbjettruthL_eta_SRB"+SR,40,0,4);   
+
+    //light jet composition
+    addHistogram("lightjettruth_pt_SRB"+SR,100,0,500); 
+    addHistogram("lightjettruth_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthB_pt_SRB"+SR,100,0,500); 
+    addHistogram("lightjettruthB_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthC_pt_SRB"+SR,100,0,500); 
+    addHistogram("lightjettruthC_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthTau_pt_SRB"+SR,100,0,500); 
+    addHistogram("lightjettruthTau_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthL_pt_SRB"+SR,100,0,500); 
+    addHistogram("lightjettruthL_eta_SRB"+SR,40,0,4);   
+
   }
 }
 
@@ -595,6 +634,76 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   if (leptons.size() > 0) pTSum+=leptons.at(0).Pt();
   for(int i=0;i<numSignalJets;i++) pTSum+=jets.at(i).Pt();
 
+
+  /////////////////////////////////////////////
+  //truth particles only available in TRUTH1
+  const xAOD::TruthParticleContainer* Truth = event->getTruthParticles();  
+  const xAOD::TruthParticle* truthFwdJet = Truth?Truth->at(7):NULL;
+  const xAOD::TruthParticle* truthB =      Truth?Truth->at(6):NULL;
+  const xAOD::TruthParticle* truthHiggs =  Truth?Truth->at(4):NULL;  // printTruthTree(Truth,4);
+  const xAOD::TruthParticle* truthHB = NULL;
+  const xAOD::TruthParticle* truthHBbar = NULL;
+  if(truthHiggs) findHbb(truthHiggs,truthHB,truthHBbar);  
+  const xAOD::TruthParticle* truthHB1 = NULL;
+  const xAOD::TruthParticle* truthHB2 = NULL;
+  if(truthHB && truthHBbar) {
+    if(truthHB->pt() > truthHBbar->pt()){ truthHB1 = truthHB;  truthHB2 = truthHBbar;}
+    if(truthHB->pt() < truthHBbar->pt()){ truthHB1 = truthHBbar;  truthHB2 = truthHB;}
+  }
+  const xAOD::TruthParticle* truthTop =  Truth?Truth->at(5):NULL; //printTruthTree(Truth,5);
+  const xAOD::TruthParticle* truthTopB = NULL;
+  const xAOD::TruthParticle* truthTopW = NULL;
+  if(truthTop) findTopWb(truthTop,truthTopW,truthTopB); 
+  const xAOD::TruthParticle* truthTopWL = NULL;
+  if(truthTopW) findWl(truthTopW,truthTopWL);
+
+  const  xAOD::TruthParticle* truthFwdB = truthB; //most forward b quark
+  if(truthFwdB && truthTopB && fabs(truthTopB->eta()) > fabs(truthFwdB->eta())) truthFwdB = truthTopB;
+  if(truthFwdB && truthHB1 && fabs(truthHB1->eta()) > fabs(truthFwdB->eta())) truthFwdB = truthHB1;
+  if(truthFwdB && truthHB2 && fabs(truthHB2->eta()) > fabs(truthFwdB->eta())) truthFwdB = truthHB2;
+
+  ///fill tuple truth info
+  if(truthTopWL)ntupVar("truth_lep_pt",truthTopWL->pt());
+  if(truthTopWL)ntupVar("truth_lep_eta",truthTopWL->eta());
+  if(truthFwdJet)ntupVar("truth_jfwd_pt",truthFwdJet->pt());
+  if(truthFwdJet)ntupVar("truth_jfwd_eta",truthFwdJet->eta());
+  if(truthHB)ntupVar("truth_b_pt",truthB->pt());
+  if(truthHB)ntupVar("truth_b_eta",truthB->eta());
+  if(truthHB1)ntupVar("truth_Hb1_pt",truthHB1->pt());
+  if(truthHB1)ntupVar("truth_Hb1_eta",truthHB1->eta());
+  if(truthHB2)ntupVar("truth_Hb2_pt",truthHB2->pt());
+  if(truthHB2)ntupVar("truth_Hb2_eta",truthHB2->eta());
+  if(truthTopB)ntupVar("truth_Topb_pt",truthTopB->pt());
+  if(truthTopB)ntupVar("truth_Topb_eta",truthTopB->eta());
+  if(truthFwdB)ntupVar("truth_Fwdb_pt",truthFwdB->pt());
+  if(truthFwdB)ntupVar("truth_Fwdb_eta",truthFwdB->eta());
+
+
+  //inclusive jet histograms without b-tagging
+  if (numSignalLeptons ==1 && pTSum > 300 && numSignalJets >= 3){
+    for (auto j : jets) {
+      fill("alljettruth_eta_noBcuts",fabs(j.Eta())); 
+      fill("alljettruth_pt_noBcuts",fabs(j.Pt())); 
+
+      if (j.pass(TrueBJet)){
+	fill("alljettruthB_eta_noBcuts",fabs(j.Eta())); 
+	fill("alljettruthB_pt_noBcuts",fabs(j.Pt())); 
+      }else if (j.pass(TrueCJet))  {
+	fill("alljettruthC_eta_noBcuts",fabs(j.Eta())); 
+	fill("alljettruthC_pt_noBcuts",fabs(j.Pt())); 
+      }else if (j.pass(TrueTau)) {
+	fill("alljettruthTau_eta_noBcuts",fabs(j.Eta())); 
+	fill("alljettruthTau_pt_noBcuts",fabs(j.Pt())); 
+      }else {
+	fill("alljettruthL_eta_noBcuts",fabs(j.Eta())); 
+	fill("alljettruthL_pt_noBcuts",fabs(j.Pt())); 
+      }     
+    }
+  }
+
+
+
+
   // Preselection
   if (numSignalLeptons != 1) return;
   fill("events",2);
@@ -656,6 +765,40 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   std::string SR=std::to_string(nBjets); 
   
 
+  for (auto j : bjets) {
+    fill("allbjettruth_eta_SRB"+SR,fabs(j.Eta())); 
+    fill("allbjettruth_pt_SRB"+SR,fabs(j.Pt()));    
+    if (j.pass(TrueBJet)){
+      fill("allbjettruthB_eta_SRB"+SR,fabs(j.Eta())); 
+      fill("allbjettruthB_pt_SRB"+SR,fabs(j.Pt())); 
+    }else if (j.pass(TrueCJet))  {
+      fill("allbjettruthC_eta_SRB"+SR,fabs(j.Eta())); 
+      fill("allbjettruthC_pt_SRB"+SR,fabs(j.Pt())); 
+    }else if (j.pass(TrueTau)) {
+      fill("allbjettruthTau_eta_SRB"+SR,fabs(j.Eta())); 
+      fill("allbjettruthTau_pt_SRB"+SR,fabs(j.Pt())); 
+    }else {
+      fill("allbjettruthL_eta_SRB"+SR,fabs(j.Eta())); 
+      fill("allbjettruthL_pt_SRB"+SR,fabs(j.Pt())); 
+    }     
+  }
+
+
+  fill("lightjettruth_eta_SRB"+SR,fabs(forwardLightjets.at(0).Eta())); 
+  fill("lightjettruth_pt_SRB"+SR,fabs(forwardLightjets.at(0).Pt())); 
+  if (forwardLightjets.at(0).pass(TrueBJet)){
+    fill("lightjettruthB_eta_SRB"+SR,fabs(forwardLightjets.at(0).Eta())); 
+    fill("lightjettruthB_pt_SRB"+SR,fabs(forwardLightjets.at(0).Pt())); 
+  }else if (forwardLightjets.at(0).pass(TrueCJet))  {
+    fill("lightjettruthC_eta_SRB"+SR,fabs(forwardLightjets.at(0).Eta())); 
+    fill("lightjettruthC_pt_SRB"+SR,fabs(forwardLightjets.at(0).Pt())); 
+  }else if (forwardLightjets.at(0).pass(TrueTau)) {
+    fill("lightjettruthTau_eta_SRB"+SR,fabs(forwardLightjets.at(0).Eta())); 
+    fill("lightjettruthTau_pt_SRB"+SR,fabs(forwardLightjets.at(0).Pt())); 
+  }else {
+    fill("lightjettruthL_eta_SRB"+SR,fabs(forwardLightjets.at(0).Eta())); 
+    fill("lightjettruthL_pt_SRB"+SR,fabs(forwardLightjets.at(0).Pt())); 
+  } 
 
   ///fwd b-jet
   fill("bfwd_pt",   forwardBjets.at(0).Pt()); 
@@ -736,38 +879,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
 
   //////////  Reco efficiencies
   fill("effReco_SRB"+SR,1);//count total events in this category
- /* //truth particles only available in TRUTH1
-  const xAOD::TruthParticleContainer* Truth = event->getTruthParticles();
-  const xAOD::TruthParticle* truthFwdJet = Truth->at(7);
-  const xAOD::TruthParticle* truthB =      Truth->at(6);
-  const xAOD::TruthParticle* truthHiggs =  Truth->at(4);  // printTruthTree(Truth,4);
-  const xAOD::TruthParticle* truthHB = NULL;
-  const xAOD::TruthParticle* truthHBbar = NULL;
-  if(truthHiggs) findHbb(truthHiggs,truthHB,truthHBbar);  
-  const xAOD::TruthParticle* truthHB1 = NULL;
-  const xAOD::TruthParticle* truthHB2 = NULL;
-  if(truthHB && truthHBbar) {
-    if(truthHB->pt() > truthHBbar->pt()){ truthHB1 = truthHB;  truthHB2 = truthHBbar;}
-    if(truthHB->pt() < truthHBbar->pt()){ truthHB1 = truthHBbar;  truthHB2 = truthHB;}
-  }
-  const xAOD::TruthParticle* truthTop =  Truth->at(5); //printTruthTree(Truth,5);
-  const xAOD::TruthParticle* truthTopB = NULL;
-  const xAOD::TruthParticle* truthTopW = NULL;
-  if(truthTop) findTopWb(truthTop,truthTopW,truthTopB); 
-  const xAOD::TruthParticle* truthTopWL = NULL;
-  if(truthTopW) findWl(truthTopW,truthTopWL);
 
-  ///fill tuple
-  if(truthTopWL)ntupVar("truth_lep_pt",truthTopWL->pt());
-  if(truthTopWL)ntupVar("truth_lep_eta",truthTopWL->eta());
-  if(truthFwdJet)ntupVar("truth_jfwd_pt",truthFwdJet->pt());
-  if(truthFwdJet)ntupVar("truth_jfwd_eta",truthFwdJet->eta());
-  if(truthHB1)ntupVar("truth_Hb1_pt",truthHB1->pt());
-  if(truthHB1)ntupVar("truth_Hb1_eta",truthHB1->eta());
-  if(truthHB2)ntupVar("truth_Hb2_pt",truthHB2->pt());
-  if(truthHB2)ntupVar("truth_Hb2_eta",truthHB2->eta());
-  if(truthTopB)ntupVar("truth_Hb2_pt",truthTopB->pt());
-  if(truthTopB)ntupVar("truth_Hb2_eta",truthTopB->eta());
 
 
   //////check the top
@@ -807,9 +919,8 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   if(truthB) 
     if(deltaR(truthB->eta(),truthB->phi(),bjets.at(0).Eta(),bjets.at(0).Phi())<0.3) ///(use leading b-jet for now)
       fill("effReco_SRB"+SR,5);
-  
-  */
-  
+
+
   fill("MET_SRB"+SR,            met);
   fill("Njets_SRB"+SR,          numSignalJets);
   fill("NLightjets_SRB"+SR,     antiBjets.size());  

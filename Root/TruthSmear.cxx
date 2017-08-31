@@ -243,11 +243,11 @@ event
 	if ( (jetpt*1000) < m_upgrade->getPileupJetPtThresholdMeV()) jetpt=0;
 	else {
 	  float trackEff = m_upgrade->getTrackJetConfirmEff(jetpt*1000.,jet.Eta(), "HS");
-	  std::cout << "Spyros CHECK1: tceff = " << trackEff << std::endl;
+	  //std::cout << "Spyros CHECK1: tceff = " << trackEff << std::endl;
 	  float hsProb = m_random.Uniform(1.0);
 	  if (hsProb > trackEff) {
 	    jetpt=0; // FIXME: should couple this to JVT flag
-	    std::cout << "Spyros CHECK1b: hsProb = " << hsProb << " , jet pt = " << jetpt << std::endl;
+	    //std::cout << "Spyros CHECK1b: hsProb = " << hsProb << " , jet pt = " << jetpt << std::endl;
 	  }  
 	}
       }
@@ -293,7 +293,7 @@ event
   if (addPileupJets) {
     for (const auto& pujet : m_upgrade->getPileupJets()) {
       float trackEff = m_upgrade->getTrackJetConfirmEff(pujet.Pt(), pujet.Eta(), "PU");
-      std::cout << "Spyros CHECK2: tceff = " << trackEff << std::endl;
+      //std::cout << "Spyros CHECK2: tceff = " << trackEff << std::endl;
       float puProb = m_random.Uniform(1.0);
             
       if (puProb > trackEff) continue; // FIXME: should couple this to JVT flag
