@@ -49,7 +49,7 @@ float getSingleElectronTriggerEfficiency(float ptMeV, float eta) {
   float effHighEta = 0.90;
 
   // HGTD forward trigger 5 GeV improvement
-  //minPtHighEta = 30000.;
+  minPtHighEta = 30000.;
 
   if ( ptMeV > 35000. && fabs(eta) < 2.5 ) return 1.0;
   if ( ptMeV > minPt && fabs(eta) < 2.5 )
@@ -65,12 +65,12 @@ float muonEtaTriggerEfficiency(float eta) {
     const float eff_gold[22] = {0.790656, 0.930483, 0.98033, 0.992508, 0.974555, 0.981241, 0.985142, 0.947444, 0.960144, 0.98223, 0.983938, 0.984972, 0.972907, 0.982902, 0.919753, 0.899409, 0.970952, 0.960322, 0.946016, 0.868755, 0.619748,0};
     //=======    
     float eff = 0.98*0.98; //TGC*MDT efficiency
-    if (fabs(eta)>2.4) return 0.;
+    if (fabs(eta)>2.65) return 0.;
     
     // RPC efficiencies for gold layout
     if (fabs(eta)<=1.05) {
       int ibin=fabs(eta)/eta_bin;
-      eff=eff_gold[ibin]*0.98; //RPC recovery with BI RPC chambers
+      eff=eff_gold[ibin]; //RPC recovery with BI RPC chambers
     }
     
     return eff;
@@ -328,15 +328,15 @@ void tH2017::Init()
   
   //lepton cut but no b-tag cuts
   addHistogram("alljettruth_pt_noBcuts",100,0,500); 
-  addHistogram("alljettruth_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruth_eta_noBcuts",80,0,4);   
   addHistogram("alljettruthB_pt_noBcuts",100,0,500); 
-  addHistogram("alljettruthB_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthB_eta_noBcuts",80,0,4);   
   addHistogram("alljettruthC_pt_noBcuts",100,0,500); 
-  addHistogram("alljettruthC_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthC_eta_noBcuts",80,0,4);   
   addHistogram("alljettruthTau_pt_noBcuts",100,0,500); 
-  addHistogram("alljettruthTau_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthTau_eta_noBcuts",80,0,4);   
   addHistogram("alljettruthL_pt_noBcuts",100,0,500); 
-  addHistogram("alljettruthL_eta_noBcuts",40,0,4);   
+  addHistogram("alljettruthL_eta_noBcuts",80,0,4);   
 
 
   //after preselection
@@ -348,20 +348,20 @@ void tH2017::Init()
   addHistogram("sphericity",50,0,1);
  
   addHistogram("lep_pt",100,0,500);
-  addHistogram("lep_eta",40,0,4);   
+  addHistogram("lep_eta",80,0,4);   
 
   addHistogram("j1_pt_allJets",100,0,500);
-  addHistogram("j1_eta_allJets",40,0,4); 
+  addHistogram("j1_eta_allJets",80,0,4); 
 
   addHistogram("jfwd_pt",100,0,500);
-  addHistogram("jfwd_eta",40,0,4);
+  addHistogram("jfwd_eta",80,0,4);
   addHistogram("j1_pt",100,0,500); 
-  addHistogram("j1_eta",40,0,4); 
+  addHistogram("j1_eta",80,0,4); 
 
   addHistogram("bfwd_pt",100,0,500);
-  addHistogram("bfwd_eta",40,0,4);
+  addHistogram("bfwd_eta",80,0,4);
   addHistogram("b1_pt",100,0,500); 
-  addHistogram("b1_eta",40,0,4); 
+  addHistogram("b1_eta",80,0,4); 
   
   addHistogram("dEta_jfwd_bfwd",100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
   addHistogram("dEta_jfwd_b1",100,0,8);
@@ -372,27 +372,27 @@ void tH2017::Init()
 
   addHistogram("top1_m",100,0,500); //reco mass of top quark
   addHistogram("top1_pt",100,0,500); 
-  addHistogram("top1_eta",40,0,4);
+  addHistogram("top1_eta",80,0,4);
 
   addHistogram("top2_m",100,0,500); 
   addHistogram("top2_pt",100,0,500); 
-  addHistogram("top2_eta",40,0,4);
+  addHistogram("top2_eta",80,0,4);
 
   addHistogram("top3_m",100,0,500); 
   addHistogram("top3_pt",100,0,500); 
-  addHistogram("top3_eta",40,0,4);
+  addHistogram("top3_eta",80,0,4);
 
   addHistogram("top4_m",100,0,500); 
   addHistogram("top4_pt",100,0,500); 
-  addHistogram("top4_eta",40,0,4);
+  addHistogram("top4_eta",80,0,4);
 
   addHistogram("H2_m",100,0,500); 
   addHistogram("H2_pt",100,0,500);
-  addHistogram("H2_eta",40,0,4);
+  addHistogram("H2_eta",80,0,4);
 
   addHistogram("H3_m",100,0,500); 
   addHistogram("H3_pt",100,0,500);
-  addHistogram("H3_eta",40,0,4);
+  addHistogram("H3_eta",80,0,4);
 
   addHistogram("dEta_H2_jfwd",100,0,8);//|eta(higgs)-eta(forwardJet)|
   addHistogram("dEta_H3_jfwd",100,0,8);//|eta(higgs)-eta(forwardJet)|
@@ -416,20 +416,20 @@ void tH2017::Init()
       addHistogram("HT"+SRjfwd+"_SRB"+SR,100,0,2000); 
 
       addHistogram("lep_pt"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("lep_eta"+SRjfwd+"_SRB"+SR,40,0,4); 
+      addHistogram("lep_eta"+SRjfwd+"_SRB"+SR,80,0,4); 
 
       addHistogram("j1_pt_allJets"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("j1_eta_allJets"+SRjfwd+"_SRB"+SR,40,0,4);
+      addHistogram("j1_eta_allJets"+SRjfwd+"_SRB"+SR,80,0,4);
 
       addHistogram("jfwd_pt"+SRjfwd+"_SRB"+SR,100,0,500);
-      addHistogram("jfwd_eta"+SRjfwd+"_SRB"+SR,40,0,4);
+      addHistogram("jfwd_eta"+SRjfwd+"_SRB"+SR,80,0,4);
       addHistogram("j1_pt"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("j1_eta"+SRjfwd+"_SRB"+SR,40,0,4);
+      addHistogram("j1_eta"+SRjfwd+"_SRB"+SR,80,0,4);
     
       addHistogram("bfwd_pt"+SRjfwd+"_SRB"+SR,100,0,500);
-      addHistogram("bfwd_eta"+SRjfwd+"_SRB"+SR,40,0,4);     
+      addHistogram("bfwd_eta"+SRjfwd+"_SRB"+SR,80,0,4);     
       addHistogram("b1_pt"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("b1_eta"+SRjfwd+"_SRB"+SR,40,0,4);  
+      addHistogram("b1_eta"+SRjfwd+"_SRB"+SR,80,0,4);  
     
       addHistogram("dEta_jfwd_bfwd"+SRjfwd+"_SRB"+SR,100,0,8); //|eta(fwdjet)-eta(fwdbjet)|
       addHistogram("dEta_j1_b1"+SRjfwd+"_SRB"+SR,100,0,8); //|eta(leadjet)-eta(leadbjet)|
@@ -439,27 +439,27 @@ void tH2017::Init()
 
       addHistogram("top1_m"+SRjfwd+"_SRB"+SR,100,0,500); //reco mass of top quark
       addHistogram("top1_pt"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("top1_eta"+SRjfwd+"_SRB"+SR,40,0,4); 
+      addHistogram("top1_eta"+SRjfwd+"_SRB"+SR,80,0,4); 
 
       addHistogram("top2_m"+SRjfwd+"_SRB"+SR,100,0,500); //reco mass of top quark
       addHistogram("top2_pt"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("top2_eta"+SRjfwd+"_SRB"+SR,40,0,4); 
+      addHistogram("top2_eta"+SRjfwd+"_SRB"+SR,80,0,4); 
 
       addHistogram("top3_m"+SRjfwd+"_SRB"+SR,100,0,500); //reco mass of top quark
       addHistogram("top3_pt"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("top3_eta"+SRjfwd+"_SRB"+SR,40,0,4); 
+      addHistogram("top3_eta"+SRjfwd+"_SRB"+SR,80,0,4); 
 
       addHistogram("top4_m"+SRjfwd+"_SRB"+SR,100,0,500); //reco mass of top quark
       addHistogram("top4_pt"+SRjfwd+"_SRB"+SR,100,0,500); 
-      addHistogram("top4_eta"+SRjfwd+"_SRB"+SR,40,0,4); 
+      addHistogram("top4_eta"+SRjfwd+"_SRB"+SR,80,0,4); 
     
       addHistogram("H2_m"+SRjfwd+"_SRB"+SR,100,0,500);
       addHistogram("H2_pt"+SRjfwd+"_SRB"+SR,100,0,500);
-      addHistogram("H2_eta"+SRjfwd+"_SRB"+SR,40,0,4);
+      addHistogram("H2_eta"+SRjfwd+"_SRB"+SR,80,0,4);
 
       addHistogram("H3_m"+SRjfwd+"_SRB"+SR,100,0,500);
       addHistogram("H3_pt"+SRjfwd+"_SRB"+SR,100,0,500);
-      addHistogram("H3_eta"+SRjfwd+"_SRB"+SR,40,0,4);
+      addHistogram("H3_eta"+SRjfwd+"_SRB"+SR,80,0,4);
 
       addHistogram("dEta_H2_jfwd"+SRjfwd+"_SRB"+SR,100,0,8);//|eta(higgs)-eta(forwardJet)|
       addHistogram("dEta_H3_jfwd"+SRjfwd+"_SRB"+SR,100,0,8);//|eta(higgs)-eta(forwardJet)|
@@ -485,8 +485,8 @@ void tH2017::Init()
     addHistogram("jfwd_pt_SRMbbH2_SRB"+SR,100,0,500);
     addHistogram("jfwd_pt_SRMbbH3_SRB"+SR,100,0,500);
 
-    addHistogram("jfwd_eta_SRMbbH2_SRB"+SR,40,0,4);
-    addHistogram("jfwd_eta_SRMbbH3_SRB"+SR,40,0,4);
+    addHistogram("jfwd_eta_SRMbbH2_SRB"+SR,80,0,4);
+    addHistogram("jfwd_eta_SRMbbH3_SRB"+SR,80,0,4);
 
     addHistogram("dEta_jfwd_b1_SRMbbH2_SRB"+SR,100,0,8);
     addHistogram("dEta_jfwd_b1_SRMbbH3_SRB"+SR,100,0,8);
@@ -519,27 +519,27 @@ void tH2017::Init()
 
     //b-tagged jet composition 
     addHistogram("allbjettruth_pt_SRB"+SR,100,0,500); 
-    addHistogram("allbjettruth_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruth_eta_SRB"+SR,80,0,4);   
     addHistogram("allbjettruthB_pt_SRB"+SR,100,0,500); 
-    addHistogram("allbjettruthB_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthB_eta_SRB"+SR,80,0,4);   
     addHistogram("allbjettruthC_pt_SRB"+SR,100,0,500); 
-    addHistogram("allbjettruthC_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthC_eta_SRB"+SR,80,0,4);   
     addHistogram("allbjettruthTau_pt_SRB"+SR,100,0,500); 
-    addHistogram("allbjettruthTau_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthTau_eta_SRB"+SR,80,0,4);   
     addHistogram("allbjettruthL_pt_SRB"+SR,100,0,500); 
-    addHistogram("allbjettruthL_eta_SRB"+SR,40,0,4);   
+    addHistogram("allbjettruthL_eta_SRB"+SR,80,0,4);   
 
     //light jet composition
     addHistogram("lightjettruth_pt_SRB"+SR,100,0,500); 
-    addHistogram("lightjettruth_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruth_eta_SRB"+SR,80,0,4);   
     addHistogram("lightjettruthB_pt_SRB"+SR,100,0,500); 
-    addHistogram("lightjettruthB_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthB_eta_SRB"+SR,80,0,4);   
     addHistogram("lightjettruthC_pt_SRB"+SR,100,0,500); 
-    addHistogram("lightjettruthC_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthC_eta_SRB"+SR,80,0,4);   
     addHistogram("lightjettruthTau_pt_SRB"+SR,100,0,500); 
-    addHistogram("lightjettruthTau_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthTau_eta_SRB"+SR,80,0,4);   
     addHistogram("lightjettruthL_pt_SRB"+SR,100,0,500); 
-    addHistogram("lightjettruthL_eta_SRB"+SR,40,0,4);   
+    addHistogram("lightjettruthL_eta_SRB"+SR,80,0,4);   
 
   }
 }
@@ -554,11 +554,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   _output->setEventWeight(eventweight); //all histograms after this point get filled with this weight
   fill("events",1); //Sum of initial weights
 
-  auto electrons_noPtCut = event->getElectrons(0., 2.47, ELooseBLLH && EIsoGradient);
+  auto electrons_noPtCut = event->getElectrons(0., 4.0, ELooseBLLH && EIsoGradient);
   auto muons_noPtCut     = event->getMuons(0., 2.7, MuLoose && MuIsoGradient);
   auto jets_noPtCut      = event->getJets(0., 3.8); 
 
-  auto electrons = event->getElectrons(25., 2.47, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
+  auto electrons = event->getElectrons(25., 4.0, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
   auto muons     = event->getMuons(25., 2.7, MuLoose && MuIsoGradient);//add vertex (MuD0Sigma3|MuZ05mm ?)
   auto jets      = event->getJets(25., 3.8, JVT50Jet); // what about NOT(LooseBadJet)
   auto metVec    = event->getMET();
@@ -715,6 +715,7 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("events",5);
   if (pTSum < 300 ) return;
   fill("events",6);
+  if (fabs(forwardLightjets.at(0).Eta()) < 2.4) return;
 
   // Trigger
   if ( electrons.size() == 1 ) {
