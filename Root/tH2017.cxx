@@ -41,6 +41,11 @@ void sortPairsClosestdR(std::vector<std::pair<AnalysisObject,AnalysisObject>>& c
   std::sort(cands.begin(), cands.end(), dR_sort());
 }
 
+float getMinDRPairs(std::vector<std::pair<AnalysisObject,AnalysisObject>>& cands) {
+  std::sort(cands.begin(), cands.end(), dR_sort());
+  return (cands.size() > 0) ? cands.at(0).first.DeltaR(cands.at(0).first) : -1.;
+}
+
 float getSingleElectronTriggerEfficiency(float ptMeV, float eta) {
   float minPt = 22000.;
   float minPtHighEta = 35000;
@@ -49,7 +54,7 @@ float getSingleElectronTriggerEfficiency(float ptMeV, float eta) {
   float effHighEta = 0.90;
 
   // HGTD forward trigger 5 GeV improvement
-  minPtHighEta = 30000.;
+  //minPtHighEta = 30000.;
 
   if ( ptMeV > 35000. && fabs(eta) < 2.5 ) return 1.0;
   if ( ptMeV > minPt && fabs(eta) < 2.5 )
@@ -123,7 +128,7 @@ void findHiggs(const AnalysisObjects& bjets, TLorentzVector& h2, TLorentzVector 
 std::vector<double> calculateFoxWMoments(const AnalysisObjects& jets, const AnalysisObjects& leptons){
   std::vector<double> FoxWMoments;
   AnalysisObjects allObj = jets; 
-  allObj.push_back(leptons.at(0));
+  if (leptons.size() > 0) allObj.push_back(leptons.at(0));
   double fw0=0;
   double fw1=0;
   double fw2=0;
@@ -554,11 +559,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   _output->setEventWeight(eventweight); //all histograms after this point get filled with this weight
   fill("events",1); //Sum of initial weights
 
-  auto electrons_noPtCut = event->getElectrons(0., 4.0, ELooseBLLH && EIsoGradient);
+  auto electrons_noPtCut = event->getElectrons(0., 2.47, ELooseBLLH && EIsoGradient);
   auto muons_noPtCut     = event->getMuons(0., 2.7, MuLoose && MuIsoGradient);
   auto jets_noPtCut      = event->getJets(0., 3.8); 
 
-  auto electrons = event->getElectrons(25., 4.0, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
+  auto electrons = event->getElectrons(25., 2.47, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
   auto muons     = event->getMuons(25., 2.7, MuLoose && MuIsoGradient);//add vertex (MuD0Sigma3|MuZ05mm ?)
   auto jets      = event->getJets(25., 3.8, JVT50Jet); // what about NOT(LooseBadJet)
   auto metVec    = event->getMET();
@@ -700,32 +705,88 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
       }     
     }
   }
+ 
 
-
-
-
-  // Preselection
-  if (numSignalLeptons != 1) return;
+  // Preselection - decision
+  bool passPreSel = true;
+  if (numSignalLeptons != 1) passPreSel = false;
   fill("events",2);
-  if (numSignalJets < 4 || numSignalJets > 5) return; 
+  if (numSignalJets < 4 || numSignalJets > 5) passPreSel = false; 
   fill("events",3);
-  if (antiBjets.size() < 1 || antiBjets.size() > 3) return;
+  if (antiBjets.size() < 1 || antiBjets.size() > 3) passPreSel = false;
   fill("events",4);
-  if (nBjets < 2 ) return;
+  if (nBjets < 2 ) passPreSel = false;
   fill("events",5);
-  if (pTSum < 300 ) return;
+  if (pTSum < 300 ) passPreSel = false;
   fill("events",6);
-  if (fabs(forwardLightjets.at(0).Eta()) < 2.4) return;
+  if (antiBjets.size() > 0) if (fabs(forwardLightjets.at(0).Eta()) < 2.4) passPreSel = false;
 
   // Trigger
+  float trigWeight = 1.0;
   if ( electrons.size() == 1 ) {
-    float trigWeight = getSingleElectronTriggerEfficiency(electrons.at(0).Pt()*1000., electrons.at(0).Eta());
-    _output->setEventWeight(eventweight*trigWeight);
+    trigWeight = getSingleElectronTriggerEfficiency(electrons.at(0).Pt()*1000., electrons.at(0).Eta());
   }
   else if ( muons.size() == 1 ) {
-    float trigWeight = getSingleMuonTriggerEfficiency(muons.at(0).Pt()*1000., muons.at(0).Eta());
-    _output->setEventWeight(eventweight*trigWeight);
+    trigWeight = getSingleMuonTriggerEfficiency(muons.at(0).Pt()*1000., muons.at(0).Eta());
   }
+
+  // Apply trigger weight
+  _output->setEventWeight(eventweight*trigWeight);
+
+  // Calculate FW moments
+  std::vector<double> fwMoments = calculateFoxWMoments(jets, leptons); 
+
+
+  //-------------------------
+  // Extra variables for BDT
+  //--------
+  
+  // mindR bjets
+  std::vector<std::pair<AnalysisObject, AnalysisObject>> bPairs;
+  for (unsigned int i=0; i < bjets.size(); ++i) {
+    for (unsigned int j=i+1; j < bjets.size(); ++j) {
+      bPairs.push_back({bjets.at(i),bjets.at(j)});
+    } 
+  } 
+  float mindRbb = getMinDRPairs(bPairs);
+  
+  // mindRLepB
+  std::vector<std::pair<AnalysisObject, AnalysisObject>> blPairs;
+  float mindRbl = -1.0;
+  if (numSignalLeptons > 0) {
+    for (unsigned int i=0; i < bjets.size(); ++i) {
+      blPairs.push_back({leptons.at(0),bjets.at(i)});
+    }
+    mindRbl = getMinDRPairs(blPairs);
+  }
+  //-------------------------
+  
+  ///fill ntuple
+  ntupVar("numSignalLeptons", numSignalLeptons);
+  ntupVar("numSignalJets", numSignalJets);
+  ntupVar("Nbjets", nBjets);
+  ntupVar("Nljets", (int)antiBjets.size());
+  ntupVar("pTSum", pTSum);
+  ntupVar("met", met); 
+  ntupVar("FW3", fwMoments.at(3)); 
+  ntupVar("FW1", fwMoments.at(1)); 
+  ntupVar("mindRbb", mindRbb);
+  ntupVar("mindRbl", mindRbl);
+  if (numSignalLeptons > 0) {
+    ntupVar("lep_pt",leptons.at(0).Pt());
+    ntupVar("lep_eta",leptons.at(0).Eta());    
+  }
+  if ( forwardLightjets.size() > 0 ) {
+    ntupVar("mostFwdLJet_eta", forwardLightjets.at(0).Eta());
+    ntupVar("mostFwdLJet_pt", forwardLightjets.at(0).Pt());    
+    if (bjets.size() > 0) ntupVar("dEta_mostFwdLJet_LeadBjet", fabs(forwardLightjets.at(0).Eta() - bjets.at(0).Eta()));
+  }
+  if ( bjets.size() > 0 ) {
+    ntupVar("bjet1_pt", bjets.at(0).Pt()); 
+  }
+
+  // Preselection application
+  if (!passPreSel) return;
 
   // Fill histogram after cuts
   fill("MET",met);
@@ -751,7 +812,6 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   fill("HT",pTSum);
 
   //Shape variables
-  std::vector<double> fwMoments = calculateFoxWMoments(jets, leptons); 
   fill("FoxW0", fwMoments.at(0)); 
   fill("FoxW1", fwMoments.at(1)); 
   fill("FoxW2", fwMoments.at(2)); 
@@ -1094,26 +1154,14 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
     fill("FoxW3_SRMbbH3_SRB"+SR, fwMoments.at(2)); 
   }
 
-  ///fill ntuple
-  ntupVar("Nbjets",nBjets);
-  ntupVar("met",met); 
-  ntupVar("bjets",bjets); 
-  ntupVar("bjets_notH",bjets_notH); 
-  ntupVar("hbjets",hbjets); 
-  ntupVar("h_pt",higgs3.Pt());
-  ntupVar("lep_pt",leptons.at(0).Pt());
-  ntupVar("b1_pt",bjets.at(0).Pt());
-  ntupVar("dR_R1_H3",R1.DeltaR(higgs3));
-  ntupVar("dR_R2_H3",R2.DeltaR(higgs3));
-  ntupVar("dEta_R1_H3",fabs(R1.Eta()-higgs3.Eta()));
-  ntupVar("dEta_R2_H3",fabs(R2.Eta()-higgs3.Eta()));
-
-  if(bjets_notH.size()>0){
+  
+  // Additional ntuple variables
+  /*if(bjets_notH.size()>0){
     ntupVar("dR_lep_b1NotH",leptons.at(0).DeltaR(bjets_notH.at(0)));
     ntupVar("dR_H3_b1NotH",higgs3.DeltaR(bjets_notH.at(0)));
     ntupVar("dEta_lep_b1NotH",fabs(leptons.at(0).Eta()-bjets_notH.at(0).Eta()));
     ntupVar("dEta_H3_b1NotH",fabs(higgs3.Eta()-bjets_notH.at(0).Eta()));
-  }                    
+  }*/                    
                  
   return;            
 }                   
