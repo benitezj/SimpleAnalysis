@@ -20,7 +20,9 @@ options
   addPileupJets(false), 
   useHGTD0(false), 
   useHGTDbtag(false), 
-  useTrackConfirm(true), 
+  useTrackConfirm(true),
+  useFlatEff(false),
+  flatLeff(0.0033), 
   puEffScheme("PU"), 
   btagScheme(""), 
   puEff(0.02), 
@@ -64,6 +66,10 @@ options
     if (option.find("PUeff=")==0) {
       puEff=std::stof(option.substr(6));
     }
+    if (option.find("useFlatEff=")==0) {
+      useFlatEff = true;
+      flatLeff   = std::stof(option.substr(11));
+    }
     if (option.find("HSeff=")==0) {
       puEffScheme="HS";
       puEff=std::stof(option.substr(6));
@@ -78,6 +84,7 @@ options
   std::cout<<"Smearing with mu="<<mu<<" and seed="<<seed<<std::endl;
   std::cout<<"btagScheme="<<btagScheme<<std::endl; 
   std::cout<<"Operating point = " << btagOP << std::endl;
+  if (useFlatEff) std::cout<<"Using flat L efficiency = " << flatLeff << std::endl;
 
   if (mu!="200") throw std::runtime_error("Unsupported pile-up level. Only mu=200 currently supported");
   m_upgrade = new UpgradePerformanceFunctions();
@@ -228,11 +235,19 @@ event
       if (jet.pass(TrueBJet)) jetType = 'B';
       if (jet.pass(TrueCJet)) jetType = 'C';
       
-      float tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
-      //float tagEff85 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", 85, m_upgrade->getPileupTrackConfSetting());
+      float tagEff70 = 1.0;
+      if (useFlatEff) {
+        if     (jetType == 'B') tagEff70 = 0.7;
+	else if (jetType == 'C') tagEff70 = m_upgrade->getFlavourTagEfficiency(30000., 0.0, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
+	else if (jetType == 'L') {
+	  if (useHGTDbtag) tagEff70 = flatLeff;
+	  else tagEff70 = 0.01;
+	}
+      }
+      else tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
-      //if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
+      std::cout << "Spyros check jet = " << jetType << " , eff = " << tagEff70 << std::endl;
       if (tag<tagEff70) jetid = GoodBJet;
       if (jet.pass(TrueLightJet)) jetid|=TrueLightJet;
       if (jet.pass(TrueCJet))     jetid|=TrueCJet;
@@ -243,11 +258,9 @@ event
 	if ( (jetpt*1000) < m_upgrade->getPileupJetPtThresholdMeV()) jetpt=0;
 	else {
 	  float trackEff = m_upgrade->getTrackJetConfirmEff(jetpt*1000.,jet.Eta(), "HS");
-	  //std::cout << "Spyros CHECK1: tceff = " << trackEff << std::endl;
 	  float hsProb = m_random.Uniform(1.0);
 	  if (hsProb > trackEff) {
 	    jetpt=0; // FIXME: should couple this to JVT flag
-	    //std::cout << "Spyros CHECK1b: hsProb = " << hsProb << " , jet pt = " << jetpt << std::endl;
 	  }  
 	}
       }
@@ -293,15 +306,19 @@ event
   if (addPileupJets) {
     for (const auto& pujet : m_upgrade->getPileupJets()) {
       float trackEff = m_upgrade->getTrackJetConfirmEff(pujet.Pt(), pujet.Eta(), "PU");
-      //std::cout << "Spyros CHECK2: tceff = " << trackEff << std::endl;
       float puProb = m_random.Uniform(1.0);
             
       if (puProb > trackEff) continue; // FIXME: should couple this to JVT flag
-      float tagEff70 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
-      //float tagEff85 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", 85, m_upgrade->getPileupTrackConfSetting());
+
+      float tagEff70 = 1.0;
+      if (useFlatEff) {
+	if (useHGTDbtag) tagEff70 = flatLeff;
+	else tagEff70 = 0.01;
+      }
+      else tagEff70 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
+
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
-      //if (tag<tagEff85) jetid|=BTag85MV2c20; //FIXME: check if this should set other working points too
       if (tag<tagEff70) jetid=GoodBJet;
       smeared->addJet(pujet.Px()/1000., pujet.Py()/1000., pujet.Pz()/1000., pujet.E()/1000., jetid, -1);
       // Add jets faking photon

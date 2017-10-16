@@ -27,6 +27,8 @@ class TruthSmear
   bool        useHGTD0;
   bool	      useHGTDbtag;
   bool        useTrackConfirm;
+  bool        useFlatEff;
+  float        flatLeff;
   std::string puEffScheme;
   std::string btagScheme;
   float        puEff;
