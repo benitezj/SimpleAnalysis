@@ -54,7 +54,7 @@ float getSingleElectronTriggerEfficiency(float ptMeV, float eta) {
   float effHighEta = 0.90;
 
   // HGTD forward trigger 5 GeV improvement
-  minPtHighEta = 30000.;
+  //minPtHighEta = 30000.;
 
   if ( ptMeV > 35000. && fabs(eta) < 2.5 ) return 1.0;
   if ( ptMeV > minPt && fabs(eta) < 2.5 )
@@ -561,11 +561,11 @@ void tH2017::ProcessEvent(AnalysisEvent *event)
   _output->setEventWeight(eventweight); //all histograms after this point get filled with this weight
   fill("events",1); //Sum of initial weights
 
-  auto electrons_noPtCut = event->getElectrons(0., 4.0, ELooseBLLH && EIsoGradient);
+  auto electrons_noPtCut = event->getElectrons(0., 2.47, ELooseBLLH && EIsoGradient);
   auto muons_noPtCut     = event->getMuons(0., 2.7, MuLoose && MuIsoGradient);
   auto jets_noPtCut      = event->getJets(0., 3.8); 
 
-  auto electrons = event->getElectrons(25., 4.0, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
+  auto electrons = event->getElectrons(25., 2.47, ELooseBLLH && EIsoGradient); //add vertex  (ED0Sigma5|EZ05mm ?)
   auto muons     = event->getMuons(25., 2.7, MuLoose && MuIsoGradient);//add vertex (MuD0Sigma3|MuZ05mm ?)
   auto jets      = event->getJets(25., 3.8, JVT50Jet); // what about NOT(LooseBadJet)
   auto metVec    = event->getMET();

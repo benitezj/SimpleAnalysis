@@ -19,6 +19,7 @@ options
   smearMET(true), 
   addPileupJets(false), 
   useHGTD0(false), 
+  useHGTD1(false),
   useHGTDbtag(false), 
   useTrackConfirm(true),
   useFlatEff(false),
@@ -53,6 +54,7 @@ options
     if (option=="noMET")          smearMET=false;
     if (option=="addPileupJets")  addPileupJets=true;
     if (option=="useHGTD0")       useHGTD0=true;
+    if (option=="useHGTD1")       useHGTD1=true;
     if (option=="noTrackConfirm") useTrackConfirm=false;
     if (option=="useHGTDbtag"){
       useHGTDbtag=true;
@@ -106,6 +108,7 @@ options
   else if (puEffScheme == "HS") m_upgrade->setPileupEfficiencyScheme(UpgradePerformanceFunctions::HS);
   m_upgrade->setPileupEff(puEff);
   if (useHGTD0) m_upgrade->setUseHGTD0(true);
+  if (useHGTD1) m_upgrade->setUseHGTD1(true);
   if (useHGTDbtag) m_upgrade->setUseHGTDbtag(true);
   m_upgrade->setbtagScheme(btagScheme); 
   m_upgrade->setPileupTemplatesPath("/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/UpgradePerformanceFunctions/");
@@ -237,17 +240,20 @@ event
       
       float tagEff70 = 1.0;
       if (useFlatEff) {
-        if     (jetType == 'B') tagEff70 = 0.7;
-	else if (jetType == 'C') tagEff70 = m_upgrade->getFlavourTagEfficiency(30000., 0.0, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
+        if     (jetType == 'B') tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., 0.0, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
+	else if (jetType == 'C') tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., 0.0, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
 	else if (jetType == 'L') {
-	  if (useHGTDbtag) tagEff70 = flatLeff;
-	  else tagEff70 = 0.01;
+	  tagEff70 = 0.01;
+	  if (useHGTDbtag) {
+	    if (useHGTD0 && fabs(jeteta) > 2.4 && fabs(jeteta) < 4.3) tagEff70 = flatLeff;
+            if (useHGTD1 && fabs(jeteta) > 0.0 && fabs(jeteta) < 4.3) tagEff70 = flatLeff;
+	  }
 	}
       }
       else tagEff70 = m_upgrade->getFlavourTagEfficiency(jetpt*1000., jeteta, jetType, "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
-      std::cout << "Spyros check jet = " << jetType << " , eff = " << tagEff70 << std::endl;
+      //std::cout << "Spyros check jet = " << jetType << " , eff = " << tagEff70 << " , pt = " << jetpt << " , eta = " << jeteta << std::endl;
       if (tag<tagEff70) jetid = GoodBJet;
       if (jet.pass(TrueLightJet)) jetid|=TrueLightJet;
       if (jet.pass(TrueCJet))     jetid|=TrueCJet;
@@ -312,10 +318,14 @@ event
 
       float tagEff70 = 1.0;
       if (useFlatEff) {
-	if (useHGTDbtag) tagEff70 = flatLeff;
-	else tagEff70 = 0.01;
+	tagEff70 = 0.01;
+	if (useHGTDbtag) {
+	  if (useHGTD0 && fabs(pujet.Eta()) > 2.4 && fabs(pujet.Eta()) < 4.3) tagEff70 = flatLeff;
+          if (useHGTD1 && fabs(pujet.Eta()) > 0.0 && fabs(pujet.Eta()) < 4.3) tagEff70 = flatLeff;
+	}
       }
       else tagEff70 = m_upgrade->getFlavourTagEfficiency(pujet.Pt(), pujet.Eta(), 'P', "mv1", btagOP, m_upgrade->getPileupTrackConfSetting());
+      //std::cout << "Spyros check jet = PU , eff = " << tagEff70 << std::endl;
 
       float tag=m_random.Uniform(1.0);
       int jetid=GoodJet;
